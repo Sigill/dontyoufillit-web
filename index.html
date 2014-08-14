@@ -36,13 +36,15 @@ stats.domElement.style.top = '0px';
 document.body.appendChild( stats.domElement );
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign#Polyfill
-function sign(x) {
-	if(isNaN(x)) {
-		return NaN;
-	} else if(x === 0) {
-		return x;
-	} else {
-		return (x > 0 ? 1 : -1);
+if(!Math.sign) {
+	Math.__proto__.sign = function(x) {
+		if(isNaN(x)) {
+			return NaN;
+		} else if(x === 0) {
+			return x;
+		} else {
+			return (x > 0 ? 1 : -1);
+		}
 	}
 }
 
