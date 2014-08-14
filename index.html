@@ -132,7 +132,8 @@ function normalizeRadian(a) {
 		BOTTOM_BORDER, TOP_BORDER, LEFT_BORDER, RIGHT_BORDER,
 		CANNON_BASE_WIDTH, CANNON_BASE_HEIGHT, CANNON_LENGTH, CANNON_WIDTH;
 
-	var lastFrameTime = 0;
+	// Browsers supporting high resolution timestamps will use them in requestAnimationFrame
+	var lastFrameTime = performance.now ? performance.now() : Date.now();
 	var staticBalls = [];
 	var currentBall = null;
 
@@ -394,7 +395,7 @@ function normalizeRadian(a) {
 		stats.begin();
 
 		update(time);
-		draw(time);
+		draw();
 
 		stats.end();
 	}
@@ -438,7 +439,7 @@ function normalizeRadian(a) {
 		lastFrameTime = time;
 	}
 
-	function draw(time) {
+	function draw() {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 		ctx.fillStyle = 'black';
