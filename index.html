@@ -132,6 +132,8 @@ function normalizeRadian(a) {
 		BOTTOM_BORDER, TOP_BORDER, LEFT_BORDER, RIGHT_BORDER,
 		CANNON_BASE_WIDTH, CANNON_BASE_HEIGHT, CANNON_LENGTH, CANNON_WIDTH;
 
+	const PAUSED = 1, RUNNING = 2, GAMEOVER = 3;
+
 	// Browsers supporting high resolution timestamps will use them in requestAnimationFrame
 	var lastFrameTime = performance.now ? performance.now() : Date.now();
 	var staticBalls = [];
@@ -326,7 +328,7 @@ function normalizeRadian(a) {
 				this.direction = Math.atan2(velocity.y, velocity.x);
 
 				if(o.counter == 0) {
-					// TODO Score
+					++score;
 					staticBalls.splice(i, 1);
 				}
 			}
@@ -363,6 +365,9 @@ function normalizeRadian(a) {
 
 	var cannon = new Cannon();
 	var lastClickDate = 0;
+	var gameState = RUNNING;
+	var score = 0;
+	var highscore = 999;
 
 	initialize();
 
@@ -374,29 +379,60 @@ function normalizeRadian(a) {
 		window.requestAnimationFrame(step);
 	}
 
-	function clickEvent() {
-		if(currentBall)
-			return;
-
+	function clickEvent(evt) {
 		if(Date.now() - lastClickDate < 1000)
 			return;
 
 		lastClickDate = Date.now();
 
-		currentBall = new Ball(
-			1 / 40,
-			0.5 + Math.cos(cannon.getAngle()) * CANNON_LENGTH / SCALE,
-			-1 / 6 + CANNON_BASE_HEIGHT / SCALE + Math.sin(cannon.getAngle()) * CANNON_LENGTH / SCALE,
-			cannon.getAngle());
+		if(gameState == GAMEOVER) {
+			currentBall = null;
+			staticBalls = [];
+			gameState = RUNNING;
+			score = 0;
+			window.requestAnimationFrame(step);
+			return false;
+		}
+
+		var rect = canvas.getBoundingClientRect();
+		var x = evt.clientX - rect.left,
+		    y = evt.clientY - rect.top
+
+		if((x > canvas.width - 60) && (y < 60)) {
+			if(gameState == RUNNING ) {
+				gameState = PAUSED;
+			} else if(gameState == PAUSED) {
+				gameState = RUNNING;
+				lastFrameTime = performance.now ? performance.now() : Date.now();
+				window.requestAnimationFrame(step);
+			}
+
+			return false;
+		}
+
+		if((currentBall == null) && (gameState == RUNNING)) {
+			currentBall = new Ball(
+				1 / 40,
+				0.5 + Math.cos(cannon.getAngle()) * CANNON_LENGTH / SCALE,
+				-1 / 6 + CANNON_BASE_HEIGHT / SCALE + Math.sin(cannon.getAngle()) * CANNON_LENGTH / SCALE,
+				cannon.getAngle());
+			return false;
+		}
+
+		return false;
 	}
 
 	function step(time) {
 		stats.begin();
 
-		update(time);
+		if(gameState == RUNNING)
+			update(time);
+
 		draw();
 
 		stats.end();
+
+		window.requestAnimationFrame(step);
 	}
 
 	function update(time) {
@@ -418,8 +454,7 @@ function normalizeRadian(a) {
 						editor.commit();
 					}
 					*/
-					// TODO Gameover
-					//setMode(Mode.GAMEOVER);
+					gameState = GAMEOVER;
 				}
 				if(currentBall.state.s < 0.01) {
 					if(currentBall.ny >= 0) {
@@ -444,6 +479,15 @@ function normalizeRadian(a) {
 		ctx.fillStyle = 'black';
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+		if(gameState == GAMEOVER) {
+			ctx.textAlign = 'center';
+			ctx.fillStyle = 'white';
+			ctx.font = Math.floor(SCALE / 12) + 'pt Arial';
+			ctx.fillText('Game Over', canvas.width / 2, canvas.height / 2);
+
+			return;
+		}
+
 		ctx.strokeStyle = 'white';
 		ctx.lineWidth = '1';
 		ctx.beginPath();
@@ -462,7 +506,26 @@ function normalizeRadian(a) {
 		if(currentBall)
 			currentBall.draw(ctx);
 
-		window.requestAnimationFrame(step);
+		ctx.fillStyle = 'white';
+		if(gameState == RUNNING) {
+			ctx.fillRect(canvas.width - 40, 10, 10, 40);
+			ctx.fillRect(canvas.width - 20, 10, 10, 40);
+		} else if(gameState == PAUSED) {
+			ctx.beginPath();
+			ctx.moveTo(canvas.width - 40, 10);
+			ctx.lineTo(canvas.width - 40, 40);
+			ctx.lineTo(canvas.width - 10, 25);
+			ctx.closePath();
+			ctx.fill();
+		}
+
+		ctx.font = Math.floor(SCALE / 12) + 'pt Arial';
+		ctx.textAlign = 'left';
+		ctx.fillText('Highscore', LEFT_BORDER, V_OFFSET + Math.floor(SCALE / 12));
+		ctx.fillText('Score', LEFT_BORDER, V_OFFSET + 2 * Math.floor(SCALE / 12));
+		var scoreOffset = ctx.measureText("Highscore ").width;
+		ctx.fillText(highscore, LEFT_BORDER + scoreOffset, V_OFFSET + Math.floor(SCALE / 12));
+		ctx.fillText(score, LEFT_BORDER + scoreOffset, V_OFFSET + 2 * Math.floor(SCALE / 12));
 	}
 
 	function resizeCanvas() {
