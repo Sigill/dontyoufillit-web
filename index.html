@@ -166,21 +166,23 @@ function normalizeRadian(a) {
 	};
 
 	Cannon.prototype.draw = function(ctx) {
+		var r = Math.round(CANNON_BASE_WIDTH / 2);
+
 		ctx.fillStyle = 'white';
 		ctx.beginPath();
-		ctx.moveTo(H_OFFSET + (SCALE - CANNON_BASE_WIDTH) / 2,
-		           BOTTOM_BORDER + SCALE / 6);
-		ctx.lineTo(H_OFFSET + (SCALE - CANNON_BASE_WIDTH) / 2,
-		           BOTTOM_BORDER + SCALE / 6 - CANNON_BASE_HEIGHT);
+		ctx.moveTo(Math.round(H_OFFSET + SCALE / 2) - r,
+		           Math.round(BOTTOM_BORDER + SCALE / 6));
+		ctx.lineTo(Math.round(H_OFFSET + SCALE / 2) - r,
+		           Math.round(BOTTOM_BORDER + SCALE / 6 - CANNON_BASE_HEIGHT));
 		ctx.arc(
-				H_OFFSET + SCALE / 2,
-				BOTTOM_BORDER + SCALE / 6 - CANNON_BASE_HEIGHT,
-				CANNON_BASE_WIDTH / 2,
+				Math.round(H_OFFSET + SCALE / 2),
+				Math.round(BOTTOM_BORDER + SCALE / 6 - CANNON_BASE_HEIGHT),
+				r,
 				Math.PI,
 				0
 			);
-		ctx.lineTo(H_OFFSET + (SCALE - CANNON_BASE_WIDTH) / 2 + CANNON_BASE_WIDTH,
-		           BOTTOM_BORDER + SCALE / 6);
+		ctx.lineTo(Math.round(H_OFFSET + SCALE / 2) + r,
+		           Math.round(BOTTOM_BORDER + SCALE / 6));
 		ctx.closePath();
 		ctx.fill();
 
@@ -222,36 +224,36 @@ function normalizeRadian(a) {
 		ctx.arc(x, y, r, 0, Math.PI*2, false);
 
 		if(this.counter == 1) {
-			ctx.moveTo(x - r * 0.2, y - r * 0.7);
-			ctx.lineTo(x - r * 0.2, y + r * 0.7);
-			ctx.lineTo(x + r * 0.2, y + r * 0.7);
-			ctx.lineTo(x + r * 0.2, y - r * 0.7);
+			ctx.moveTo(Math.round(x - r * 0.2), Math.round(y - r * 0.7));
+			ctx.lineTo(Math.round(x - r * 0.2), Math.round(y + r * 0.7));
+			ctx.lineTo(Math.round(x + r * 0.2), Math.round(y + r * 0.7));
+			ctx.lineTo(Math.round(x + r * 0.2), Math.round(y - r * 0.7));
 		} else if(this.counter == 2) {
-			ctx.moveTo(x - r * 0.5, y - r * 0.7);
-			ctx.lineTo(x - r * 0.5, y - r * 0.3);
-			ctx.lineTo(x + r * 0.1, y - r * 0.3);
-			ctx.lineTo(x + r * 0.1, y - r * 0.15);
-			ctx.lineTo(x - r * 0.5, y - r * 0.15);
-			ctx.lineTo(x - r * 0.5, y + r * 0.7);
-			ctx.lineTo(x + r * 0.5, y + r * 0.7);
-			ctx.lineTo(x + r * 0.5, y + r * 0.3);
-			ctx.lineTo(x - r * 0.1, y + r * 0.3);
-			ctx.lineTo(x - r * 0.1, y + r * 0.15);
-			ctx.lineTo(x + r * 0.5, y + r * 0.15);
-			ctx.lineTo(x + r * 0.5, y - r * 0.7);
+			ctx.moveTo(Math.round(x - r * 0.5), Math.round(y - r * 0.7));
+			ctx.lineTo(Math.round(x - r * 0.5), Math.round(y - r * 0.3));
+			ctx.lineTo(Math.round(x + r * 0.1), Math.round(y - r * 0.3));
+			ctx.lineTo(Math.round(x + r * 0.1), Math.round(y - r * 0.15));
+			ctx.lineTo(Math.round(x - r * 0.5), Math.round(y - r * 0.15));
+			ctx.lineTo(Math.round(x - r * 0.5), Math.round(y + r * 0.7));
+			ctx.lineTo(Math.round(x + r * 0.5), Math.round(y + r * 0.7));
+			ctx.lineTo(Math.round(x + r * 0.5), Math.round(y + r * 0.3));
+			ctx.lineTo(Math.round(x - r * 0.1), Math.round(y + r * 0.3));
+			ctx.lineTo(Math.round(x - r * 0.1), Math.round(y + r * 0.15));
+			ctx.lineTo(Math.round(x + r * 0.5), Math.round(y + r * 0.15));
+			ctx.lineTo(Math.round(x + r * 0.5), Math.round(y - r * 0.7));
 		} else if(this.counter == 3) {
-			ctx.moveTo(x - r * 0.5, y - r * 0.7);
-			ctx.lineTo(x - r * 0.5, y - r * 0.3);
-			ctx.lineTo(x + r * 0.1, y - r * 0.3);
-			ctx.lineTo(x + r * 0.1, y - r * 0.15);
-			ctx.lineTo(x - r * 0.5, y - r * 0.15);
-			ctx.lineTo(x - r * 0.5, y + r * 0.15);
-			ctx.lineTo(x + r * 0.1, y + r * 0.15);
-			ctx.lineTo(x + r * 0.1, y + r * 0.3);
-			ctx.lineTo(x - r * 0.5, y + r * 0.3);
-			ctx.lineTo(x - r * 0.5, y + r * 0.7);
-			ctx.lineTo(x + r * 0.5, y + r * 0.7);
-			ctx.lineTo(x + r * 0.5, y - r * 0.7);
+			ctx.moveTo(Math.round(x - r * 0.5), Math.round(y - r * 0.7));
+			ctx.lineTo(Math.round(x - r * 0.5), Math.round(y - r * 0.3));
+			ctx.lineTo(Math.round(x + r * 0.1), Math.round(y - r * 0.3));
+			ctx.lineTo(Math.round(x + r * 0.1), Math.round(y - r * 0.15));
+			ctx.lineTo(Math.round(x - r * 0.5), Math.round(y - r * 0.15));
+			ctx.lineTo(Math.round(x - r * 0.5), Math.round(y + r * 0.15));
+			ctx.lineTo(Math.round(x + r * 0.1), Math.round(y + r * 0.15));
+			ctx.lineTo(Math.round(x + r * 0.1), Math.round(y + r * 0.3));
+			ctx.lineTo(Math.round(x - r * 0.5), Math.round(y + r * 0.3));
+			ctx.lineTo(Math.round(x - r * 0.5), Math.round(y + r * 0.7));
+			ctx.lineTo(Math.round(x + r * 0.5), Math.round(y + r * 0.7));
+			ctx.lineTo(Math.round(x + r * 0.5), Math.round(y - r * 0.7));
 		}
 		ctx.closePath();
 		ctx.fill();
@@ -379,6 +381,7 @@ function normalizeRadian(a) {
 		resizeCanvas();
 		canvas.addEventListener('mousedown', clickEvent, false);
 		canvas.addEventListener('touchstart', clickEvent, false);
+
 		window.requestAnimationFrame(step);
 	}
 
@@ -484,13 +487,15 @@ function normalizeRadian(a) {
 			return;
 		}
 
+		// Always add 0.5 to coordinates of lines of width 1
+		// https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Canvas_tutorial/Applying_styles_and_colors#A_lineWidth_example
 		ctx.strokeStyle = 'white';
 		ctx.lineWidth = '1';
 		ctx.beginPath();
-		ctx.moveTo(LEFT_BORDER, TOP_BORDER);
-		ctx.lineTo(RIGHT_BORDER, TOP_BORDER);
-		ctx.lineTo(RIGHT_BORDER, BOTTOM_BORDER);
-		ctx.lineTo(LEFT_BORDER, BOTTOM_BORDER);
+		ctx.moveTo(Math.floor(LEFT_BORDER) + 0.5, Math.floor(TOP_BORDER) + 0.5);
+		ctx.lineTo(Math.floor(RIGHT_BORDER) - 0.5, Math.floor(TOP_BORDER) + 0.5);
+		ctx.lineTo(Math.floor(RIGHT_BORDER) - 0.5, Math.floor(BOTTOM_BORDER) + 0.5);
+		ctx.lineTo(Math.floor(LEFT_BORDER) + 0.5, Math.floor(BOTTOM_BORDER) + 0.5);
 		ctx.closePath();
 		ctx.stroke();
 
