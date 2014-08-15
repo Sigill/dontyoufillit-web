@@ -367,11 +367,14 @@ function normalizeRadian(a) {
 	var lastClickDate = 0;
 	var gameState = RUNNING;
 	var score = 0;
-	var highscore = 999;
+	var highscore;
 
 	initialize();
 
 	function initialize() {
+		highscore = localStorage.getItem('highscore');
+		highscore = (highscore == null) ? 0 : parseInt(highscore, 10);
+
 		window.addEventListener('resize', resizeCanvas, false);
 		resizeCanvas();
 		canvas.addEventListener('mousedown', clickEvent, false);
@@ -443,17 +446,10 @@ function normalizeRadian(a) {
 				currentBall.update(last / 1000, (current - last) / 1000);
 				if(currentBall.ny < currentBall.nr && normalizeRadian(currentBall.direction) > Math.PI) {
 					currentBall.state.s = 0;
-					// TODO Highscore
-					/*
-					if(this.mScore > this.mHighScore) {
-						this.mHighScore = this.mScore;
-						Context ctx = this.getContext();
-						SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
-						SharedPreferences.Editor editor = prefs.edit();
-						editor.putInt(HIGHSCORE_PREF, this.mHighScore);
-						editor.commit();
+					if(score > highscore) {
+						highscore = score;
+						localStorage.setItem('highscore', (score).toString(10));
 					}
-					*/
 					gameState = GAMEOVER;
 				}
 				if(currentBall.state.s < 0.01) {
