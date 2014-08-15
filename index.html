@@ -379,13 +379,15 @@ function normalizeRadian(a) {
 
 		window.addEventListener('resize', resizeCanvas, false);
 		resizeCanvas();
-		canvas.addEventListener('mousedown', clickEvent, false);
-		canvas.addEventListener('touchstart', clickEvent, false);
+		canvas.addEventListener('mousedown', handleClick, false);
+		canvas.addEventListener('touchstart', handleClick, false);
+
+		document.addEventListener('visibilitychange', handleVisibilityChange, false);
 
 		window.requestAnimationFrame(step);
 	}
 
-	function clickEvent(evt) {
+	function handleClick(evt) {
 		if(Date.now() - lastClickDate < 1000)
 			return;
 
@@ -426,6 +428,12 @@ function normalizeRadian(a) {
 		}
 
 		return false;
+	}
+
+	function handleVisibilityChange() {
+		if (document.hidden) {
+			gameState = PAUSED;
+		}
 	}
 
 	function step(time) {
