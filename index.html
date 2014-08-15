@@ -218,48 +218,41 @@ function normalizeRadian(a) {
 		ctx.lineWidth = 1;
 		ctx.beginPath();
 		ctx.arc(x, y, r, 0, Math.PI*2, false);
-		ctx.fill();
-		ctx.closePath();
 
 		if(this.counter == 1) {
-			ctx.fillStyle = 'black';
-			ctx.fillRect(x - r * 0.2,
-			             y - r * 0.7,
-			             r * 0.4,
-			             r * 1.4);
-
+			ctx.moveTo(x - r * 0.2, y - r * 0.7);
+			ctx.lineTo(x - r * 0.2, y + r * 0.7);
+			ctx.lineTo(x + r * 0.2, y + r * 0.7);
+			ctx.lineTo(x + r * 0.2, y - r * 0.7);
 		} else if(this.counter == 2) {
-			ctx.fillStyle = 'black';
-			ctx.fillRect(x - r * 0.5,
-			             y - r * 0.7,
-			             r,
-			             r * 1.4);
-			ctx.fillStyle = 'white';
-			ctx.fillRect(x - r * 0.5,
-			             y - r * 0.3,
-			             r * 0.6,
-			             r * 0.15);
-			ctx.fillRect(x - r * 0.1,
-			             y + r * 0.15,
-			             r * 0.6,
-			             r * 0.15);
+			ctx.moveTo(x - r * 0.5, y - r * 0.7);
+			ctx.lineTo(x - r * 0.5, y - r * 0.3);
+			ctx.lineTo(x + r * 0.1, y - r * 0.3);
+			ctx.lineTo(x + r * 0.1, y - r * 0.15);
+			ctx.lineTo(x - r * 0.5, y - r * 0.15);
+			ctx.lineTo(x - r * 0.5, y + r * 0.7);
+			ctx.lineTo(x + r * 0.5, y + r * 0.7);
+			ctx.lineTo(x + r * 0.5, y + r * 0.3);
+			ctx.lineTo(x - r * 0.1, y + r * 0.3);
+			ctx.lineTo(x - r * 0.1, y + r * 0.15);
+			ctx.lineTo(x + r * 0.5, y + r * 0.15);
+			ctx.lineTo(x + r * 0.5, y - r * 0.7);
 		} else if(this.counter == 3) {
-			ctx.fillStyle = 'black';
-			ctx.fillRect(x - r * 0.5,
-			             y - r * 0.7,
-			             r,
-			             r * 1.4);
-			ctx.fillStyle = 'white';
-			ctx.fillRect(x - r * 0.5,
-			             y - r * 0.3,
-			             r * 0.6,
-			             r * 0.15);
-			ctx.fillRect(x - r * 0.5,
-			             y + r * 0.15,
-			             r * 0.6,
-			             r * 0.15);
-
+			ctx.moveTo(x - r * 0.5, y - r * 0.7);
+			ctx.lineTo(x - r * 0.5, y - r * 0.3);
+			ctx.lineTo(x + r * 0.1, y - r * 0.3);
+			ctx.lineTo(x + r * 0.1, y - r * 0.15);
+			ctx.lineTo(x - r * 0.5, y - r * 0.15);
+			ctx.lineTo(x - r * 0.5, y + r * 0.15);
+			ctx.lineTo(x + r * 0.1, y + r * 0.15);
+			ctx.lineTo(x + r * 0.1, y + r * 0.3);
+			ctx.lineTo(x - r * 0.5, y + r * 0.3);
+			ctx.lineTo(x - r * 0.5, y + r * 0.7);
+			ctx.lineTo(x + r * 0.5, y + r * 0.7);
+			ctx.lineTo(x + r * 0.5, y - r * 0.7);
 		}
+		ctx.closePath();
+		ctx.fill();
 	};
 
 	Ball.prototype.acceleration = function(state, t) {
