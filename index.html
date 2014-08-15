@@ -362,6 +362,7 @@ function normalizeRadian(a) {
 	};
 
 	var cannon = new Cannon();
+	var lastClickDate = 0;
 
 	initialize();
 
@@ -376,6 +377,11 @@ function normalizeRadian(a) {
 	function clickEvent() {
 		if(currentBall)
 			return;
+
+		if(Date.now() - lastClickDate < 1000)
+			return;
+
+		lastClickDate = Date.now();
 
 		currentBall = new Ball(
 			1 / 40,
