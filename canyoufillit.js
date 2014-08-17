@@ -330,7 +330,6 @@ function CanYouFillItGame(canvasID) {
 		canvas.addEventListener('touchstart', handleClick, false);
 
 		document.addEventListener('visibilitychange', handleVisibilityChange, false);
-
 		window.requestAnimationFrame(step);
 	}
 
@@ -345,7 +344,6 @@ function CanYouFillItGame(canvasID) {
 			staticBalls = [];
 			gameState = RUNNING;
 			score = 0;
-			window.requestAnimationFrame(step);
 			return false;
 		}
 
@@ -353,13 +351,13 @@ function CanYouFillItGame(canvasID) {
 		var x = evt.clientX - rect.left,
 		    y = evt.clientY - rect.top
 
+		// TODO Hard to click on a tablet
 		if((x > canvas.width - 60) && (y < 60)) {
 			if(gameState == RUNNING ) {
 				gameState = PAUSED;
 			} else if(gameState == PAUSED) {
 				gameState = RUNNING;
 				lastFrameTime = performance.now ? performance.now() : Date.now();
-				window.requestAnimationFrame(step);
 			}
 
 			return false;
@@ -393,7 +391,11 @@ function CanYouFillItGame(canvasID) {
 
 		stats.end();
 
-		window.requestAnimationFrame(step);
+		if(gameState == RUNNING) {
+			window.requestAnimationFrame(step);
+		} else {
+			setTimeout(function() { window.requestAnimationFrame(step); }, 250);
+		}
 	}
 
 	function update(time) {
@@ -475,13 +477,31 @@ function CanYouFillItGame(canvasID) {
 			ctx.fill();
 		}
 
-		ctx.font = Math.floor(SCALE / 12) + 'pt Arial';
+		ctx.font = Math.floor(SCALE / 12) + 'px Arial';
+
 		ctx.textAlign = 'left';
-		ctx.fillText('Highscore', LEFT_BORDER, V_OFFSET + Math.floor(SCALE / 12));
-		ctx.fillText('Score', LEFT_BORDER, V_OFFSET + 2 * Math.floor(SCALE / 12));
-		var scoreOffset = ctx.measureText("Highscore ").width;
-		ctx.fillText(highscore, LEFT_BORDER + scoreOffset, V_OFFSET + Math.floor(SCALE / 12));
-		ctx.fillText(score, LEFT_BORDER + scoreOffset, V_OFFSET + 2 * Math.floor(SCALE / 12));
+		ctx.textBaseline = 'top';
+		ctx.fillText('Highscore', LEFT_BORDER, V_OFFSET + SCALE / 120);
+		ctx.fillText('Score', LEFT_BORDER, V_OFFSET + SCALE / 12);
+		var scoreOffset = ctx.measureText('Highscore ').width;
+		ctx.fillText(highscore, LEFT_BORDER + scoreOffset, V_OFFSET + SCALE / 120);
+		ctx.fillText(score, LEFT_BORDER + scoreOffset, V_OFFSET + SCALE / 12);
+
+		if(gameState == PAUSED) {
+			var s = ctx.measureText('Pause').width;
+			var o = 0.2 * SCALE / 12;
+			ctx.fillStyle = 'black';
+			ctx.fillRect(Math.floor((canvas.width - s - o) / 2),
+			             Math.floor((canvas.height - Math.floor(SCALE / 12) - o) / 2),
+			             Math.ceil(s + o),
+			             Math.ceil(Math.floor(SCALE / 12) + o));
+
+			ctx.textAlign = 'center';
+			ctx.textBaseline = 'middle';
+			ctx.fillStyle = 'white';
+			ctx.font = Math.floor(SCALE / 12) + 'px Arial';
+			ctx.fillText('Pause', canvas.width / 2, canvas.height / 2);
+		}
 	}
 
 	function resizeCanvas() {
@@ -489,8 +509,6 @@ function CanYouFillItGame(canvasID) {
 		canvas.height = container.clientHeight;
 
 		computeGameDimensions();
-
-		window.requestAnimationFrame(step);
 	}
 
 	function computeGameDimensions() {
