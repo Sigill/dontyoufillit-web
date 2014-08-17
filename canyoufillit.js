@@ -327,13 +327,23 @@ function CanYouFillItGame(canvasID) {
 		window.addEventListener('resize', resizeCanvas, false);
 		resizeCanvas();
 		canvas.addEventListener('mousedown', handleClick, false);
-		canvas.addEventListener('touchstart', handleClick, false);
+		canvas.addEventListener('touchstart', handleTouch, false);
 
 		document.addEventListener('visibilitychange', handleVisibilityChange, false);
 		window.requestAnimationFrame(step);
 	}
 
+	function handleTouch(evt) {
+		evt.preventDefault();
+		handleTouchOrClick(evt.touches[0].clientX, evt.touches[0].clientY);
+	}
+
 	function handleClick(evt) {
+		evt.preventDefault();
+		handleTouchOrClick(evt.clientX, evt.clientY);
+	}
+
+	function handleTouchOrClick(evx, evy) {
 		if(Date.now() - lastClickDate < 1000)
 			return;
 
@@ -348,10 +358,10 @@ function CanYouFillItGame(canvasID) {
 		}
 
 		var rect = canvas.getBoundingClientRect();
-		var x = evt.clientX - rect.left,
-		    y = evt.clientY - rect.top
+		var x = evx - rect.left,
+		    y = evy - rect.top;
 
-		// TODO Hard to click on a tablet
+		// TODO Size and position of the button
 		if((x > canvas.width - 60) && (y < 60)) {
 			if(gameState == RUNNING ) {
 				gameState = PAUSED;
@@ -438,7 +448,7 @@ function CanYouFillItGame(canvasID) {
 		if(gameState == GAMEOVER) {
 			ctx.textAlign = 'center';
 			ctx.fillStyle = 'white';
-			ctx.font = Math.floor(SCALE / 12) + 'pt Arial';
+			ctx.font = Math.floor(SCALE / 12) + 'px Arial';
 			ctx.fillText('Game Over', canvas.width / 2, canvas.height / 2);
 
 			return;
@@ -488,8 +498,8 @@ function CanYouFillItGame(canvasID) {
 		ctx.fillText(score, LEFT_BORDER + scoreOffset, V_OFFSET + SCALE / 12);
 
 		if(gameState == PAUSED) {
-			var s = ctx.measureText('Pause').width;
-			var o = 0.2 * SCALE / 12;
+			var s = ctx.measureText('Pause').width,
+			    o = 0.2 * SCALE / 12;
 			ctx.fillStyle = 'black';
 			ctx.fillRect(Math.floor((canvas.width - s - o) / 2),
 			             Math.floor((canvas.height - Math.floor(SCALE / 12) - o) / 2),
