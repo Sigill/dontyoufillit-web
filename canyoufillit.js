@@ -93,22 +93,7 @@ function normalizeRadian(a) {
 }
 
 
-(function() {
-	var canvas = document.getElementById('c'),
-		ctx = canvas.getContext('2d'),
-		container = canvas.parentNode;
-
-	var SCALE, GAME_WIDTH, GAME_HEIGHT, V_OFFSET, H_OFFSET,
-		BOTTOM_BORDER, TOP_BORDER, LEFT_BORDER, RIGHT_BORDER,
-		CANNON_BASE_WIDTH, CANNON_BASE_HEIGHT, CANNON_LENGTH, CANNON_WIDTH;
-
-	const PAUSED = 1, RUNNING = 2, GAMEOVER = 3;
-
-	// Browsers supporting high resolution timestamps will use them in requestAnimationFrame
-	var lastFrameTime = performance.now ? performance.now() : Date.now();
-	var staticBalls = [];
-	var currentBall = null;
-
+function CanYouFillItGame(canvasID) {
 	function Cannon() {
 		RK41DObject.call(this);
 		this.state.u = 0;
@@ -135,7 +120,7 @@ function normalizeRadian(a) {
 		}
 	};
 
-	Cannon.prototype.draw = function(ctx) {
+	Cannon.prototype.draw = function() {
 		var r = Math.round(CANNON_BASE_WIDTH / 2);
 
 		ctx.fillStyle = 'white';
@@ -183,7 +168,7 @@ function normalizeRadian(a) {
 	Ball.prototype = new RK41DObject();
 	Ball.prototype.constructor = RK41DObject;
 
-	Ball.prototype.draw = function(ctx) {
+	Ball.prototype.draw = function() {
 		var x = LEFT_BORDER + this.nx * SCALE,
 		    y = BOTTOM_BORDER - this.ny * SCALE,
 		    r = this.nr * SCALE;
@@ -335,14 +320,6 @@ function normalizeRadian(a) {
 		this.nr = Math.abs(minRadius);
 	};
 
-	var cannon = new Cannon();
-	var lastClickDate = 0;
-	var gameState = RUNNING;
-	var score = 0;
-	var highscore;
-
-	initialize();
-
 	function initialize() {
 		highscore = localStorage.getItem('highscore');
 		highscore = (highscore == null) ? 0 : parseInt(highscore, 10);
@@ -477,13 +454,13 @@ function normalizeRadian(a) {
 		ctx.closePath();
 		ctx.stroke();
 
-		cannon.draw(ctx);
+		cannon.draw();
 
 		for(var i = 0; i < staticBalls.length; ++i)
-			staticBalls[i].draw(ctx);
+			staticBalls[i].draw();
 
 		if(currentBall)
-			currentBall.draw(ctx);
+			currentBall.draw();
 
 		ctx.fillStyle = 'white';
 		if(gameState == RUNNING) {
@@ -538,7 +515,29 @@ function normalizeRadian(a) {
 		CANNON_BASE_HEIGHT = SCALE / 15;
 		CANNON_LENGTH      = SCALE / 15;
 		CANNON_WIDTH       = SCALE / 18;
-
 	}
-})();
+
+	var canvas = document.getElementById(canvasID),
+	    ctx = canvas.getContext('2d'),
+	    container = canvas.parentNode;
+
+	var SCALE, GAME_WIDTH, GAME_HEIGHT, V_OFFSET, H_OFFSET,
+	    BOTTOM_BORDER, TOP_BORDER, LEFT_BORDER, RIGHT_BORDER,
+	    CANNON_BASE_WIDTH, CANNON_BASE_HEIGHT, CANNON_LENGTH, CANNON_WIDTH;
+
+	const PAUSED = 1, RUNNING = 2, GAMEOVER = 3;
+
+	// Browsers supporting high resolution timestamps will use them in requestAnimationFrame
+	var lastFrameTime = performance.now ? performance.now() : Date.now();
+	var staticBalls = [];
+	var currentBall = null;
+
+	var cannon = new Cannon();
+	var lastClickDate = 0;
+	var gameState = RUNNING;
+	var score = 0;
+	var highscore;
+
+	initialize();
+}
 
