@@ -18,27 +18,8 @@ if(!Math.sign) {
 	}
 }
 
-function V2D(x, y) {
-	this.x = x || 0;
-	this.y = y || 0;
-}
-
-V2D.prototype.mag = function() {
-	return Math.sqrt(this.x * this.x + this.y * this.y);
-};
-
-V2D.prototype.normalize = function() {
-	var length = this.mag();
-	if(length > 0) {
-		x /= length;
-		y /= length;
-	}
-}
-
-V2D.prototype.mult = function(value) {
-	var v = Math.sign(value) * Math.sqrt(Math.abs(value));
-	x *= v;
-	y *= v;
+function vectorLength(x, y) {
+	return Math.sqrt(x * x + y * y);
 }
 
 function RK41DObject_State(u, s) {
@@ -219,11 +200,11 @@ function CanYouFillItGame(canvasID) {
 	};
 
 	Ball.prototype.update = function(t, dt) {
-		var previousState = new RK41DObject_State(this.state.u, this.state.v);
+		var previousStateU = this.state.u;
 
 		this.integrate(t, dt);
 
-		var d = this.state.u - previousState.u;
+		var d = this.state.u - previousStateU;
 		this.nx += d * Math.cos(this.direction);
 		this.ny += d * Math.sin(this.direction);
 
@@ -247,42 +228,37 @@ function CanYouFillItGame(canvasID) {
 		for(var i = staticBalls.length - 1; i >= 0; --i) {
 			var o = staticBalls[i];
 
-			var normal = new V2D(this.nx - o.nx, this.ny - o.ny);
-			if(normal.mag() <= o.nr + this.nr) {
+			var normalX = this.nx - o.nx,
+			    normalY = this.ny - o.ny;
+			if(vectorLength(normalX, normalY) <= o.nr + this.nr) {
 				--o.counter;
 
-				var  alpha = Math.atan2(normal.y, normal.x),
-				      sine = Math.sin(alpha),
-				    cosine = Math.cos(alpha);
+				var alpha = Math.atan2(normalY, normalX),
+				     sine = Math.sin(alpha),
+				   cosine = Math.cos(alpha);
 
-				var velocity = new V2D(Math.cos(this.direction), Math.sin(this.direction));
+				var velocityX = Math.cos(this.direction),
+				    velocityY = Math.sin(this.direction);
 
-				var bTemp = new V2D(
-					cosine * normal.x + sine * normal.y,
-					cosine * normal.y - sine * normal.x
-					);
+				var vFinalX = -(cosine * velocityX + sine * velocityY),
+				    vFinalY = cosine * velocityY - sine * velocityX;
 
-				var vTemp = new V2D(
-					cosine * velocity.x + sine * velocity.y,
-					cosine * velocity.y - sine * velocity.x
-					);
+				var bTempX = cosine * normalX + sine * normalY,
+				    bTempY = cosine * normalY - sine * normalX;
 
-				var vFinal = new V2D(-vTemp.x, vTemp.y);
+				bTempX += vFinalX / SCALE;
+				bTempY += vFinalY / SCALE;
 
-				bTemp.x += vFinal.x / SCALE;
+				var bFinalX = cosine * bTempX - sine * bTempY,
+				    bFinalY = cosine * bTempY + sine * bTempX;
 
-				var bFinal = new V2D();
-				bFinal.x = cosine * bTemp.x - sine * bTemp.y;
-				bFinal.y = cosine * bTemp.y + sine * bTemp.x;
+				this.nx = o.nx + bFinalX;
+				this.ny = o.ny + bFinalY;
 
+				velocityX = cosine * vFinalX - sine * vFinalY;
+				velocityY = cosine * vFinalY + sine * vFinalX;
 
-				this.nx = o.nx + bFinal.x;
-				this.ny = o.ny + bFinal.y;
-
-				velocity.x = cosine * vFinal.x - sine * vFinal.y;
-				velocity.y = cosine * vFinal.y + sine * vFinal.x;
-
-				this.direction = Math.atan2(velocity.y, velocity.x);
+				this.direction = Math.atan2(velocityY, velocityX);
 
 				if(o.counter == 0) {
 					++score;
@@ -295,13 +271,11 @@ function CanYouFillItGame(canvasID) {
 	Ball.prototype.grow = function() {
 		var minRadius = Number.MAX_VALUE,
 		    available,
-			o,
-			vector;
+		    o;
 
 		for(var i = 0; i < staticBalls.length; ++i) {
 			o = staticBalls[i];
-			vector = new V2D(this.nx - o.nx, this.ny - o.ny);
-			available = vector.mag() - o.nr;
+			available = vectorLength(this.nx - o.nx, this.ny - o.ny) - o.nr;
 			if(minRadius > available) minRadius = available;
 		}
 
@@ -422,7 +396,7 @@ function CanYouFillItGame(canvasID) {
 					}
 					gameState = GAMEOVER;
 				}
-				if(currentBall.state.s < 0.01) {
+				if(currentBall.state.s < 0.001) {
 					if(currentBall.ny >= 0) {
 						currentBall.grow();
 						staticBalls.push(currentBall);
@@ -440,15 +414,14 @@ function CanYouFillItGame(canvasID) {
 	}
 
 	function draw() {
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-
 		ctx.fillStyle = 'black';
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 		if(gameState == GAMEOVER) {
 			ctx.textAlign = 'center';
+			ctx.textBaseline = 'middle';
 			ctx.fillStyle = 'white';
-			ctx.font = Math.floor(SCALE / 12) + 'px Arial';
+			ctx.font = Math.floor(SCALE / 8) + 'px Arial';
 			ctx.fillText('Game Over', canvas.width / 2, canvas.height / 2);
 
 			return;
@@ -487,19 +460,19 @@ function CanYouFillItGame(canvasID) {
 			ctx.fill();
 		}
 
-		ctx.font = Math.floor(SCALE / 12) + 'px Arial';
-
+		var scoreOffset = ctx.measureText('Highscore ').width;
 		ctx.textAlign = 'left';
 		ctx.textBaseline = 'top';
+		ctx.font = Math.floor(SCALE / 12) + 'px Arial';
 		ctx.fillText('Highscore', LEFT_BORDER, V_OFFSET + SCALE / 120);
 		ctx.fillText('Score', LEFT_BORDER, V_OFFSET + SCALE / 12);
-		var scoreOffset = ctx.measureText('Highscore ').width;
 		ctx.fillText(highscore, LEFT_BORDER + scoreOffset, V_OFFSET + SCALE / 120);
 		ctx.fillText(score, LEFT_BORDER + scoreOffset, V_OFFSET + SCALE / 12);
 
 		if(gameState == PAUSED) {
+			ctx.font = Math.floor(SCALE / 8) + 'px Arial';
 			var s = ctx.measureText('Pause').width,
-			    o = 0.2 * SCALE / 12;
+			    o = 0.2 * SCALE / 8;
 			ctx.fillStyle = 'black';
 			ctx.fillRect(Math.floor((canvas.width - s - o) / 2),
 			             Math.floor((canvas.height - Math.floor(SCALE / 12) - o) / 2),
@@ -509,7 +482,6 @@ function CanYouFillItGame(canvasID) {
 			ctx.textAlign = 'center';
 			ctx.textBaseline = 'middle';
 			ctx.fillStyle = 'white';
-			ctx.font = Math.floor(SCALE / 12) + 'px Arial';
 			ctx.fillText('Pause', canvas.width / 2, canvas.height / 2);
 		}
 	}
