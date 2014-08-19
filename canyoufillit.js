@@ -160,36 +160,36 @@ function CanYouFillItGame(canvasID) {
 		ctx.arc(x, y, r, 0, Math.PI*2, false);
 
 		if(this.counter == 1) {
-			ctx.moveTo(Math.round(x - r * 0.2), Math.round(y - r * 0.7));
-			ctx.lineTo(Math.round(x - r * 0.2), Math.round(y + r * 0.7));
-			ctx.lineTo(Math.round(x + r * 0.2), Math.round(y + r * 0.7));
-			ctx.lineTo(Math.round(x + r * 0.2), Math.round(y - r * 0.7));
+			ctx.moveTo(x - r * 0.2, y - r * 0.7);
+			ctx.lineTo(x - r * 0.2, y + r * 0.7);
+			ctx.lineTo(x + r * 0.2, y + r * 0.7);
+			ctx.lineTo(x + r * 0.2, y - r * 0.7);
 		} else if(this.counter == 2) {
-			ctx.moveTo(Math.round(x - r * 0.5), Math.round(y - r * 0.7));
-			ctx.lineTo(Math.round(x - r * 0.5), Math.round(y - r * 0.3));
-			ctx.lineTo(Math.round(x + r * 0.1), Math.round(y - r * 0.3));
-			ctx.lineTo(Math.round(x + r * 0.1), Math.round(y - r * 0.15));
-			ctx.lineTo(Math.round(x - r * 0.5), Math.round(y - r * 0.15));
-			ctx.lineTo(Math.round(x - r * 0.5), Math.round(y + r * 0.7));
-			ctx.lineTo(Math.round(x + r * 0.5), Math.round(y + r * 0.7));
-			ctx.lineTo(Math.round(x + r * 0.5), Math.round(y + r * 0.3));
-			ctx.lineTo(Math.round(x - r * 0.1), Math.round(y + r * 0.3));
-			ctx.lineTo(Math.round(x - r * 0.1), Math.round(y + r * 0.15));
-			ctx.lineTo(Math.round(x + r * 0.5), Math.round(y + r * 0.15));
-			ctx.lineTo(Math.round(x + r * 0.5), Math.round(y - r * 0.7));
+			ctx.moveTo(x - r * 0.5, y - r * 0.7);
+			ctx.lineTo(x - r * 0.5, y - r * 0.3);
+			ctx.lineTo(x + r * 0.1, y - r * 0.3);
+			ctx.lineTo(x + r * 0.1, y - r * 0.15);
+			ctx.lineTo(x - r * 0.5, y - r * 0.15);
+			ctx.lineTo(x - r * 0.5, y + r * 0.7);
+			ctx.lineTo(x + r * 0.5, y + r * 0.7);
+			ctx.lineTo(x + r * 0.5, y + r * 0.3);
+			ctx.lineTo(x - r * 0.1, y + r * 0.3);
+			ctx.lineTo(x - r * 0.1, y + r * 0.15);
+			ctx.lineTo(x + r * 0.5, y + r * 0.15);
+			ctx.lineTo(x + r * 0.5, y - r * 0.7);
 		} else if(this.counter == 3) {
-			ctx.moveTo(Math.round(x - r * 0.5), Math.round(y - r * 0.7));
-			ctx.lineTo(Math.round(x - r * 0.5), Math.round(y - r * 0.3));
-			ctx.lineTo(Math.round(x + r * 0.1), Math.round(y - r * 0.3));
-			ctx.lineTo(Math.round(x + r * 0.1), Math.round(y - r * 0.15));
-			ctx.lineTo(Math.round(x - r * 0.5), Math.round(y - r * 0.15));
-			ctx.lineTo(Math.round(x - r * 0.5), Math.round(y + r * 0.15));
-			ctx.lineTo(Math.round(x + r * 0.1), Math.round(y + r * 0.15));
-			ctx.lineTo(Math.round(x + r * 0.1), Math.round(y + r * 0.3));
-			ctx.lineTo(Math.round(x - r * 0.5), Math.round(y + r * 0.3));
-			ctx.lineTo(Math.round(x - r * 0.5), Math.round(y + r * 0.7));
-			ctx.lineTo(Math.round(x + r * 0.5), Math.round(y + r * 0.7));
-			ctx.lineTo(Math.round(x + r * 0.5), Math.round(y - r * 0.7));
+			ctx.moveTo(x - r * 0.5, y - r * 0.7);
+			ctx.lineTo(x - r * 0.5, y - r * 0.3);
+			ctx.lineTo(x + r * 0.1, y - r * 0.3);
+			ctx.lineTo(x + r * 0.1, y - r * 0.15);
+			ctx.lineTo(x - r * 0.5, y - r * 0.15);
+			ctx.lineTo(x - r * 0.5, y + r * 0.15);
+			ctx.lineTo(x + r * 0.1, y + r * 0.15);
+			ctx.lineTo(x + r * 0.1, y + r * 0.3);
+			ctx.lineTo(x - r * 0.5, y + r * 0.3);
+			ctx.lineTo(x - r * 0.5, y + r * 0.7);
+			ctx.lineTo(x + r * 0.5, y + r * 0.7);
+			ctx.lineTo(x + r * 0.5, y - r * 0.7);
 		}
 		ctx.closePath();
 		ctx.fill();
