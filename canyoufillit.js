@@ -414,6 +414,8 @@ function CanYouFillItGame(canvasID) {
 	}
 
 	function draw() {
+		// clearRect doesn't work on android stock browser, fillRect is used instead
+		// ctx.clearRect(0, 0, canvas.width, canvas.height);
 		ctx.fillStyle = 'black';
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -537,6 +539,9 @@ function CanYouFillItGame(canvasID) {
 	var gameState = RUNNING;
 	var score = 0;
 	var highscore;
+
+	canvas.style.display = 'block';
+	canvas.style.background = 'black';
 
 	initialize();
 }
