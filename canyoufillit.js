@@ -41,7 +41,7 @@ RK41DObject.prototype.evaluate = function(initialState, t, dt, derivative) {
 		return new RK41DObject_Derivative(initialState.s, this.acceleration(initialState, t));
 	} else {
 		var state = new RK41DObject_State(initialState.u + derivative.du * dt,
-							  initialState.s + derivative.ds * dt);
+		                                  initialState.s + derivative.ds * dt);
 
 		return new RK41DObject_Derivative(state.s, this.acceleration(state, t + dt));
 	}
