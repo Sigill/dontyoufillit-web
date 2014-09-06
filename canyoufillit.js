@@ -336,7 +336,7 @@ function CanYouFillItGame(canvasID) {
 		    y = evy - rect.top;
 
 		// TODO Size and position of the button
-		if((x > canvas.width - 60) && (y < 60)) {
+		if((x > canvas.width - Math.floor(SCALE / 6)) && (y < Math.floor(SCALE / 6))) {
 			if(gameState == RUNNING ) {
 				gameState = PAUSED;
 			} else if(gameState == PAUSED) {
@@ -457,13 +457,13 @@ function CanYouFillItGame(canvasID) {
 
 		ctx.fillStyle = 'white';
 		if(gameState == RUNNING) {
-			ctx.fillRect(canvas.width - 40, 10, 10, 40);
-			ctx.fillRect(canvas.width - 20, 10, 10, 40);
+			ctx.fillRect(canvas.width - Math.floor(SCALE / 6 * 0.9), Math.floor(SCALE / 6 * 0.1), Math.floor(SCALE / 6 * 0.3), Math.floor(SCALE / 6 * 0.8));
+			ctx.fillRect(canvas.width - Math.floor(SCALE / 6 * 0.4), Math.floor(SCALE / 6 * 0.1), Math.floor(SCALE / 6 * 0.3), Math.floor(SCALE / 6 * 0.8));
 		} else if(gameState == PAUSED) {
 			ctx.beginPath();
-			ctx.moveTo(canvas.width - 40, 10);
-			ctx.lineTo(canvas.width - 40, 40);
-			ctx.lineTo(canvas.width - 10, 25);
+			ctx.moveTo(canvas.width - Math.floor(SCALE / 6 * 0.9), Math.floor(SCALE / 6 * 0.1));
+			ctx.lineTo(canvas.width - Math.floor(SCALE / 6 * 0.9), Math.floor(SCALE / 6 * 0.9));
+			ctx.lineTo(canvas.width - 10, Math.floor(SCALE / 12));
 			ctx.closePath();
 			ctx.fill();
 		}
