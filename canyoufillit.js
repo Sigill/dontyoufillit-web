@@ -1,10 +1,3 @@
-var stats = new Stats();
-stats.setMode(0); // 0: fps, 1: ms
-stats.domElement.style.position = 'absolute';
-stats.domElement.style.left = '0px';
-stats.domElement.style.bottom = '0px';
-document.body.appendChild( stats.domElement );
-
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign#Polyfill
 if(!Math.sign) {
 	Math.__proto__.sign = function(x) {
@@ -366,14 +359,14 @@ function CanYouFillItGame(canvasID) {
 	}
 
 	function step(time) {
-		stats.begin();
+		that.observable.notifyObservers('beginStep');
 
 		if(gameState == RUNNING)
 			update(time);
 
 		draw();
 
-		stats.end();
+		that.observable.notifyObservers('endStep');
 
 		if(gameState == RUNNING) {
 			window.requestAnimationFrame(step);
@@ -547,9 +540,24 @@ function CanYouFillItGame(canvasID) {
 	var score = 0;
 	var highscore;
 
+	this.observable = new Observable();
+
+	var that = this; // Allow to access this from the closure.
+
 	canvas.style.display = 'block';
 	canvas.style.background = 'black';
 
 	initialize();
 }
 
+CanYouFillItGame.prototype.addObserver = function(o) {
+	this.observable.addObserver(o);
+};
+
+CanYouFillItGame.prototype.removeObserver = function(o) {
+	this.observable.removeObserver(o);
+};
+
+CanYouFillItGame.prototype.notifyObservers = function(o) {
+	this.observable.notifyObservers();
+};
