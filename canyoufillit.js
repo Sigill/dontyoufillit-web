@@ -318,7 +318,7 @@ function CanYouFillItGame(canvasID) {
 	}
 
 	function handleTouchOrClick(evx, evy) {
-		if(Date.now() - lastClickDate < 1000)
+		if(Date.now() - lastClickDate < 500)
 			return;
 
 		lastClickDate = Date.now();
