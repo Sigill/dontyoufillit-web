@@ -382,11 +382,17 @@ function CanYouFillItGame(canvasID) {
 		}
 	}
 
+	/*
+	 * Position of the current ball is important, so it will be calculated 1000 times per second.
+	 * Position of the cannon isn't, so it will be calculated only once every frame.
+	 */
 	function update(time) {
 		if(currentBall) {
-			var last = lastFrameTime, current;
-			for(var i = 1; i <= 10; ++i) {
-				current = (lastFrameTime* (10-i) + time * i) / 10;
+			var last = lastFrameTime,
+			    steps = Math.floor(time - lastFrameTime),
+			    current;
+			for(var i = 1; i <= steps; ++i) {
+				current = (lastFrameTime* (steps-i) + time * i) / steps;
 				currentBall.update(last / 1000, (current - last) / 1000);
 				if(currentBall.ny < currentBall.nr && normalizeRadian(currentBall.direction) > Math.PI) {
 					currentBall.state.s = 0;
