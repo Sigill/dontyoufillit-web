@@ -2,7 +2,7 @@ var stats = new Stats();
 stats.setMode(0); // 0: fps, 1: ms
 stats.domElement.style.position = 'absolute';
 stats.domElement.style.left = '0px';
-stats.domElement.style.top = '0px';
+stats.domElement.style.bottom = '0px';
 document.body.appendChild( stats.domElement );
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign#Polyfill
