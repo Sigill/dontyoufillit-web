@@ -462,12 +462,13 @@ function CanYouFillItGame(canvasID) {
 			ctx.fill();
 		}
 
-		var scoreOffset = ctx.measureText('Highscore ').width;
 		ctx.textAlign = 'left';
 		ctx.textBaseline = 'top';
 		ctx.font = Math.floor(SCALE / 12) + 'px Arial';
 		ctx.fillText('Highscore', LEFT_BORDER, V_OFFSET + SCALE / 120);
 		ctx.fillText('Score', LEFT_BORDER, V_OFFSET + SCALE / 12);
+
+		var scoreOffset = ctx.measureText('Highscore ').width;
 		ctx.fillText(highscore, LEFT_BORDER + scoreOffset, V_OFFSET + SCALE / 120);
 		ctx.fillText(score, LEFT_BORDER + scoreOffset, V_OFFSET + SCALE / 12);
 
