@@ -319,7 +319,6 @@ function CanYouFillItGame(canvasID) {
 		var x = evx - rect.left,
 		    y = evy - rect.top;
 
-		// TODO Size and position of the button
 		if((x > canvas.width - Math.floor(SCALE / 6)) && (y < Math.floor(SCALE / 6))) {
 			if(gameState == RUNNING ) {
 				gameState = PAUSED;
