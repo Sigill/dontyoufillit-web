@@ -1,8 +1,9 @@
 CACHE MANIFEST
-# hash 918d23c61e0da7ee41018ef9b807940b5c26572b
+# hash b83d084475373ed91f837538aaaf168d7f8a9c00
 CACHE:
 index.html
 requestAnimationFrame.min.js
 stats.min.js
 observable.js
 canyoufillit.js
+canyoufillit_canvas_gui.js

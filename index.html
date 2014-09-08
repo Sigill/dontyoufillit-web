@@ -23,8 +23,10 @@ body, html { height:100%; }
 <script src="stats.min.js"></script>
 <script src="observable.js"></script>
 <script src="canyoufillit.js"></script>
+<script src="canyoufillit_canvas_gui.js"></script>
 <script>
-var game = new CanYouFillItGame('c');
+var game = new CanYouFillItGame();
+var gui = new CanYouFillItCanvasGui(game, 'c');
 
 function isDebug() {
 	var query = window.location.search.substring(1);
@@ -46,7 +48,7 @@ if(isDebug()) {
 	stats.domElement.style.bottom = '0px';
 	document.body.appendChild( stats.domElement );
 
-	game.addObserver(function(message) {
+	gui.addObserver(function(message) {
 		if(message == 'beginStep')
 			stats.begin();
 		else if(message == 'endStep')
