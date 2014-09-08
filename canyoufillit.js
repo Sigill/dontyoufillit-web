@@ -222,35 +222,26 @@ function CanYouFillItGame(canvasID) {
 			var o = staticBalls[i];
 
 			var normalX = this.nx - o.nx,
-			    normalY = this.ny - o.ny;
-			if(vectorLength(normalX, normalY) <= o.nr + this.nr) {
+			    normalY = this.ny - o.ny,
+			    dist = vectorLength(normalX, normalY);
+
+			if(dist <= o.nr + this.nr) {
 				--o.counter;
 
-				var alpha = Math.atan2(normalY, normalX),
-				     sine = Math.sin(alpha),
-				   cosine = Math.cos(alpha);
+				// Move it back to prevent clipping
+				this.nx = o.nx + normalX * (this.nr + o.nr) / dist;
+				this.ny = o.ny + normalY * (this.nr + o.nr) / dist;
 
-				var velocityX = Math.cos(this.direction),
-				    velocityY = Math.sin(this.direction);
+				// http://en.wikipedia.org/wiki/Elastic_collision#Two-Dimensional_Collision_With_Two_Moving_Objects
+				// Assuming no speed and an infinite mass for the second ball.
+				var phi = Math.atan2(normalY, normalX),
+				  theta = this.direction,
+				  speed = this.state.s;
 
-				var vFinalX = -(cosine * velocityX + sine * velocityY),
-				    vFinalY = cosine * velocityY - sine * velocityX;
+				var velocityX = -speed * Math.cos(theta - phi) * Math.cos(phi) + speed * Math.sin(theta - phi) * Math.cos(phi + Math.PI / 2),
+				    velocityY = -speed * Math.cos(theta - phi) * Math.sin(phi) + speed * Math.sin(theta - phi) * Math.sin(phi + Math.PI / 2);
 
-				var bTempX = cosine * normalX + sine * normalY,
-				    bTempY = cosine * normalY - sine * normalX;
-
-				bTempX += vFinalX / SCALE;
-				bTempY += vFinalY / SCALE;
-
-				var bFinalX = cosine * bTempX - sine * bTempY,
-				    bFinalY = cosine * bTempY + sine * bTempX;
-
-				this.nx = o.nx + bFinalX;
-				this.ny = o.ny + bFinalY;
-
-				velocityX = cosine * vFinalX - sine * vFinalY;
-				velocityY = cosine * vFinalY + sine * vFinalX;
-
+				// Linear speed doesn't change, only the direction.
 				this.direction = Math.atan2(velocityY, velocityX);
 
 				if(o.counter == 0) {
