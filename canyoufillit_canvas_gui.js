@@ -1,4 +1,4 @@
-function CanYouFillItCanvasGui(game, canvasID) {
+function CanYouFillItCanvasGui(game, containerID) {
 	function drawCannon(cannon) {
 		var r = Math.round(CANNON_BASE_WIDTH / 2);
 
@@ -252,9 +252,10 @@ function CanYouFillItCanvasGui(game, canvasID) {
 	this.game = game;
 	this.observable = new Observable();
 
-	var canvas = document.getElementById(canvasID),
-	    ctx = canvas.getContext('2d'),
-	    container = canvas.parentNode;
+	var container = document.getElementById(containerID),
+	       canvas = container.appendChild(document.createElement('canvas'));
+
+	var ctx = canvas.getContext('2d');
 
 	var SCALE, GAME_WIDTH, GAME_HEIGHT, V_OFFSET, H_OFFSET,
 	    BOTTOM_BORDER, TOP_BORDER, LEFT_BORDER, RIGHT_BORDER,
