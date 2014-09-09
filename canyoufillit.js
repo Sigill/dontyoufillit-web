@@ -159,7 +159,7 @@ Ball.prototype.bounce = function(staticBalls) {
 			  speed = this.state.s;
 
 			var velocityX = -speed * Math.cos(theta - phi) * Math.cos(phi) + speed * Math.sin(theta - phi) * Math.cos(phi + Math.PI / 2),
-				velocityY = -speed * Math.cos(theta - phi) * Math.sin(phi) + speed * Math.sin(theta - phi) * Math.sin(phi + Math.PI / 2);
+			    velocityY = -speed * Math.cos(theta - phi) * Math.sin(phi) + speed * Math.sin(theta - phi) * Math.sin(phi + Math.PI / 2);
 
 			// Linear speed doesn't change, only the direction.
 			this.direction = Math.atan2(velocityY, velocityX);
@@ -169,8 +169,8 @@ Ball.prototype.bounce = function(staticBalls) {
 
 Ball.prototype.grow = function(staticBalls) {
 	var minRadius = Number.MAX_VALUE,
-		available,
-		o;
+	    available,
+	    o;
 
 	for(var i = 0; i < staticBalls.length; ++i) {
 		o = staticBalls[i];
@@ -275,8 +275,8 @@ CanYouFillItGame.prototype.reset = function() {
 
 CanYouFillItGame.prototype.fire = function() {
 	this.currentBall = new Ball(
-		1 / 40.0,
-		0.5 + Math.cos(this.cannon.getAngle()) / 15.0,
-		-1 / 6.0 + 1 / 15.0 + Math.sin(this.cannon.getAngle()) / 15.0,
-		this.cannon.getAngle());
+	    1 / 40.0,
+	    0.5 + Math.cos(this.cannon.getAngle()) / 15.0,
+	    -1 / 6.0 + 1 / 15.0 + Math.sin(this.cannon.getAngle()) / 15.0,
+	    this.cannon.getAngle());
 };

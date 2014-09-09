@@ -9,12 +9,11 @@ function CanYouFillItCanvasGui(game, canvasID) {
 		ctx.lineTo(Math.round(H_OFFSET + SCALE / 2) - r,
 		           Math.round(BOTTOM_BORDER + SCALE / 6 - CANNON_BASE_HEIGHT));
 		ctx.arc(
-				Math.round(H_OFFSET + SCALE / 2),
-				Math.round(BOTTOM_BORDER + SCALE / 6 - CANNON_BASE_HEIGHT),
-				r,
-				Math.PI,
-				0
-			);
+		    Math.round(H_OFFSET + SCALE / 2),
+		    Math.round(BOTTOM_BORDER + SCALE / 6 - CANNON_BASE_HEIGHT),
+		    r,
+		    Math.PI,
+		    0);
 		ctx.lineTo(Math.round(H_OFFSET + SCALE / 2) + r,
 		           Math.round(BOTTOM_BORDER + SCALE / 6));
 		ctx.closePath();
@@ -24,9 +23,9 @@ function CanYouFillItCanvasGui(game, canvasID) {
 		ctx.lineCap = 'butt';
 		ctx.beginPath();
 		ctx.moveTo(H_OFFSET + SCALE / 2,
-				   BOTTOM_BORDER + SCALE / 6 - CANNON_BASE_HEIGHT);
+		           BOTTOM_BORDER + SCALE / 6 - CANNON_BASE_HEIGHT);
 		ctx.lineTo(H_OFFSET + SCALE / 2 + Math.cos(game.cannon.getAngle()) * CANNON_LENGTH,
-				   BOTTOM_BORDER + SCALE / 6 - CANNON_BASE_HEIGHT - Math.sin(game.cannon.getAngle()) * CANNON_LENGTH);
+		           BOTTOM_BORDER + SCALE / 6 - CANNON_BASE_HEIGHT - Math.sin(game.cannon.getAngle()) * CANNON_LENGTH);
 		ctx.stroke();
 		ctx.closePath();
 	};
