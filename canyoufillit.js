@@ -206,6 +206,8 @@ function CanYouFillItGame() {
 	this.highscore = (this.highscore == null) ? 0 : parseInt(this.highscore, 10);
 
 	this.score = 0;
+
+	this.newHighScore = false;
 }
 
 CanYouFillItGame.prototype.PAUSED   = function() { return 1; };
@@ -234,7 +236,8 @@ CanYouFillItGame.prototype.update = function(time) {
 
 			if(this.currentBall.ny < this.currentBall.nr && normalizeRadian(this.currentBall.direction) > Math.PI) {
 				this.currentBall.state.s = 0;
-				if(this.score > this.highscore) {
+				this.newHighScore = this.score > this.highscore;
+				if(this.newHighScore) {
 					this.highscore = this.score;
 					localStorage.setItem('highscore', this.score.toString(10));
 				}

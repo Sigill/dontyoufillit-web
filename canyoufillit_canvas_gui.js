@@ -1,16 +1,26 @@
+function roundedRectangle(context, left, top, right, bottom, radius) {
+	context.beginPath();
+	context.moveTo(left + radius, top);
+	context.arcTo(right, top,    right,         bottom, radius);
+	context.arcTo(right, bottom, left,          bottom, radius);
+	context.arcTo(left,  bottom, left,          top,    radius);
+	context.arcTo(left,  top,    left + radius, top,    radius);
+	context.closePath();
+}
+
 function CanYouFillItCanvasGui(game, containerID) {
 	PlayPauseButton = {
 		draw: function() {
 			ctx.fillStyle = 'white';
 			if(game.state == game.RUNNING()) {
 				ctx.fillRect(canvas.width - Math.floor(SCALE / 6 * 0.9),
-							 Math.floor(SCALE / 6 * 0.1),
-							 Math.floor(SCALE / 6 * 0.3),
-							 Math.floor(SCALE / 6 * 0.8));
+				             Math.floor(SCALE / 6 * 0.1),
+				             Math.floor(SCALE / 6 * 0.3),
+				             Math.floor(SCALE / 6 * 0.8));
 				ctx.fillRect(canvas.width - Math.floor(SCALE / 6 * 0.4),
-							 Math.floor(SCALE / 6 * 0.1),
-							 Math.floor(SCALE / 6 * 0.3),
-							 Math.floor(SCALE / 6 * 0.8));
+				             Math.floor(SCALE / 6 * 0.1),
+				             Math.floor(SCALE / 6 * 0.3),
+				             Math.floor(SCALE / 6 * 0.8));
 			} else if(game.state == game.PAUSED()) {
 				ctx.beginPath();
 				ctx.moveTo(canvas.width - Math.floor(SCALE / 6 * 0.9), Math.floor(SCALE / 6 * 0.1));
@@ -36,7 +46,6 @@ function CanYouFillItCanvasGui(game, containerID) {
 		}
 	};
 
-	// TODO Background on button
 	MenuScreen = {
 		draw: function() {
 			ctx.textAlign = 'center';
@@ -44,17 +53,47 @@ function CanYouFillItCanvasGui(game, containerID) {
 			ctx.fillStyle = 'white';
 
 			ctx.font = Math.floor(SCALE / 8) + 'px Arial';
-			ctx.fillText('CanYouFillIt', LEFT_BORDER + SCALE / 2, TOP_BORDER + SCALE / 3);
+			ctx.fillText('CanYouFillIt',
+			             LEFT_BORDER + SCALE / 2,
+			             TOP_BORDER + SCALE / 2 - 2 * Math.floor(SCALE / 8));
 
 			ctx.font = Math.floor(SCALE / 10) + 'px Arial';
-			ctx.fillText('Play now', LEFT_BORDER + SCALE / 2, TOP_BORDER + 2 * SCALE / 3);
+			var w = ctx.measureText('Play now').width,
+			    o = Math.floor(SCALE / 10) / 5;
+			roundedRectangle(ctx,
+			                 Math.floor(LEFT_BORDER + (SCALE - w) / 2 - o),
+			                 Math.floor(TOP_BORDER + (SCALE - Math.floor(SCALE / 10)) / 2 - o),
+			                 Math.floor(LEFT_BORDER + (SCALE + w) / 2 + o),
+			                 Math.floor(TOP_BORDER + (SCALE + Math.floor(SCALE / 10)) / 2 + o),
+			                 SCALE / 50);
+			ctx.fill();
+			ctx.fillStyle = 'black';
+			ctx.fillText('Play now',
+			             LEFT_BORDER + SCALE / 2,
+			             TOP_BORDER + SCALE / 2);
+
+			ctx.fillStyle = 'white';
+			ctx.font = Math.floor(SCALE / 24) + 'px Arial';
+			ctx.fillText('Developped by',
+			             LEFT_BORDER + SCALE / 2,
+			             BOTTOM_BORDER - 4 * Math.floor(SCALE / 24));
+			ctx.fillText('Cyrille Faucheux',
+			             LEFT_BORDER + SCALE / 2,
+			             BOTTOM_BORDER - 3 * Math.floor(SCALE / 24));
+			ctx.fillText('Freely inspired by',
+			             LEFT_BORDER + SCALE / 2,
+			             BOTTOM_BORDER - 1.5 * Math.floor(SCALE / 24));
+			ctx.fillText('gimmefrictionbaby.com',
+			             LEFT_BORDER + SCALE / 2,
+			             BOTTOM_BORDER - 0.5 * Math.floor(SCALE / 24));
 		},
 		handleClick: function(x, y) {
-			var s = ctx.measureText('Play now').width;
-			if(x >= LEFT_BORDER + (SCALE - s) / 2 &&
-			   x <= LEFT_BORDER + (SCALE + s) / 2 &&
-			   y >= TOP_BORDER + (2 * SCALE) / 3 - Math.floor(SCALE / 10) / 2 &&
-			   y <= TOP_BORDER + (2 * SCALE) / 3 + Math.floor(SCALE / 10) / 2) {
+			var w = ctx.measureText('Play now').width,
+			    o = Math.floor(SCALE / 10) / 5;
+			if(x >= LEFT_BORDER + (SCALE - w) / 2 - o &&
+			   x <= LEFT_BORDER + (SCALE + w) / 2 + o &&
+			   y >= TOP_BORDER + SCALE / 2 - Math.floor(SCALE / 10) / 2 - o &&
+			   y <= TOP_BORDER + SCALE / 2 + Math.floor(SCALE / 10) / 2 + o) {
 				game.resume();
 				that.state = that.GAME;
 				window.requestAnimationFrame(step);
@@ -65,7 +104,6 @@ function CanYouFillItCanvasGui(game, containerID) {
 	};
 
 	// TODO Add "Menu" button
-	// TODO Background on button
 	GameOverScreen = {
 		draw: function() {
 			ctx.textAlign = 'center';
@@ -73,17 +111,33 @@ function CanYouFillItCanvasGui(game, containerID) {
 			ctx.fillStyle = 'white';
 
 			ctx.font = Math.floor(SCALE / 8) + 'px Arial';
-			ctx.fillText('Game Over', LEFT_BORDER + SCALE / 2, TOP_BORDER + SCALE / 3);
+			ctx.fillText('Game Over', LEFT_BORDER + SCALE / 2, TOP_BORDER + SCALE / 2 - 2 * Math.floor(SCALE / 8));
 
 			ctx.font = Math.floor(SCALE / 10) + 'px Arial';
-			ctx.fillText('Play again', LEFT_BORDER + SCALE / 2, TOP_BORDER + 2 * SCALE / 3);
+			ctx.fillText((game.newHighScore ? 'New highscore: ' : 'Your score: ') + game.score,
+			             LEFT_BORDER + SCALE / 2, TOP_BORDER + SCALE / 2);
+
+			var w = ctx.measureText('Play again').width,
+			    o = Math.floor(SCALE / 10) / 5;
+			roundedRectangle(ctx,
+			                 Math.floor(LEFT_BORDER + (SCALE - w) / 2 - o),
+			                 Math.floor(TOP_BORDER + SCALE / 2 + 2 * Math.floor(SCALE / 8) - Math.floor(SCALE / 10) / 2 - o),
+			                 Math.floor(LEFT_BORDER + (SCALE + w) / 2 + o),
+			                 Math.floor(TOP_BORDER + SCALE / 2 + 2 * Math.floor(SCALE / 8) + Math.floor(SCALE / 10) / 2 + o),
+			                 SCALE / 50);
+			ctx.fill();
+			ctx.fillStyle = 'black';
+			ctx.fillText('Play again',
+			             LEFT_BORDER + SCALE / 2,
+			             TOP_BORDER + SCALE / 2 + 2 * Math.floor(SCALE / 8));
 		},
 		handleClick: function(x, y) {
-			var s = ctx.measureText('Play again').width;
-			if(x >= LEFT_BORDER + (SCALE - s) / 2 &&
-			   x <= LEFT_BORDER + (SCALE + s) / 2 &&
-			   y >= TOP_BORDER + (2 * SCALE) / 3 - Math.floor(SCALE / 10) / 2 &&
-			   y <= TOP_BORDER + (2 * SCALE) / 3 + Math.floor(SCALE / 10) / 2) {
+			var w = ctx.measureText('Play again').width,
+			    o = Math.floor(SCALE / 10) / 5;
+			if(x >= LEFT_BORDER + (SCALE - w) / 2 - o &&
+			   x <= LEFT_BORDER + (SCALE + w) / 2 + o &&
+			   y >= TOP_BORDER + SCALE / 2 + 2 * Math.floor(SCALE / 8) - Math.floor(SCALE / 10) / 2 - o &&
+			   y <= TOP_BORDER + SCALE / 2 + 2 * Math.floor(SCALE / 8) + Math.floor(SCALE / 10) / 2 + o) {
 				game.reset();
 				window.requestAnimationFrame(step);
 				return true;
@@ -195,12 +249,24 @@ function CanYouFillItCanvasGui(game, containerID) {
 		ctx.strokeStyle = 'white';
 		ctx.lineWidth = '1';
 		ctx.beginPath();
-		ctx.moveTo(Math.floor(LEFT_BORDER) + 0.5, Math.floor(TOP_BORDER) + 0.5);
+		ctx.moveTo(Math.floor(LEFT_BORDER) + 0.5, Math.floor(BOTTOM_BORDER) + 0.5);
+		ctx.lineTo(Math.floor(LEFT_BORDER) + 0.5, Math.floor(TOP_BORDER) + 0.5);
 		ctx.lineTo(Math.floor(RIGHT_BORDER) - 0.5, Math.floor(TOP_BORDER) + 0.5);
 		ctx.lineTo(Math.floor(RIGHT_BORDER) - 0.5, Math.floor(BOTTOM_BORDER) + 0.5);
-		ctx.lineTo(Math.floor(LEFT_BORDER) + 0.5, Math.floor(BOTTOM_BORDER) + 0.5);
-		ctx.closePath();
+		if(!ctx.setLineDash)
+			ctx.closePath();
 		ctx.stroke();
+
+		// Android stock browser does not support setLineDash
+		// (at least on version <= 4.1.2)
+		if(ctx.setLineDash) {
+			ctx.beginPath();
+			ctx.setLineDash([5, 5]);
+			ctx.moveTo(Math.floor(RIGHT_BORDER) - 0.5, Math.floor(BOTTOM_BORDER) + 0.5);
+			ctx.lineTo(Math.floor(LEFT_BORDER) + 0.5, Math.floor(BOTTOM_BORDER) + 0.5);
+			ctx.stroke();
+			ctx.setLineDash([]);
+		}
 
 		drawCannon(game.cannon);
 
@@ -213,14 +279,14 @@ function CanYouFillItCanvasGui(game, containerID) {
 		PlayPauseButton.draw();
 
 		ctx.textAlign = 'left';
-		ctx.textBaseline = 'top';
+		ctx.textBaseline = 'bottom';
 		ctx.font = Math.floor(SCALE / 12) + 'px Arial';
-		ctx.fillText('Highscore', LEFT_BORDER, V_OFFSET + SCALE / 120);
-		ctx.fillText('Score', LEFT_BORDER, V_OFFSET + SCALE / 12);
+		ctx.fillText('Highscore', LEFT_BORDER, TOP_BORDER - Math.floor(SCALE / 12) + Math.floor(SCALE / 120));
+		ctx.fillText('Score', LEFT_BORDER, TOP_BORDER);
 
 		var scoreOffset = ctx.measureText('Highscore ').width;
-		ctx.fillText(game.highscore, LEFT_BORDER + scoreOffset, V_OFFSET + SCALE / 120);
-		ctx.fillText(game.score, LEFT_BORDER + scoreOffset, V_OFFSET + SCALE / 12);
+		ctx.fillText(game.highscore, LEFT_BORDER + scoreOffset, TOP_BORDER - Math.floor(SCALE / 12) + Math.floor(SCALE / 120));
+		ctx.fillText(game.score, LEFT_BORDER + scoreOffset, TOP_BORDER);
 	}
 
 	function draw() {
