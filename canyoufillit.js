@@ -194,7 +194,7 @@ Ball.prototype.grow = function(staticBalls) {
 };
 
 function CanYouFillItGame() {
-	this.state = this.RUNNING();
+	this.state = this.PAUSED();
 	this.cannon = new Cannon();
 	this.staticBalls = [];
 	this.currentBall = null;
@@ -269,6 +269,7 @@ CanYouFillItGame.prototype.resume = function() {
 CanYouFillItGame.prototype.reset = function() {
 	this.currentBall = null;
 	this.staticBalls = [];
+	this.cannon.state.u = 0;
 	this.score = 0;
 	this.resume();
 };

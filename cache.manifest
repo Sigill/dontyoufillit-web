@@ -1,7 +1,7 @@
 CACHE MANIFEST
-# hash 6af65f61d958cc62a364ac311214418a2325aae7
+# hash 62487dbd3ca00a2d0381e8d85188f6a02de330dc
 CACHE:
-index.html
+play.html
 requestAnimationFrame.min.js
 stats.min.js
 observable.js

@@ -1,4 +1,117 @@
 function CanYouFillItCanvasGui(game, containerID) {
+	PlayPauseButton = {
+		draw: function() {
+			ctx.fillStyle = 'white';
+			if(game.state == game.RUNNING()) {
+				ctx.fillRect(canvas.width - Math.floor(SCALE / 6 * 0.9),
+							 Math.floor(SCALE / 6 * 0.1),
+							 Math.floor(SCALE / 6 * 0.3),
+							 Math.floor(SCALE / 6 * 0.8));
+				ctx.fillRect(canvas.width - Math.floor(SCALE / 6 * 0.4),
+							 Math.floor(SCALE / 6 * 0.1),
+							 Math.floor(SCALE / 6 * 0.3),
+							 Math.floor(SCALE / 6 * 0.8));
+			} else if(game.state == game.PAUSED()) {
+				ctx.beginPath();
+				ctx.moveTo(canvas.width - Math.floor(SCALE / 6 * 0.9), Math.floor(SCALE / 6 * 0.1));
+				ctx.lineTo(canvas.width - Math.floor(SCALE / 6 * 0.9), Math.floor(SCALE / 6 * 0.9));
+				ctx.lineTo(canvas.width - 10, Math.floor(SCALE / 12));
+				ctx.closePath();
+				ctx.fill();
+			}
+		},
+		handleClick: function(x, y) {
+			if((x > canvas.width - Math.floor(SCALE / 6)) && (y < Math.floor(SCALE / 6))) {
+				if(game.state == game.RUNNING()) {
+					game.pause();
+				} else if(game.state == game.PAUSED()) {
+					game.resume();
+					window.requestAnimationFrame(step);
+				}
+
+				return true;
+			}
+
+			return false;
+		}
+	};
+
+	// TODO Background on button
+	MenuScreen = {
+		draw: function() {
+			ctx.textAlign = 'center';
+			ctx.textBaseline = 'middle';
+			ctx.fillStyle = 'white';
+
+			ctx.font = Math.floor(SCALE / 8) + 'px Arial';
+			ctx.fillText('CanYouFillIt', LEFT_BORDER + SCALE / 2, TOP_BORDER + SCALE / 3);
+
+			ctx.font = Math.floor(SCALE / 10) + 'px Arial';
+			ctx.fillText('Play now', LEFT_BORDER + SCALE / 2, TOP_BORDER + 2 * SCALE / 3);
+		},
+		handleClick: function(x, y) {
+			var s = ctx.measureText('Play now').width;
+			if(x >= LEFT_BORDER + (SCALE - s) / 2 &&
+			   x <= LEFT_BORDER + (SCALE + s) / 2 &&
+			   y >= TOP_BORDER + (2 * SCALE) / 3 - Math.floor(SCALE / 10) / 2 &&
+			   y <= TOP_BORDER + (2 * SCALE) / 3 + Math.floor(SCALE / 10) / 2) {
+				game.resume();
+				that.state = that.GAME;
+				window.requestAnimationFrame(step);
+				return true;
+			}
+			return false;
+		}
+	};
+
+	// TODO Add "Menu" button
+	// TODO Background on button
+	GameOverScreen = {
+		draw: function() {
+			ctx.textAlign = 'center';
+			ctx.textBaseline = 'middle';
+			ctx.fillStyle = 'white';
+
+			ctx.font = Math.floor(SCALE / 8) + 'px Arial';
+			ctx.fillText('Game Over', LEFT_BORDER + SCALE / 2, TOP_BORDER + SCALE / 3);
+
+			ctx.font = Math.floor(SCALE / 10) + 'px Arial';
+			ctx.fillText('Play again', LEFT_BORDER + SCALE / 2, TOP_BORDER + 2 * SCALE / 3);
+		},
+		handleClick: function(x, y) {
+			var s = ctx.measureText('Play again').width;
+			if(x >= LEFT_BORDER + (SCALE - s) / 2 &&
+			   x <= LEFT_BORDER + (SCALE + s) / 2 &&
+			   y >= TOP_BORDER + (2 * SCALE) / 3 - Math.floor(SCALE / 10) / 2 &&
+			   y <= TOP_BORDER + (2 * SCALE) / 3 + Math.floor(SCALE / 10) / 2) {
+				game.reset();
+				window.requestAnimationFrame(step);
+				return true;
+			}
+
+			return false;
+		}
+	};
+
+	// TODO Add "Menu" button
+	PauseScreen = {
+		draw: function() {
+			ctx.font = Math.floor(SCALE / 8) + 'px Arial';
+			var s = ctx.measureText('Pause').width,
+			    o = 0.2 * SCALE / 8;
+			ctx.fillStyle = 'black';
+			ctx.fillRect(Math.floor((canvas.width - s - o) / 2),
+			             Math.floor((canvas.height - Math.floor(SCALE / 12) - o) / 2),
+			             Math.ceil(s + o),
+			             Math.ceil(Math.floor(SCALE / 12) + o));
+
+			ctx.textAlign = 'center';
+			ctx.textBaseline = 'middle';
+			ctx.fillStyle = 'white';
+			ctx.fillText('Pause', canvas.width / 2, canvas.height / 2);
+		}
+	};
+
 	function drawCannon(cannon) {
 		var r = Math.round(CANNON_BASE_WIDTH / 2);
 
@@ -76,22 +189,7 @@ function CanYouFillItCanvasGui(game, containerID) {
 		ctx.fill();
 	}
 
-	function draw() {
-		// clearRect doesn't work on android stock browser, fillRect is used instead
-		// ctx.clearRect(0, 0, canvas.width, canvas.height);
-		ctx.fillStyle = 'black';
-		ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-		if(game.state == game.GAMEOVER()) {
-			ctx.textAlign = 'center';
-			ctx.textBaseline = 'middle';
-			ctx.fillStyle = 'white';
-			ctx.font = Math.floor(SCALE / 8) + 'px Arial';
-			ctx.fillText('Game Over', canvas.width / 2, canvas.height / 2);
-
-			return;
-		}
-
+	function drawGame() {
 		// Always add 0.5 to coordinates of lines of width 1
 		// https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Canvas_tutorial/Applying_styles_and_colors#A_lineWidth_example
 		ctx.strokeStyle = 'white';
@@ -112,18 +210,7 @@ function CanYouFillItCanvasGui(game, containerID) {
 		if(game.currentBall)
 			drawBall(game.currentBall);
 
-		ctx.fillStyle = 'white';
-		if(game.state == game.RUNNING()) {
-			ctx.fillRect(canvas.width - Math.floor(SCALE / 6 * 0.9), Math.floor(SCALE / 6 * 0.1), Math.floor(SCALE / 6 * 0.3), Math.floor(SCALE / 6 * 0.8));
-			ctx.fillRect(canvas.width - Math.floor(SCALE / 6 * 0.4), Math.floor(SCALE / 6 * 0.1), Math.floor(SCALE / 6 * 0.3), Math.floor(SCALE / 6 * 0.8));
-		} else if(game.state == game.PAUSED()) {
-			ctx.beginPath();
-			ctx.moveTo(canvas.width - Math.floor(SCALE / 6 * 0.9), Math.floor(SCALE / 6 * 0.1));
-			ctx.lineTo(canvas.width - Math.floor(SCALE / 6 * 0.9), Math.floor(SCALE / 6 * 0.9));
-			ctx.lineTo(canvas.width - 10, Math.floor(SCALE / 12));
-			ctx.closePath();
-			ctx.fill();
-		}
+		PlayPauseButton.draw();
 
 		ctx.textAlign = 'left';
 		ctx.textBaseline = 'top';
@@ -134,21 +221,25 @@ function CanYouFillItCanvasGui(game, containerID) {
 		var scoreOffset = ctx.measureText('Highscore ').width;
 		ctx.fillText(game.highscore, LEFT_BORDER + scoreOffset, V_OFFSET + SCALE / 120);
 		ctx.fillText(game.score, LEFT_BORDER + scoreOffset, V_OFFSET + SCALE / 12);
+	}
 
-		if(game.state == game.PAUSED()) {
-			ctx.font = Math.floor(SCALE / 8) + 'px Arial';
-			var s = ctx.measureText('Pause').width,
-			    o = 0.2 * SCALE / 8;
-			ctx.fillStyle = 'black';
-			ctx.fillRect(Math.floor((canvas.width - s - o) / 2),
-			             Math.floor((canvas.height - Math.floor(SCALE / 12) - o) / 2),
-			             Math.ceil(s + o),
-			             Math.ceil(Math.floor(SCALE / 12) + o));
+	function draw() {
+		// clearRect doesn't work on android stock browser, fillRect is used instead
+		// ctx.clearRect(0, 0, canvas.width, canvas.height);
+		ctx.fillStyle = 'black';
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-			ctx.textAlign = 'center';
-			ctx.textBaseline = 'middle';
-			ctx.fillStyle = 'white';
-			ctx.fillText('Pause', canvas.width / 2, canvas.height / 2);
+		if(that.state == that.MENU) {
+			MenuScreen.draw();
+		} else {
+			if(game.state == game.GAMEOVER()) {
+				GameOverScreen.draw();
+			} else {
+				drawGame();
+				if(game.state == game.PAUSED()) {
+					PauseScreen.draw();
+				}
+			}
 		}
 	}
 
@@ -164,8 +255,6 @@ function CanYouFillItCanvasGui(game, containerID) {
 
 		if(game.state == game.RUNNING()) {
 			window.requestAnimationFrame(step);
-		} else {
-			setTimeout(function() { window.requestAnimationFrame(step); }, 250);
 		}
 	}
 
@@ -185,35 +274,31 @@ function CanYouFillItCanvasGui(game, containerID) {
 
 		lastClickDate = Date.now();
 
-		if(game.state == game.GAMEOVER()) {
-			game.reset();
-			return false;
-		}
-
 		var rect = canvas.getBoundingClientRect();
 		var x = evx - rect.left,
 		    y = evy - rect.top;
 
-		if((x > canvas.width - Math.floor(SCALE / 6)) && (y < Math.floor(SCALE / 6))) {
-			if(game.state == game.RUNNING()) {
-				game.pause();
-			} else if(game.state == game.PAUSED()) {
-				game.resume();
-			}
-
-			return false;
+		if(that.state == that.MENU) {
+			MenuScreen.handleClick(x, y);
+			return;
 		}
+
+		if(game.state == game.GAMEOVER()) {
+			if(GameOverScreen.handleClick(x, y))
+				return;
+		}
+
+		if(PlayPauseButton.handleClick(x, y))
+			return;
 
 		if((game.currentBall == null) && (game.state == game.RUNNING())) {
 			game.fire();
-			return false;
+			return;
 		}
-
-		return false;
 	}
 
 	function handleVisibilityChange() {
-		if (document.hidden) {
+		if(document.hidden) {
 			game.pause();
 		}
 	}
@@ -223,6 +308,8 @@ function CanYouFillItCanvasGui(game, containerID) {
 		canvas.height = container.clientHeight;
 
 		computeGameDimensions();
+
+		window.requestAnimationFrame(step);
 	}
 
 	function computeGameDimensions() {
@@ -249,11 +336,17 @@ function CanYouFillItCanvasGui(game, containerID) {
 		CANNON_WIDTH       = SCALE / 18;
 	}
 
+	this.MENU = 1;
+	this.GAME = 2;
+
+	this.state = this.MENU;
+
 	this.game = game;
 	this.observable = new Observable();
 
 	var container = document.getElementById(containerID),
-	       canvas = container.appendChild(document.createElement('canvas'));
+	       canvas = container.appendChild(document.createElement('canvas'));//,
+	//         menu = container.appendChild(document.createElement('div'));
 
 	var ctx = canvas.getContext('2d');
 
@@ -267,15 +360,16 @@ function CanYouFillItCanvasGui(game, containerID) {
 
 	canvas.style.display = 'block';
 	canvas.style.background = 'black';
+	// https://bugzilla.mozilla.org/show_bug.cgi?id=430906
+	canvas.setAttribute('moz-opaque', 'moz-opaque');
 
 	window.addEventListener('resize', resizeCanvas, false);
-	resizeCanvas();
 	canvas.addEventListener('mousedown', handleClick, false);
 	canvas.addEventListener('touchstart', handleTouch, false);
 
 	document.addEventListener('visibilitychange', handleVisibilityChange, false);
 
-	window.requestAnimationFrame(step);
+	resizeCanvas();
 }
 
 CanYouFillItCanvasGui.prototype.addObserver = function(o) {
