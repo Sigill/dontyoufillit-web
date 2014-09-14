@@ -1,3 +1,4 @@
+"use strict";
 function roundedRectangle(context, left, top, right, bottom, radius) {
 	context.beginPath();
 	context.moveTo(left + radius, top);
@@ -9,7 +10,7 @@ function roundedRectangle(context, left, top, right, bottom, radius) {
 }
 
 function CanYouFillItCanvasGui(game, containerID) {
-	PlayPauseButton = {
+	var PlayPauseButton = {
 		draw: function() {
 			ctx.fillStyle = 'white';
 			if(game.state == game.RUNNING()) {
@@ -46,7 +47,7 @@ function CanYouFillItCanvasGui(game, containerID) {
 		}
 	};
 
-	MenuScreen = {
+	var MenuScreen = {
 		draw: function() {
 			ctx.textAlign = 'center';
 			ctx.textBaseline = 'middle';
@@ -104,7 +105,7 @@ function CanYouFillItCanvasGui(game, containerID) {
 	};
 
 	// TODO Add "Menu" button
-	GameOverScreen = {
+	var GameOverScreen = {
 		draw: function() {
 			ctx.textAlign = 'center';
 			ctx.textBaseline = 'middle';
@@ -148,7 +149,7 @@ function CanYouFillItCanvasGui(game, containerID) {
 	};
 
 	// TODO Add "Menu" button
-	PauseScreen = {
+	var PauseScreen = {
 		draw: function() {
 			ctx.font = Math.floor(SCALE / 8) + 'px Arial';
 			var s = ctx.measureText('Pause').width,
