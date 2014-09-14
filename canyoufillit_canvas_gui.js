@@ -375,8 +375,6 @@ function CanYouFillItCanvasGui(game, containerID) {
 		canvas.height = container.clientHeight;
 
 		computeGameDimensions();
-
-		window.requestAnimationFrame(step);
 	}
 
 	function computeGameDimensions() {
@@ -437,6 +435,8 @@ function CanYouFillItCanvasGui(game, containerID) {
 	document.addEventListener('visibilitychange', handleVisibilityChange, false);
 
 	resizeCanvas();
+
+	window.requestAnimationFrame(step);
 }
 
 CanYouFillItCanvasGui.prototype.addObserver = function(o) {
