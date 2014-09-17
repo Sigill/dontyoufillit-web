@@ -12,11 +12,94 @@ body, html { height:100%; }
 #d {
 	width: 100%;
 	height: 100%;
+	overflow: hidden;
+}
+#c {
+	display: block;
+	background-color: black;
+}
+.modalScreen {
+	position: absolute;
+	display: none;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	padding: 0 1em;
+	overflow-x: hidden;
+	overflow-y: auto;
+	background-color: black;
+	color: white;
+	z-index: -1;
+	text-align: center;
+	font-family: 'Arial';
+	cursor: default;
+}
+.modalScreen p {
+	font-size: 1.5em;
+}
+#startScreen {
+	z-index: 1;
+	display: block;
+}
+#pauseScreen {
+	background-color: rgba(0, 0, 0, 0.85);
+}
+.modalScreen .title {
+	margin: 1em auto;
+	font-size: 3.5em;
+	font-weight: bold;
+}
+.modalScreen .button {
+	font-size: 3em;
+	margin: 2em auto;
+}
+.modalScreen .button span {
+	background-color: white;
+	color: black;
+	border-radius: 0.25em;
+	padding: 0.25em;
+	font-weight: bold;
+	cursor: pointer;
+	line-height: 1.6;
+}
+.modalScreen .score {
+	font-size: 2em;
+}
+.modalScreen .leftAligned {
+	text-align: left;
+}
+.modalScreen .leftAligned p {
+	margin: 1em 0;
 }
 	</style>
 </head>
 <body>
 <div id="d">
+	<!-- moz-opaque: https://bugzilla.mozilla.org/show_bug.cgi?id=430906 -->
+	<canvas id="c" moz-opaque></canvas>
+	<div id="startScreen" class="modalScreen">
+		<p class="title">CanYouFillIt</p>
+		<p class="button"><span id="startScreenPlayButton">Play</span></p>
+		<p>Developped by Cyrille Faucheux</p>
+		<p>Freely inspired by gimmefrictionbaby.com</p>
+		<p class="button"><span id="startScreenLicenseButton">License</span></p>
+	</div>
+	<div id="pauseScreen" class="modalScreen">
+		<p class="title">Game paused</p>
+		<p class="button"><span id="pauseScreenContinueButton">Continue</span></p>
+	</div>
+	<div id="gameoverScreen" class="modalScreen">
+		<p class="title">Game Over</p>
+		<p class="score"><span id="gameoverScreenScoreMessage">Your score</span><span id="gameoverScreenHighscoreMessage">New highscore</span>: <span id="gameoverScreenScore"></span></p>
+		<p class="button"><span id="gameoverScreenPlayAgainButton">Play again</span></p>
+	</div>
+	<div id="licenseScreen" class="modalScreen">
+		<p class="title">License</p>
+		<div class="leftAligned">
+		$LICENSE$
+		</div>
+	</div>
 </div>
 <!-- https://github.com/darius/requestAnimationFrame -->
 <script src="requestAnimationFrame.min.js"></script>
@@ -27,7 +110,7 @@ body, html { height:100%; }
 <script>
 "use strict";
 var game = new CanYouFillItGame();
-var gui = new CanYouFillItCanvasGui(game, 'd');
+var gui = new CanYouFillItCanvasGui(game, 'c');
 
 function isDebug() {
 	var query = window.location.search.substring(1);

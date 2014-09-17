@@ -1,5 +1,5 @@
 "use strict";
-function CanYouFillItCanvasGui(game, containerID) {
+function CanYouFillItCanvasGui(game, canvasID) {
 	var PlayPauseButton = {
 		draw: function() {
 			ctx.fillStyle = 'white';
@@ -18,7 +18,7 @@ function CanYouFillItCanvasGui(game, containerID) {
 			if((x > canvas.width - Math.floor(SCALE / 6)) && (y < Math.floor(SCALE / 6))) {
 				if(game.state == game.RUNNING()) {
 					game.pause();
-					pauseMenu.style.zIndex = 1;
+					setScreenVisible(pauseScreen, 1);
 				}
 
 				return true;
@@ -175,7 +175,10 @@ function CanYouFillItCanvasGui(game, containerID) {
 		if(game.state == game.RUNNING()) {
 			window.requestAnimationFrame(step);
 		} else if(game.state == game.GAMEOVER()) {
-			gameoverMenu.style.zIndex = 1;
+			document.getElementById('gameoverScreenScoreMessage').style.display = (game.newHighscore ? 'none' : 'inline');
+			document.getElementById('gameoverScreenHighscoreMessage').style.display = (game.newHighscore ? 'inline' : 'none');
+			document.getElementById('gameoverScreenScore').innerHTML = game.score;
+			setScreenVisible(gameoverScreen, 1);
 		}
 	}
 
@@ -249,23 +252,9 @@ function CanYouFillItCanvasGui(game, containerID) {
 		CANNON_WIDTH       = SCALE / 18;
 	}
 
-	function makeMenu() {
-		var m = container.appendChild(document.createElement('div'));
-		m.style.position = 'absolute';
-		m.style.top = '0';
-		m.style.left = '0';
-		m.style.bottom = '0';
-		m.style.right = '0';
-		m.style.overflowX = 'hidden';
-		m.style.overflowY = 'auto';
-		m.style.backgroundColor = 'black';
-		m.style.color = 'white';
-		m.style.zIndex = -1;
-		m.style.textAlign = 'center';
-		m.style.fontFamily = 'Arial';
-		m.style.cursor = 'default';
-
-		return m;
+	function setScreenVisible(screen, zindex) {
+		screen.style.zIndex = (zindex >= 0 ? zindex : -1);
+		screen.style.display = (zindex >= 0 ? 'block' : 'none');
 	}
 
 	this.MENU = 1;
@@ -276,108 +265,39 @@ function CanYouFillItCanvasGui(game, containerID) {
 	this.game = game;
 	this.observable = new Observable();
 
-	var container = document.getElementById(containerID),
-	       canvas = container.appendChild(document.createElement('canvas')),
-	         startMenu = makeMenu(),
-	         pauseMenu = makeMenu(),
-	      gameoverMenu = makeMenu();
+	var      canvas = document.getElementById(canvasID),
+	      container = canvas.parentNode,
+	    startScreen = document.getElementById('startScreen'),
+	    pauseScreen = document.getElementById('pauseScreen'),
+	 gameoverScreen = document.getElementById('gameoverScreen'),
+	  licenseScreen = document.getElementById('licenseScreen');
 
-	{
-		startMenu.style.zIndex = 1;
+	document.getElementById('startScreenPlayButton').addEventListener('click', function(evt) {
+		evt.preventDefault();
+		game.resume();
+		that.state = that.GAME;
+		window.requestAnimationFrame(step);
+		setScreenVisible(startScreen, -1);
+	});
 
-		var t = startMenu.appendChild(document.createElement('p'));
-		t.style.marginTop = '1em';
-		t.style.fontSize = '3.5em';
-		t.style.fontWeight = 'bold';
-		t.innerHTML = 'CanYouFillIt';
+	document.getElementById('pauseScreenContinueButton').addEventListener('click', function(evt) {
+		evt.preventDefault();
+		game.resume();
+		window.requestAnimationFrame(step);
+		setScreenVisible(pauseScreen, -1);
+	});
 
-		var pb = startMenu.appendChild(document.createElement('p'));
-		pb.style.backgroundColor = 'white';
-		pb.style.color = 'black';
-		pb.style.borderRadius = '0.25em';
-		pb.style.width = '5ex';
-		pb.style.margin = '2em auto 0 auto';
-		pb.style.padding = '0.25em';
-		pb.style.fontSize = '3em';
-		pb.style.fontWeight = 'bold';
-		pb.style.cursor = 'pointer';
-		pb.innerHTML = 'Play';
+	document.getElementById('gameoverScreenPlayAgainButton').addEventListener('click', function(evt) {
+		evt.preventDefault();
+		game.reset();
+		window.requestAnimationFrame(step);
+		setScreenVisible(gameoverScreen, -1);
+	});
 
-		pb.addEventListener('click', function(evt) {
-			evt.preventDefault();
-			game.resume();
-			that.state = that.GAME;
-			window.requestAnimationFrame(step);
-			startMenu.style.zIndex = -1;
-		});
-
-		var c1 = startMenu.appendChild(document.createElement('p'));
-		c1.innerHTML = 'Developped by Cyrille Faucheux';
-		c1.style.fontSize = '1.5em';
-		c1.style.marginTop = '4em';
-
-		var c2 = startMenu.appendChild(document.createElement('p'));
-		c2.innerHTML = 'Freely inspired by gimmefrictionbaby.com';
-		c2.style.fontSize = '1.5em';
-		c2.style.marginTop = '1.5em';
-	}
-
-	{
-		pauseMenu.style.backgroundColor = 'rgba(0, 0, 0, 0.85)';
-
-		var t = pauseMenu.appendChild(document.createElement('p'));
-		t.style.marginTop = '1em';
-		t.style.fontSize = '3.5em';
-		t.style.fontWeight = 'bold';
-		t.innerHTML = 'Game paused';
-
-		var pb = pauseMenu.appendChild(document.createElement('p'));
-		pb.style.backgroundColor = 'white';
-		pb.style.color = 'black';
-		pb.style.borderRadius = '0.25em';
-		pb.style.width = '8ex';
-		pb.style.margin = '1.5em auto 0 auto';
-		pb.style.padding = '0.25em';
-		pb.style.fontSize = '3em';
-		pb.style.fontWeight = 'bold';
-		pb.style.cursor = 'pointer';
-		pb.innerHTML = 'Continue';
-
-		pb.addEventListener('click', function(evt) {
-			evt.preventDefault();
-			game.resume();
-			window.requestAnimationFrame(step);
-			pauseMenu.style.zIndex = -1;
-		});
-	}
-
-	// TODO Display score
-	{
-		var t = gameoverMenu.appendChild(document.createElement('p'));
-		t.style.marginTop = '1em';
-		t.style.fontSize = '3.5em';
-		t.style.fontWeight = 'bold';
-		t.innerHTML = 'Game Over';
-
-		var pb = gameoverMenu.appendChild(document.createElement('p'));
-		pb.style.backgroundColor = 'white';
-		pb.style.color = 'black';
-		pb.style.borderRadius = '0.25em';
-		pb.style.width = '10ex';
-		pb.style.margin = '1.5em auto 0 auto';
-		pb.style.padding = '0.25em';
-		pb.style.fontSize = '3em';
-		pb.style.fontWeight = 'bold';
-		pb.style.cursor = 'pointer';
-		pb.innerHTML = 'Play again';
-
-		pb.addEventListener('click', function(evt) {
-			evt.preventDefault();
-			game.reset();
-			window.requestAnimationFrame(step);
-			gameoverMenu.style.zIndex = -1;
-		});
-	}
+	document.getElementById('startScreenLicenseButton').addEventListener('click', function(evt) {
+		evt.preventDefault();
+		setScreenVisible(licenseScreen, 2);
+	});
 
 	var ctx = canvas.getContext('2d');
 
@@ -388,11 +308,6 @@ function CanYouFillItCanvasGui(game, containerID) {
 	var lastClickDate = 0;
 
 	var that = this; // Allow to access this from the closure.
-
-	canvas.style.display = 'block';
-	canvas.style.background = 'black';
-	// https://bugzilla.mozilla.org/show_bug.cgi?id=430906
-	canvas.setAttribute('moz-opaque', 'moz-opaque');
 
 	window.addEventListener('resize', resizeCanvas, false);
 	canvas.addEventListener('mousedown', handleClick, false);
