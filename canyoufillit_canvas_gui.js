@@ -1,14 +1,4 @@
 "use strict";
-function roundedRectangle(context, left, top, right, bottom, radius) {
-	context.beginPath();
-	context.moveTo(left + radius, top);
-	context.arcTo(right, top,    right,         bottom, radius);
-	context.arcTo(right, bottom, left,          bottom, radius);
-	context.arcTo(left,  bottom, left,          top,    radius);
-	context.arcTo(left,  top,    left + radius, top,    radius);
-	context.closePath();
-}
-
 function CanYouFillItCanvasGui(game, containerID) {
 	var PlayPauseButton = {
 		draw: function() {
@@ -22,148 +12,19 @@ function CanYouFillItCanvasGui(game, containerID) {
 				             Math.floor(SCALE / 6 * 0.1),
 				             Math.floor(SCALE / 6 * 0.3),
 				             Math.floor(SCALE / 6 * 0.8));
-			} else if(game.state == game.PAUSED()) {
-				ctx.beginPath();
-				ctx.moveTo(canvas.width - Math.floor(SCALE / 6 * 0.9), Math.floor(SCALE / 6 * 0.1));
-				ctx.lineTo(canvas.width - Math.floor(SCALE / 6 * 0.9), Math.floor(SCALE / 6 * 0.9));
-				ctx.lineTo(canvas.width - 10, Math.floor(SCALE / 12));
-				ctx.closePath();
-				ctx.fill();
 			}
 		},
 		handleClick: function(x, y) {
 			if((x > canvas.width - Math.floor(SCALE / 6)) && (y < Math.floor(SCALE / 6))) {
 				if(game.state == game.RUNNING()) {
 					game.pause();
-				} else if(game.state == game.PAUSED()) {
-					game.resume();
-					window.requestAnimationFrame(step);
+					pauseMenu.style.zIndex = 1;
 				}
 
 				return true;
 			}
 
 			return false;
-		}
-	};
-
-	var MenuScreen = {
-		draw: function() {
-			ctx.textAlign = 'center';
-			ctx.textBaseline = 'middle';
-			ctx.fillStyle = 'white';
-
-			ctx.font = Math.floor(SCALE / 8) + 'px Arial';
-			ctx.fillText('CanYouFillIt',
-			             LEFT_BORDER + SCALE / 2,
-			             TOP_BORDER + SCALE / 2 - 2 * Math.floor(SCALE / 8));
-
-			ctx.font = Math.floor(SCALE / 10) + 'px Arial';
-			var w = ctx.measureText('Play now').width,
-			    o = Math.floor(SCALE / 10) / 5;
-			roundedRectangle(ctx,
-			                 Math.floor(LEFT_BORDER + (SCALE - w) / 2 - o),
-			                 Math.floor(TOP_BORDER + (SCALE - Math.floor(SCALE / 10)) / 2 - o),
-			                 Math.floor(LEFT_BORDER + (SCALE + w) / 2 + o),
-			                 Math.floor(TOP_BORDER + (SCALE + Math.floor(SCALE / 10)) / 2 + o),
-			                 SCALE / 50);
-			ctx.fill();
-			ctx.fillStyle = 'black';
-			ctx.fillText('Play now',
-			             LEFT_BORDER + SCALE / 2,
-			             TOP_BORDER + SCALE / 2);
-
-			ctx.fillStyle = 'white';
-			ctx.font = Math.floor(SCALE / 24) + 'px Arial';
-			ctx.fillText('Developped by',
-			             LEFT_BORDER + SCALE / 2,
-			             BOTTOM_BORDER - 4 * Math.floor(SCALE / 24));
-			ctx.fillText('Cyrille Faucheux',
-			             LEFT_BORDER + SCALE / 2,
-			             BOTTOM_BORDER - 3 * Math.floor(SCALE / 24));
-			ctx.fillText('Freely inspired by',
-			             LEFT_BORDER + SCALE / 2,
-			             BOTTOM_BORDER - 1.5 * Math.floor(SCALE / 24));
-			ctx.fillText('gimmefrictionbaby.com',
-			             LEFT_BORDER + SCALE / 2,
-			             BOTTOM_BORDER - 0.5 * Math.floor(SCALE / 24));
-		},
-		handleClick: function(x, y) {
-			var w = ctx.measureText('Play now').width,
-			    o = Math.floor(SCALE / 10) / 5;
-			if(x >= LEFT_BORDER + (SCALE - w) / 2 - o &&
-			   x <= LEFT_BORDER + (SCALE + w) / 2 + o &&
-			   y >= TOP_BORDER + SCALE / 2 - Math.floor(SCALE / 10) / 2 - o &&
-			   y <= TOP_BORDER + SCALE / 2 + Math.floor(SCALE / 10) / 2 + o) {
-				game.resume();
-				that.state = that.GAME;
-				window.requestAnimationFrame(step);
-				return true;
-			}
-			return false;
-		}
-	};
-
-	// TODO Add "Menu" button
-	var GameOverScreen = {
-		draw: function() {
-			ctx.textAlign = 'center';
-			ctx.textBaseline = 'middle';
-			ctx.fillStyle = 'white';
-
-			ctx.font = Math.floor(SCALE / 8) + 'px Arial';
-			ctx.fillText('Game Over', LEFT_BORDER + SCALE / 2, TOP_BORDER + SCALE / 2 - 2 * Math.floor(SCALE / 8));
-
-			ctx.font = Math.floor(SCALE / 10) + 'px Arial';
-			ctx.fillText((game.newHighScore ? 'New highscore: ' : 'Your score: ') + game.score,
-			             LEFT_BORDER + SCALE / 2, TOP_BORDER + SCALE / 2);
-
-			var w = ctx.measureText('Play again').width,
-			    o = Math.floor(SCALE / 10) / 5;
-			roundedRectangle(ctx,
-			                 Math.floor(LEFT_BORDER + (SCALE - w) / 2 - o),
-			                 Math.floor(TOP_BORDER + SCALE / 2 + 2 * Math.floor(SCALE / 8) - Math.floor(SCALE / 10) / 2 - o),
-			                 Math.floor(LEFT_BORDER + (SCALE + w) / 2 + o),
-			                 Math.floor(TOP_BORDER + SCALE / 2 + 2 * Math.floor(SCALE / 8) + Math.floor(SCALE / 10) / 2 + o),
-			                 SCALE / 50);
-			ctx.fill();
-			ctx.fillStyle = 'black';
-			ctx.fillText('Play again',
-			             LEFT_BORDER + SCALE / 2,
-			             TOP_BORDER + SCALE / 2 + 2 * Math.floor(SCALE / 8));
-		},
-		handleClick: function(x, y) {
-			var w = ctx.measureText('Play again').width,
-			    o = Math.floor(SCALE / 10) / 5;
-			if(x >= LEFT_BORDER + (SCALE - w) / 2 - o &&
-			   x <= LEFT_BORDER + (SCALE + w) / 2 + o &&
-			   y >= TOP_BORDER + SCALE / 2 + 2 * Math.floor(SCALE / 8) - Math.floor(SCALE / 10) / 2 - o &&
-			   y <= TOP_BORDER + SCALE / 2 + 2 * Math.floor(SCALE / 8) + Math.floor(SCALE / 10) / 2 + o) {
-				game.reset();
-				window.requestAnimationFrame(step);
-				return true;
-			}
-
-			return false;
-		}
-	};
-
-	// TODO Add "Menu" button
-	var PauseScreen = {
-		draw: function() {
-			ctx.font = Math.floor(SCALE / 8) + 'px Arial';
-			var s = ctx.measureText('Pause').width,
-			    o = 0.2 * SCALE / 8;
-			ctx.fillStyle = 'black';
-			ctx.fillRect(Math.floor((canvas.width - s - o) / 2),
-			             Math.floor((canvas.height - Math.floor(SCALE / 12) - o) / 2),
-			             Math.ceil(s + o),
-			             Math.ceil(Math.floor(SCALE / 12) + o));
-
-			ctx.textAlign = 'center';
-			ctx.textBaseline = 'middle';
-			ctx.fillStyle = 'white';
-			ctx.fillText('Pause', canvas.width / 2, canvas.height / 2);
 		}
 	};
 
@@ -296,17 +157,8 @@ function CanYouFillItCanvasGui(game, containerID) {
 		ctx.fillStyle = 'black';
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-		if(that.state == that.MENU) {
-			MenuScreen.draw();
-		} else {
-			if(game.state == game.GAMEOVER()) {
-				GameOverScreen.draw();
-			} else {
-				drawGame();
-				if(game.state == game.PAUSED()) {
-					PauseScreen.draw();
-				}
-			}
+		if(that.state == that.GAME) {
+			drawGame();
 		}
 	}
 
@@ -322,6 +174,8 @@ function CanYouFillItCanvasGui(game, containerID) {
 
 		if(game.state == game.RUNNING()) {
 			window.requestAnimationFrame(step);
+		} else if(game.state == game.GAMEOVER()) {
+			gameoverMenu.style.zIndex = 1;
 		}
 	}
 
@@ -345,16 +199,6 @@ function CanYouFillItCanvasGui(game, containerID) {
 		var x = evx - rect.left,
 		    y = evy - rect.top;
 
-		if(that.state == that.MENU) {
-			MenuScreen.handleClick(x, y);
-			return;
-		}
-
-		if(game.state == game.GAMEOVER()) {
-			if(GameOverScreen.handleClick(x, y))
-				return;
-		}
-
 		if(PlayPauseButton.handleClick(x, y))
 			return;
 
@@ -375,6 +219,10 @@ function CanYouFillItCanvasGui(game, containerID) {
 		canvas.height = container.clientHeight;
 
 		computeGameDimensions();
+
+		// Redraw event when the game is not running
+		if(game.state != game.RUNNING())
+			window.requestAnimationFrame(step);
 	}
 
 	function computeGameDimensions() {
@@ -401,6 +249,25 @@ function CanYouFillItCanvasGui(game, containerID) {
 		CANNON_WIDTH       = SCALE / 18;
 	}
 
+	function makeMenu() {
+		var m = container.appendChild(document.createElement('div'));
+		m.style.position = 'absolute';
+		m.style.top = '0';
+		m.style.left = '0';
+		m.style.bottom = '0';
+		m.style.right = '0';
+		m.style.overflowX = 'hidden';
+		m.style.overflowY = 'auto';
+		m.style.backgroundColor = 'black';
+		m.style.color = 'white';
+		m.style.zIndex = -1;
+		m.style.textAlign = 'center';
+		m.style.fontFamily = 'Arial';
+		m.style.cursor = 'default';
+
+		return m;
+	}
+
 	this.MENU = 1;
 	this.GAME = 2;
 
@@ -410,8 +277,107 @@ function CanYouFillItCanvasGui(game, containerID) {
 	this.observable = new Observable();
 
 	var container = document.getElementById(containerID),
-	       canvas = container.appendChild(document.createElement('canvas'));//,
-	//         menu = container.appendChild(document.createElement('div'));
+	       canvas = container.appendChild(document.createElement('canvas')),
+	         startMenu = makeMenu(),
+	         pauseMenu = makeMenu(),
+	      gameoverMenu = makeMenu();
+
+	{
+		startMenu.style.zIndex = 1;
+
+		var t = startMenu.appendChild(document.createElement('p'));
+		t.style.marginTop = '1em';
+		t.style.fontSize = '3.5em';
+		t.style.fontWeight = 'bold';
+		t.innerHTML = 'CanYouFillIt';
+
+		var pb = startMenu.appendChild(document.createElement('p'));
+		pb.style.backgroundColor = 'white';
+		pb.style.color = 'black';
+		pb.style.borderRadius = '0.25em';
+		pb.style.width = '5ex';
+		pb.style.margin = '2em auto 0 auto';
+		pb.style.padding = '0.25em';
+		pb.style.fontSize = '3em';
+		pb.style.fontWeight = 'bold';
+		pb.style.cursor = 'pointer';
+		pb.innerHTML = 'Play';
+
+		pb.addEventListener('click', function(evt) {
+			evt.preventDefault();
+			game.resume();
+			that.state = that.GAME;
+			window.requestAnimationFrame(step);
+			startMenu.style.zIndex = -1;
+		});
+
+		var c1 = startMenu.appendChild(document.createElement('p'));
+		c1.innerHTML = 'Developped by Cyrille Faucheux';
+		c1.style.fontSize = '1.5em';
+		c1.style.marginTop = '4em';
+
+		var c2 = startMenu.appendChild(document.createElement('p'));
+		c2.innerHTML = 'Freely inspired by gimmefrictionbaby.com';
+		c2.style.fontSize = '1.5em';
+		c2.style.marginTop = '1.5em';
+	}
+
+	{
+		pauseMenu.style.backgroundColor = 'rgba(0, 0, 0, 0.85)';
+
+		var t = pauseMenu.appendChild(document.createElement('p'));
+		t.style.marginTop = '1em';
+		t.style.fontSize = '3.5em';
+		t.style.fontWeight = 'bold';
+		t.innerHTML = 'Game paused';
+
+		var pb = pauseMenu.appendChild(document.createElement('p'));
+		pb.style.backgroundColor = 'white';
+		pb.style.color = 'black';
+		pb.style.borderRadius = '0.25em';
+		pb.style.width = '8ex';
+		pb.style.margin = '1.5em auto 0 auto';
+		pb.style.padding = '0.25em';
+		pb.style.fontSize = '3em';
+		pb.style.fontWeight = 'bold';
+		pb.style.cursor = 'pointer';
+		pb.innerHTML = 'Continue';
+
+		pb.addEventListener('click', function(evt) {
+			evt.preventDefault();
+			game.resume();
+			window.requestAnimationFrame(step);
+			pauseMenu.style.zIndex = -1;
+		});
+	}
+
+	// TODO Display score
+	{
+		var t = gameoverMenu.appendChild(document.createElement('p'));
+		t.style.marginTop = '1em';
+		t.style.fontSize = '3.5em';
+		t.style.fontWeight = 'bold';
+		t.innerHTML = 'Game Over';
+
+		var pb = gameoverMenu.appendChild(document.createElement('p'));
+		pb.style.backgroundColor = 'white';
+		pb.style.color = 'black';
+		pb.style.borderRadius = '0.25em';
+		pb.style.width = '10ex';
+		pb.style.margin = '1.5em auto 0 auto';
+		pb.style.padding = '0.25em';
+		pb.style.fontSize = '3em';
+		pb.style.fontWeight = 'bold';
+		pb.style.cursor = 'pointer';
+		pb.innerHTML = 'Play again';
+
+		pb.addEventListener('click', function(evt) {
+			evt.preventDefault();
+			game.reset();
+			window.requestAnimationFrame(step);
+			gameoverMenu.style.zIndex = -1;
+		});
+	}
 
 	var ctx = canvas.getContext('2d');
 
