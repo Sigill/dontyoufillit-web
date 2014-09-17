@@ -1,0 +1,10 @@
+{
+	"name": "CanYouFillIt",
+	"version": "1.0b",
+	"description": "A breakout-syle game mixed with snooker.",
+	"package_path": "URL/CanYouFillIt-WebApp.zip",
+	"developer": {
+		"name": "Cyrille Faucheux",
+		"url": "http://about.me/cyrille.faucheux"
+	}
+}
