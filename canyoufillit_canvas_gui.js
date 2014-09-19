@@ -254,6 +254,8 @@ function CanYouFillItCanvasGui(game, canvasID) {
 
 	function setScreenVisible(screen, zindex) {
 		screen.style.zIndex = (zindex >= 0 ? zindex : -1);
+		screen.scrollTop = 0;
+		// Prevent flickering
 		screen.style.display = (zindex >= 0 ? 'block' : 'none');
 	}
 
@@ -297,6 +299,11 @@ function CanYouFillItCanvasGui(game, canvasID) {
 	document.getElementById('startScreenLicenseButton').addEventListener('click', function(evt) {
 		evt.preventDefault();
 		setScreenVisible(licenseScreen, 2);
+	});
+
+	document.getElementById('licenseScreenBackButton').addEventListener('click', function(evt) {
+		evt.preventDefault();
+		setScreenVisible(licenseScreen, -1);
 	});
 
 	var ctx = canvas.getContext('2d');

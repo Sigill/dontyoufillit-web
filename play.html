@@ -4,100 +4,71 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<title>CanYouFillIt</title>
-	<style>
-* { margin: 0; padding: 0;}
+	<link rel="stylesheet" href="app.css">
 
-body, html { height:100%; }
+	<!-- For iPad with high-resolution Retina display running iOS ≥ 7: -->
+	<link rel="apple-touch-icon" sizes="152x152" href="icon-153.png">
+	<!-- For iPad with high-resolution Retina display running iOS ≤ 6: -->
+	<link rel="apple-touch-icon" sizes="144x144" href="icon-144.png">
+	<!-- For iPhone with high-resolution Retina display running iOS ≥ 7: -->
+	<link rel="apple-touch-icon" sizes="120x120" href="icon-120.png">
+	<!-- For iPhone with high-resolution Retina display running iOS ≤ 6: -->
+	<link rel="apple-touch-icon" sizes="114x114" href="icon-114.png">
+	<!-- For first- and second-generation iPad: -->
+	<link rel="apple-touch-icon" sizes="72x72" href="icon-72.png">
+	<!-- For non-Retina iPhone, iPod Touch, and Android 2.1+ devices: -->
+	<link rel="apple-touch-icon" href="icon-57.png">
 
-#d {
-	width: 100%;
-	height: 100%;
-	overflow: hidden;
-}
-#c {
-	display: block;
-	background-color: black;
-}
-.modalScreen {
-	position: absolute;
-	display: none;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	padding: 0 1em;
-	overflow-x: hidden;
-	overflow-y: auto;
-	background-color: black;
-	color: white;
-	z-index: -1;
-	text-align: center;
-	font-family: 'Arial';
-	cursor: default;
-}
-.modalScreen p {
-	font-size: 1.5em;
-}
-#startScreen {
-	z-index: 1;
-	display: block;
-}
-#pauseScreen {
-	background-color: rgba(0, 0, 0, 0.85);
-}
-.modalScreen .title {
-	margin: 1em auto;
-	font-size: 3.5em;
-	font-weight: bold;
-}
-.modalScreen .button {
-	font-size: 3em;
-	margin: 2em auto;
-}
-.modalScreen .button span {
-	background-color: white;
-	color: black;
-	border-radius: 0.25em;
-	padding: 0.25em;
-	font-weight: bold;
-	cursor: pointer;
-	line-height: 1.6;
-}
-.modalScreen .score {
-	font-size: 2em;
-}
-.modalScreen .leftAligned {
-	text-align: left;
-}
-.modalScreen .leftAligned p {
-	margin: 1em 0;
-}
-	</style>
+	<link rel="icon" type="image/png" sizes="152x152" href="icon-152.png">
+	<link rel="icon" type="image/png" sizes="144x144" href="icon-144.png">
+	<link rel="icon" type="image/png" sizes="120x120" href="icon-120.png">
+	<link rel="icon" type="image/png" sizes="114x114" href="icon-114.png">
+	<link rel="icon" type="image/png" sizes="96x96" href="icon-96.png">
+	<link rel="icon" type="image/png" sizes="72x72" href="icon-72.png">
+	<link rel="icon" type="image/png" sizes="57x57" href="icon-57.png">
+	<link rel="icon" type="image/png" sizes="48x48" href="icon-48.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="icon-16.png">
+
+	<link rel="icon" type="image/x-icon" sizes="16x16 32x32 48x48 57x57" href="favicon.ico">
+
+	<meta name="msapplication-TileColor" content="#000000">
+	<meta name="msapplication-TileImage" content="icon-144.png">
+
+	<meta name="apple-mobile-web-app-capable" content="yes">
 </head>
 <body>
 <div id="d">
-	<!-- moz-opaque: https://bugzilla.mozilla.org/show_bug.cgi?id=430906 -->
-	<canvas id="c" moz-opaque></canvas>
+	<canvas id="c"></canvas>
 	<div id="startScreen" class="modalScreen">
-		<p class="title">CanYouFillIt</p>
-		<p class="button"><span id="startScreenPlayButton">Play</span></p>
-		<p>Developped by Cyrille Faucheux</p>
-		<p>Freely inspired by gimmefrictionbaby.com</p>
-		<p class="button"><span id="startScreenLicenseButton">License</span></p>
+		<div class="container">
+			<p class="title">CanYouFillIt</p>
+			<p>Developped by Cyrille&nbsp;Faucheux</p>
+			<p>Freely inspired by gimmefrictionbaby.com</p>
+			<p class="button"><span id="startScreenPlayButton">Play</span></p>
+			<p class="button"><span id="startScreenLicenseButton">License</span></p>
+		</div>
 	</div>
 	<div id="pauseScreen" class="modalScreen">
-		<p class="title">Game paused</p>
-		<p class="button"><span id="pauseScreenContinueButton">Continue</span></p>
+		<div class="container">
+			<p class="title">Game paused</p>
+			<p class="button"><span id="pauseScreenContinueButton">Continue</span></p>
+		</div>
 	</div>
 	<div id="gameoverScreen" class="modalScreen">
-		<p class="title">Game Over</p>
-		<p class="score"><span id="gameoverScreenScoreMessage">Your score</span><span id="gameoverScreenHighscoreMessage">New highscore</span>: <span id="gameoverScreenScore"></span></p>
-		<p class="button"><span id="gameoverScreenPlayAgainButton">Play again</span></p>
+		<div class="container">
+			<p class="title">Game Over</p>
+			<p class="score"><span id="gameoverScreenScoreMessage">Your score</span><span id="gameoverScreenHighscoreMessage">New highscore</span>: <span id="gameoverScreenScore"></span></p>
+			<p class="button"><span id="gameoverScreenPlayAgainButton">Play again</span></p>
+		</div>
 	</div>
 	<div id="licenseScreen" class="modalScreen">
-		<p class="title">License</p>
-		<div class="leftAligned">
-		$LICENSE$
+		<div class="container">
+			<p class="title">License</p>
+			<div class="leftAligned">
+			$LICENSE$
+			</div>
+			<p class="button"><span id="licenseScreenBackButton">Back</span></p>
 		</div>
 	</div>
 </div>
@@ -107,39 +78,6 @@ body, html { height:100%; }
 <script src="observable.js"></script>
 <script src="canyoufillit.js"></script>
 <script src="canyoufillit_canvas_gui.js"></script>
-<script>
-"use strict";
-var game = new CanYouFillItGame();
-var gui = new CanYouFillItCanvasGui(game, 'c');
-
-function isDebug() {
-	var query = window.location.search.substring(1);
-	var vars = query.split('&');
-	for (var i = 0; i < vars.length; i++) {
-		var pair = vars[i].split('=');
-		if (pair[0] == 'debug') {
-			return true;
-		}
-	}
-	return false;
-}
-
-if(isDebug()) {
-	var stats = new Stats();
-	stats.setMode(0); // 0: fps, 1: ms
-	stats.domElement.style.position = 'absolute';
-	stats.domElement.style.left = '0px';
-	stats.domElement.style.bottom = '0px';
-	document.body.appendChild( stats.domElement );
-
-	gui.addObserver(function(message) {
-		if(message == 'beginStep')
-			stats.begin();
-		else if(message == 'endStep')
-			stats.end();
-	});
-}
-
-</script>
+<script src="app.js"></script>
 </body>
 </html>
