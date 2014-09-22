@@ -5,8 +5,9 @@
 	"launch_path": "PATH/play.html",
 	"appcache_path": "PATH/cache.manifest",
 	"icons": {
-		"128": "PATH/icon-128.png",
-		"512": "PATH/icon-512.png"
+		"128": "PATH/icon-128x128.png",
+		"512": "PATH/icon-512x512.png",
+		"64": "PATH/icon-64x64.png"
 	},
 	"developer": {
 		"name": "Cyrille Faucheux",

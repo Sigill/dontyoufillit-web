@@ -9,3 +9,11 @@ observable.js
 canyoufillit.js
 canyoufillit_canvas_gui.js
 app.js
+# BEGIN FAVICONS
+favicon.ico
+icon-270x270.png
+icon-192x192.png
+icon-128x128.png
+icon-32x32.png
+icon-16x16.png
+# END FAVICONS
