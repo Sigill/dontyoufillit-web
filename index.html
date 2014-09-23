@@ -36,42 +36,64 @@ h1 {
 </head>
 <body>
 <div class="container">
-	<div class="col-xs-12 col-md-6 col-md-offset-3 text-center">
-		<div class="page-header">
+	<div class="col-xs-12 col-md-8 col-md-offset-2">
+		<div class="page-header text-center">
 			<h1>CanYouFillIt</h1>
 		</div>
 		<p>CanYouFillIt is a Breakout-like game mixed with snooker. It is freely inspired by the game available at <a href="http://gimmefrictionbaby.com">gimmefrictionbaby.com</a>. It has been developed with HTML5 technologies, so it should work on any modern browser (including mobile ones).</p>
 		<p><a class="btn btn-primary btn-lg btn-block" href="play.html" title="Play CanYouFillIt"><strong>Play now</strong></a></p>
-		<p>The game has been designed to be available <strong>offline</strong>. Play once, and bookmark the page. You will then be able to play without any internet connection.</p>
-		<p>If your browser is <strong>Firefox</strong> or <strong>Chrome</strong>, you can install the game as an Open Web App.</p>
-		<p><button id="firefox-install-btn" class="btn btn-default btn-lg btn-block">Install in Firefox (hosted)</button></p>
-		<p><button id="firefox-install-package-btn" class="btn btn-default btn-lg btn-block">Install in Firefox (packaged)</button></p>
-		<p><a class="btn btn-default btn-lg btn-block" href="CanYouFillIt-ChromeHosted.crx">Install in Chrome (hosted)</a></p>
-		<p><a class="btn btn-default btn-lg btn-block" href="CanYouFillIt-ChromePackaged.crx">Install in Chrome (packaged)</a></p>
+
+		<h2>Play offline</h2>
+		<p>The game has been designed to be available <strong>offline</strong> (so that you don't need any internet connection to play).</p>
+		<p>Depending on your operating system or web browser, there are several ways to make the game available offline.</p>
+
+		<h3>Every browser on every operating system</h3>
+		<p>Click on the blue <em>Play now</em> button above and ask your browser to bookmark the page.</p>
+
+		<h3>Firefox, Firefox for Android, Firefox OS</h3>
+		<p>Install CanYouFillIt as an Open Web App.</p>
+		<p><button id="firefox-install-hosted-btn" class="btn btn-default btn-lg btn-block">Install in Firefox (hosted)</button></p>
+		<p><button id="firefox-install-packaged-btn" class="btn btn-default btn-lg btn-block">Install in Firefox (packaged)</button></p>
+
+		<h3>Chrome, Chrome for Android</h3>
+		<p>Click on the blue <em>Play now</em> button above then, in the Chrome menu, click on the <em>Tools/Create applications shortcut</em> (Chrome) or <em>Add to homescreen</em> (Chrome for Android) entry.</p>
+
+		<p>or</p>
+
+		<p>Install CanYouFillIt as a Chrome App.</p>
+		<p><a id="chrome-install-hosted-btn" class="btn btn-default btn-lg btn-block" href="CanYouFillIt-ChromeHosted.crx">Install in Chrome (hosted)</a></p>
+		<p><a id="chrome-install-packaged-btn" class="btn btn-default btn-lg btn-block" href="CanYouFillIt-ChromePackaged.crx">Install in Chrome (packaged)</a></p>
+		<!--
 		<p>You can also install it on your <strong>Android</strong> device.</p>
 		<p>Or on your <strong>FirefoxOS</strong> device.</p>
+		-->
 	</div>
 </div>
 <script>
-// TODO Use checkInstall to enable the install link
-// https://developer.mozilla.org/fr/Apps/Quickstart/Build/Votre_premier_application
+function platform_only_message(platform) {
+	return function() {
+		alert('This functionality is only available on the ' + platform + ' platform.');
+	};
+}
 
-var         firefox_install_button = document.getElementById('firefox-install-btn');
-    firefox_install_package_button = document.getElementById('firefox-install-package-btn');
+var firefox_platform_message_only = platform_only_message('Firefox'),
+     chrome_platform_message_only = platform_only_message('Chrome');
 
-if('mozApps' in navigator) {
+var  firefox_install_hosted_button = document.getElementById('firefox-install-hosted-btn');
+   firefox_install_packaged_button = document.getElementById('firefox-install-packaged-btn');
+
+if(navigator.mozApps) {
 	var hosted_manifest = location.href + 'manifest.webapp';
 	var hostedInstallCheck = navigator.mozApps.checkInstalled(hosted_manifest);
 	hostedInstallCheck.onsuccess = function() {
 		if(hostedInstallCheck.result) {
-			firefox_install_button.disabled = true;
+			firefox_install_hosted_button.disabled = true;
 		} else {
-			firefox_install_button.addEventListener('click', function(evt) {
-				evt.preventDefault();
-
+			firefox_install_hosted_button.addEventListener('click', function(evt) {
 				var request = navigator.mozApps.install(hosted_manifest);
 				request.onsuccess = function() {};
-				request.onerror = function() { alert('Installation failed: ' + this.error.name); };
+				request.onerror = function() { alert('Installation failed: ' + request.error.name); };
+				return false;
 			});
 		};
 	};
@@ -80,21 +102,39 @@ if('mozApps' in navigator) {
 	var packagedInstallCheck = navigator.mozApps.checkInstalled(packaged_manifest);
 	packagedInstallCheck.onsuccess = function() {
 		if(packagedInstallCheck.result) {
-			firefox_install_package_button.disabled = true;
+			firefox_install_packaged_button.disabled = true;
 		} else {
-			firefox_install_package_button.addEventListener('click', function(evt) {
-				evt.preventDefault();
-
+			firefox_install_packaged_button.addEventListener('click', function(evt) {
 				var request = navigator.mozApps.installPackage(packaged_manifest);
 				request.onsuccess = function() {};
-				request.onerror = function() { alert('Installation failed: ' + this.error.name); };
+				request.onerror = function() { alert('Installation failed: ' + request.error.name); };
+				return false;
 			});
 		};
 	};
 } else {
-	firefox_install_button.style.display = 'none'
-	firefox_install_package_button.style.display = 'none';
+	firefox_install_hosted_button.addEventListener('click', function(evt) {
+		firefox_platform_message_only();
+		return false;
+	});
+	firefox_install_packaged_button.addEventListener('click', function(evt) {
+		firefox_platform_message_only();
+		return false;
+	});
 }
+
+function allowChromeLink(evt) {
+	if(window.chrome) {
+		return true;
+	} else {
+		chrome_platform_message_only();
+		evt.preventDefault();
+		return false;
+	}
+}
+
+document.getElementById('chrome-install-hosted-btn').addEventListener('click', allowChromeLink);
+document.getElementById('chrome-install-packaged-btn').addEventListener('click', allowChromeLink);
 
 </script>
 </body>
