@@ -1,6 +1,6 @@
 {
 	"name": "CanYouFillIt",
-	"version": "1.0b",
+	"version": "0.1",
 	"description": "A breakout-syle game mixed with snooker.",
 	"launch_path": "PATH/play.html",
 	"appcache_path": "PATH/cache.manifest",

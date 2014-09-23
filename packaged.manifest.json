@@ -1,0 +1,15 @@
+{
+	"name": "CanYouFillIt",
+	"description": "A breakout-syle game mixed with snooker.",
+	"version": "0.1",
+	"app": {
+		"launch": {
+			"local_path": "play.html",
+			"container": "panel"
+		}
+	},
+	"icons": {
+		"128": "icon-128x128.png"
+	},
+	"manifest_version": 2
+}

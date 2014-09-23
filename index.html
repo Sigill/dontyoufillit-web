@@ -6,34 +6,8 @@
 	<title>CanYouFillIt</title>
 	<link rel="stylesheet" href="bootstrap.css">
 
-	<!-- For iPad with high-resolution Retina display running iOS ≥ 7: -->
-	<link rel="apple-touch-icon" sizes="152x152" href="icon-153.png">
-	<!-- For iPad with high-resolution Retina display running iOS ≤ 6: -->
-	<link rel="apple-touch-icon" sizes="144x144" href="icon-144.png">
-	<!-- For iPhone with high-resolution Retina display running iOS ≥ 7: -->
-	<link rel="apple-touch-icon" sizes="120x120" href="icon-120.png">
-	<!-- For iPhone with high-resolution Retina display running iOS ≤ 6: -->
-	<link rel="apple-touch-icon" sizes="114x114" href="icon-114.png">
-	<!-- For first- and second-generation iPad: -->
-	<link rel="apple-touch-icon" sizes="72x72" href="icon-72.png">
-	<!-- For non-Retina iPhone, iPod Touch, and Android 2.1+ devices: -->
-	<link rel="apple-touch-icon" href="icon-57.png">
-
-	<link rel="icon" type="image/png" sizes="152x152" href="icon-152.png">
-	<link rel="icon" type="image/png" sizes="144x144" href="icon-144.png">
-	<link rel="icon" type="image/png" sizes="120x120" href="icon-120.png">
-	<link rel="icon" type="image/png" sizes="114x114" href="icon-114.png">
-	<link rel="icon" type="image/png" sizes="96x96" href="icon-96.png">
-	<link rel="icon" type="image/png" sizes="72x72" href="icon-72.png">
-	<link rel="icon" type="image/png" sizes="57x57" href="icon-57.png">
-	<link rel="icon" type="image/png" sizes="48x48" href="icon-48.png">
-	<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
-	<link rel="icon" type="image/png" sizes="16x16" href="icon-16.png">
-
-	<link rel="icon" type="image/x-icon" sizes="16x16 32x32 48x48 57x57" href="favicon.ico">
-
-	<meta name="msapplication-TileColor" content="#000000">
-	<meta name="msapplication-TileImage" content="icon-144.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="icon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="icon-16x16.png">
 
 	<style>
 body {
@@ -70,9 +44,10 @@ h1 {
 		<p><a class="btn btn-primary btn-lg btn-block" href="play.html" title="Play CanYouFillIt"><strong>Play now</strong></a></p>
 		<p>The game has been designed to be available <strong>offline</strong>. Play once, and bookmark the page. You will then be able to play without any internet connection.</p>
 		<p>If your browser is <strong>Firefox</strong> or <strong>Chrome</strong>, you can install the game as an Open Web App.</p>
-		<p><a id="firefox-install-btn" class="btn btn-default btn-lg btn-block" href="#">Install in Firefox</a></p>
-		<p><a id="firefox-install-package-btn" class="btn btn-default btn-lg btn-block" href="#">Install package in Firefox</a></p>
-		<p><a class="btn btn-default btn-lg btn-block" href="#">Install in Chrome&nbsp;(comming soon)</a></p>
+		<p><button id="firefox-install-btn" class="btn btn-default btn-lg btn-block">Install in Firefox (hosted)</button></p>
+		<p><button id="firefox-install-package-btn" class="btn btn-default btn-lg btn-block">Install in Firefox (packaged)</button></p>
+		<p><a class="btn btn-default btn-lg btn-block" href="CanYouFillIt-ChromeHosted.crx">Install in Chrome (hosted)</a></p>
+		<p><a class="btn btn-default btn-lg btn-block" href="CanYouFillIt-ChromePackaged.crx">Install in Chrome (packaged)</a></p>
 		<p>You can also install it on your <strong>Android</strong> device.</p>
 		<p>Or on your <strong>FirefoxOS</strong> device.</p>
 	</div>
@@ -80,39 +55,46 @@ h1 {
 <script>
 // TODO Use checkInstall to enable the install link
 // https://developer.mozilla.org/fr/Apps/Quickstart/Build/Votre_premier_application
-var firefox_install_button = document.getElementById('firefox-install-btn');
-firefox_install_button.addEventListener('click', function(evt) {
-	evt.preventDefault();
 
-	if('mozApps' in navigator) {
-		var request = navigator.mozApps.install(location.href + 'manifest.webapp');
-		request.onsuccess = function() {
-			alert('CanYouFillIt has been successfully installed.');
-		};
-		request.onerror = function() {
-			alert('Installation failed: ' + this.error.name);
-		};
-	} else {
-		alert('This functionality is only available on the Firefox platform.');
-	}
-});
+var         firefox_install_button = document.getElementById('firefox-install-btn');
+    firefox_install_package_button = document.getElementById('firefox-install-package-btn');
 
-var firefox_install_package_button = document.getElementById('firefox-install-package-btn');
-firefox_install_package_button.addEventListener('click', function(evt) {
-	evt.preventDefault();
+if('mozApps' in navigator) {
+	var hosted_manifest = location.href + 'manifest.webapp';
+	var hostedInstallCheck = navigator.mozApps.checkInstalled(hosted_manifest);
+	hostedInstallCheck.onsuccess = function() {
+		if(hostedInstallCheck.result) {
+			firefox_install_button.disabled = true;
+		} else {
+			firefox_install_button.addEventListener('click', function(evt) {
+				evt.preventDefault();
 
-	if('mozApps' in navigator) {
-		var request = navigator.mozApps.installPackage(location.href + 'package.webapp');
-		request.onsuccess = function() {
-			alert('CanYouFillIt has been successfully installed.');
+				var request = navigator.mozApps.install(hosted_manifest);
+				request.onsuccess = function() {};
+				request.onerror = function() { alert('Installation failed: ' + this.error.name); };
+			});
 		};
-		request.onerror = function() {
-			alert('Installation failed: ' + this.error.name);
+	};
+
+	var packaged_manifest = location.href + 'package.webapp';
+	var packagedInstallCheck = navigator.mozApps.checkInstalled(packaged_manifest);
+	packagedInstallCheck.onsuccess = function() {
+		if(packagedInstallCheck.result) {
+			firefox_install_package_button.disabled = true;
+		} else {
+			firefox_install_package_button.addEventListener('click', function(evt) {
+				evt.preventDefault();
+
+				var request = navigator.mozApps.installPackage(packaged_manifest);
+				request.onsuccess = function() {};
+				request.onerror = function() { alert('Installation failed: ' + this.error.name); };
+			});
 		};
-	} else {
-		alert('This functionality is only available on the Firefox platform.');
-	}
-});
+	};
+} else {
+	firefox_install_button.style.display = 'none'
+	firefox_install_package_button.style.display = 'none';
+}
 
 </script>
 </body>

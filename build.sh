@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ "$#" -ne "1" ]
+if [ "$#" -ne "2" ]
 then
-	echo "You need to specity the url where the game will be published."
+	echo "Usage: $0 <publication url> <private key>"
 	exit
 fi
 
@@ -70,13 +70,35 @@ sed -e "s/# hash xyz/# hash $h/g" cache.manifest > dist/cache.manifest
 ## Build the hosted open web app manifest
 sed "s!PATH!$path!g" manifest.webapp > dist/manifest.webapp
 
-## Build the packaged open web app
+## Build the packaged Open Web App
 # Remove the favicons
 sed -e '/BEGIN FAVICONS/,/END FAVICONS/d' dist/play_online.html > tmp/packaged_app/play.html
 cp app.css requestAnimationFrame.min.js stats.min.js observable.js canyoufillit.js canyoufillit_canvas_gui.js app.js tmp/packaged_app/
 cp dist/icon-64x64.png dist/icon-128x128.png dist/icon-512x512.png tmp/packaged_app/
 sed -e "/appcache_path/d" -e "s!PATH!!g" manifest.webapp > tmp/packaged_app/manifest.webapp
 
-zip dist/CanYouFillIt-WebApp.zip -j -r tmp/packaged_app
+zip dist/CanYouFillIt-FirefoxApp.zip -j -r tmp/packaged_app
 
 sed "s!URL!$url!g" package.webapp > dist/package.webapp
+
+## Build the packaged Chrome packaged app
+# https://developer.chrome.com/extensions/apps
+# TODO Crop 128 image https://developer.chrome.com/webstore/images
+# Chrome >= 35 assumes apps are offline capable by default: https://developer.chrome.com/extensions/manifest/offline_enabled
+mkdir -p tmp/chrome/packaged
+
+sed -e '/BEGIN FAVICONS/,/END FAVICONS/d' dist/play_online.html > tmp/chrome/packaged/play.html
+cp app.css requestAnimationFrame.min.js stats.min.js observable.js canyoufillit.js canyoufillit_canvas_gui.js app.js tmp/chrome/packaged/
+cp dist/icon-128x128.png tmp/chrome/packaged/
+cp packaged.manifest.json tmp/chrome/packaged/manifest.json
+
+./crxmake.sh tmp/chrome/packaged/ $2 dist/CanYouFillIt-ChromePackaged.crx
+
+## Build the hosted Chrome packaged app
+# https://developers.google.com/chrome/apps/docs/developers_guide
+mkdir -p tmp/chrome/hosted
+
+sed "s!URL!$url!g" hosted.manifest.json > tmp/chrome/hosted/manifest.json
+cp dist/icon-128x128.png tmp/chrome/hosted/
+
+./crxmake.sh tmp/chrome/hosted/ $2 dist/CanYouFillIt-ChromeHosted.crx
