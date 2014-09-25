@@ -10,7 +10,7 @@ url=$( ruby -ruri -e "print '$1'.to_s.chomp('/')" )
 origin=$( ruby -ruri -e "print URI.join('$1', '/').to_s.chomp('/')" )
 path=$( ruby -ruri -e "print URI.parse('$1').path.chomp('/')" )
 
-rm -rf dist tmp
+rm -rf dist
 
 [ -d dist ] || mkdir dist
 [ -d tmp/packaged_app ] || mkdir -p tmp/packaged_app
@@ -29,17 +29,25 @@ rm -rf dist tmp
 
 for S in 512 270 192 128
 do
-	inkscape -z -e tmp/icon-${S}x${S}.png -w $S -h $S img/icon.svg
-	pngcrush -brute -c 0 -q tmp/icon-${S}x${S}.png dist/icon-${S}x${S}.png
+	if [ img/icon.svg -nt tmp/icon-${S}x${S}.png ]; then
+		inkscape -z -e tmp/icon-${S}x${S}.png -w $S -h $S img/icon.svg
+		pngcrush -brute -c 0 -q -ow tmp/icon-${S}x${S}.png
+	fi
+	cp tmp/icon-${S}x${S}.png dist/icon-${S}x${S}.png
 done
 
 for S in 16 32 48 64 256
 do
-	inkscape -z -e tmp/icon-${S}x${S}.png -w $S -h $S img/icon3.svg
-	pngcrush -brute -c 4 -q -ow tmp/icon-${S}x${S}.png
+	if [ img/icon3.svg -nt tmp/icon-${S}x${S}.png ]; then
+		inkscape -z -e tmp/icon-${S}x${S}.png -w $S -h $S img/icon3.svg
+		pngcrush -brute -c 4 -q -ow tmp/icon-${S}x${S}.png
+	fi
 done
+
 cp tmp/icon-16x16.png tmp/icon-32x32.png tmp/icon-64x64.png dist/
 convert tmp/icon-16x16.png tmp/icon-32x32.png tmp/icon-48x48.png tmp/icon-256x256.png dist/favicon.ico
+
+sed -e "s!URL!$url!g" index.html > dist/index.html
 
 ## Add paragraph markup to license file
 sed -e '/^\s*$/d' -e 's/^/<p>/g' -e 's/$/<\/p>/g' LICENSE > tmp/LICENSE
@@ -55,7 +63,7 @@ d
 sed -e 's/<html>/<html manifest="cache.manifest">/g' dist/play_online.html > dist/play.html
 
 cp app.css requestAnimationFrame.min.js stats.min.js observable.js canyoufillit.js canyoufillit_canvas_gui.js app.js .htaccess dist/
-cp index.html bootstrap.css dist/
+cp bootstrap.css dist/
 
 # Compute a hash of all the files that need to be cached.
 h=$(for f in app.css play.html requestAnimationFrame.min.js stats.min.js observable.js canyoufillit.js canyoufillit_canvas_gui.js app.js

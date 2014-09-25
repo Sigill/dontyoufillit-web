@@ -29,8 +29,13 @@ body {
 	margin-left: auto;
 }
 h1 {
-	font-size: 50px;
+	font-size: 45px;
 	font-weight: 500;
+}
+@media (min-width: 768px) {
+	h1 {
+		font-size: 50px;
+	}
 }
 	</style>
 </head>
@@ -70,6 +75,7 @@ h1 {
 	</div>
 </div>
 <script>
+"use strict";
 function platform_only_message(platform) {
 	return function() {
 		alert('This functionality is only available on the ' + platform + ' platform.');
@@ -79,11 +85,11 @@ function platform_only_message(platform) {
 var firefox_platform_message_only = platform_only_message('Firefox'),
      chrome_platform_message_only = platform_only_message('Chrome');
 
-var  firefox_install_hosted_button = document.getElementById('firefox-install-hosted-btn');
+var  firefox_install_hosted_button = document.getElementById('firefox-install-hosted-btn'),
    firefox_install_packaged_button = document.getElementById('firefox-install-packaged-btn');
 
 if(navigator.mozApps) {
-	var hosted_manifest = location.href + 'manifest.webapp';
+	var hosted_manifest = 'URL/manifest.webapp';
 	var hostedInstallCheck = navigator.mozApps.checkInstalled(hosted_manifest);
 	hostedInstallCheck.onsuccess = function() {
 		if(hostedInstallCheck.result) {
@@ -92,13 +98,12 @@ if(navigator.mozApps) {
 			firefox_install_hosted_button.addEventListener('click', function(evt) {
 				var request = navigator.mozApps.install(hosted_manifest);
 				request.onsuccess = function() {};
-				request.onerror = function() { alert('Installation failed: ' + request.error.name); };
-				return false;
+				request.onerror = function() {};
 			});
 		};
 	};
 
-	var packaged_manifest = location.href + 'package.webapp';
+	var packaged_manifest = 'URL/package.webapp';
 	var packagedInstallCheck = navigator.mozApps.checkInstalled(packaged_manifest);
 	packagedInstallCheck.onsuccess = function() {
 		if(packagedInstallCheck.result) {
@@ -107,8 +112,7 @@ if(navigator.mozApps) {
 			firefox_install_packaged_button.addEventListener('click', function(evt) {
 				var request = navigator.mozApps.installPackage(packaged_manifest);
 				request.onsuccess = function() {};
-				request.onerror = function() { alert('Installation failed: ' + request.error.name); };
-				return false;
+				request.onerror = function() {};
 			});
 		};
 	};
