@@ -3,11 +3,6 @@ CACHE MANIFEST
 CACHE:
 play.html
 app.css
-requestAnimationFrame.min.js
-stats.min.js
-observable.js
-canyoufillit.js
-canyoufillit_canvas_gui.js
 app.js
 # BEGIN FAVICONS
 favicon.ico

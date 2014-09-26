@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ "$#" -ne "2" ]
+if [ "$#" -ne "4" ]
 then
-	echo "Usage: $0 <publication url> <private key>"
+	echo "Usage: $0 <publication url> <chrome hosted app private key> <chrome packaged app private key> <version>"
 	exit
 fi
 
@@ -10,10 +10,12 @@ url=$( ruby -ruri -e "print '$1'.to_s.chomp('/')" )
 origin=$( ruby -ruri -e "print URI.join('$1', '/').to_s.chomp('/')" )
 path=$( ruby -ruri -e "print URI.parse('$1').path.chomp('/')" )
 
-rm -rf dist
+chromeHostedKey="$2"
+chromePackagedKey="$3"
+version="$4"
 
-[ -d dist ] || mkdir dist
-[ -d tmp/packaged_app ] || mkdir -p tmp/packaged_app
+rm -rf dist tmp/chrome tmp/firefox
+mkdir -p dist tmp/firefox tmp/chrome
 
 ## Icons
 # 16: favicon
@@ -25,15 +27,14 @@ rm -rf dist
 # 70, 150, 310x150, 310: Windows 8 tiles (recommanded: 128, 270, 558x270, 558) (http://msdn.microsoft.com/en-us/library/ie/dn455106%28v=vs.85%29.aspx)
 # 128, 512: Firefox Marketplace
 
-# Inkscape does not export grayscale png, pngcrush will
+# Inkscape does not export grayscale png, pngcrush does
 
-for S in 512 270 192 128
+for S in 512 270 192 128 96
 do
 	if [ img/icon.svg -nt tmp/icon-${S}x${S}.png ]; then
 		inkscape -z -e tmp/icon-${S}x${S}.png -w $S -h $S img/icon.svg
 		pngcrush -brute -c 0 -q -ow tmp/icon-${S}x${S}.png
 	fi
-	cp tmp/icon-${S}x${S}.png dist/icon-${S}x${S}.png
 done
 
 for S in 16 32 48 64 256
@@ -44,69 +45,92 @@ do
 	fi
 done
 
-cp tmp/icon-16x16.png tmp/icon-32x32.png tmp/icon-64x64.png dist/
+for S in 512 270 192 128 64 32 16
+do
+	cp tmp/icon-${S}x${S}.png dist/
+done
+
 convert tmp/icon-16x16.png tmp/icon-32x32.png tmp/icon-48x48.png tmp/icon-256x256.png dist/favicon.ico
 
 sed -e "s!URL!$url!g" index.html > dist/index.html
 
 ## Add paragraph markup to license file
+# Removes empty lines and add paragraph tags to each lines
 sed -e '/^\s*$/d' -e 's/^/<p>/g' -e 's/$/<\/p>/g' LICENSE > tmp/LICENSE
 
-## For testing purpose, keep an online version of the game.
+## Add license, strip unneeded js files (due to minimization)
+# For testing purpose, keep an online version of the game.
 sed -e '/\$LICENSE\$/ {
 r tmp/LICENSE
 d
-}' play.html > dist/play_online.html
+}' -e '/BEGIN JS/,/END JS/d' play.html > dist/play_online.html
 
 ## Build the offline app
-# Add the cache manifest
-sed -e 's/<html>/<html manifest="cache.manifest">/g' dist/play_online.html > dist/play.html
+# Add the cache manifest to the game
+sed -e 's/<html>/<html manifest="cache.manifest">/g' -e 's/^[[:space:]]*//g' dist/play_online.html > dist/play.html
 
-cp app.css requestAnimationFrame.min.js stats.min.js observable.js canyoufillit.js canyoufillit_canvas_gui.js app.js .htaccess dist/
-cp bootstrap.css dist/
+for F in requestAnimationFrame.js stats.js observable.js canyoufillit.js canyoufillit_canvas_gui.js app.js
+do
+	if [ $F -nt tmp/app.js ]; then
+		closure-compiler --compilation_level SIMPLE_OPTIMIZATIONS requestAnimationFrame.js stats.js observable.js canyoufillit.js canyoufillit_canvas_gui.js app.js > tmp/app.js
+		break
+	fi
+done
+cp tmp/app.js dist/app.js
+
+cat app.css| cssmin -w 512 > dist/app.css
+cat bootstrap.css| cssmin -w 512 > dist/bootstrap.css
+cp .htaccess dist/
 
 # Compute a hash of all the files that need to be cached.
-h=$(for f in app.css play.html requestAnimationFrame.min.js stats.min.js observable.js canyoufillit.js canyoufillit_canvas_gui.js app.js
-do
-	echo `sha1sum $f`
-done|sha1sum|cut -d ' ' -f1)
+h=$(tar -c app.css play.html requestAnimationFrame.js stats.js observable.js canyoufillit.js canyoufillit_canvas_gui.js app.js|sha1sum|cut -d ' ' -f1)
 
 # and put it in the cache manifest, in order to make it unique.
 sed -e "s/# hash xyz/# hash $h/g" cache.manifest > dist/cache.manifest
 
 
 ## Build the hosted open web app manifest
-sed "s!PATH!$path!g" manifest.webapp > dist/manifest.webapp
+sed -e "s!PATH!$path!g" -e "s!URL!$url!g" -e "s!VERSION!$version!g" manifest.webapp > dist/manifest.webapp
+
+# Icons are useless in a packaged app
+sed -e '/BEGIN FAVICONS/,/END FAVICONS/d' dist/play_online.html > tmp/packageable_play.html
 
 ## Build the packaged Open Web App
-# Remove the favicons
-sed -e '/BEGIN FAVICONS/,/END FAVICONS/d' dist/play_online.html > tmp/packaged_app/play.html
-cp app.css requestAnimationFrame.min.js stats.min.js observable.js canyoufillit.js canyoufillit_canvas_gui.js app.js tmp/packaged_app/
-cp dist/icon-64x64.png dist/icon-128x128.png dist/icon-512x512.png tmp/packaged_app/
-sed -e "/appcache_path/d" -e "s!PATH!!g" manifest.webapp > tmp/packaged_app/manifest.webapp
+cp tmp/packageable_play.html tmp/firefox/play.html
+cp dist/app.js app.css dist/icon-512x512.png tmp/firefox/
+sed -e "/appcache_path/d" -e "s!PATH!!g" -e "s!URL!!g" -e "s!VERSION!$version!g" manifest.webapp > tmp/firefox/manifest.webapp
 
-zip dist/CanYouFillIt-FirefoxApp.zip -j -r tmp/packaged_app
+zip dist/CanYouFillIt-FirefoxApp.zip -j -r -q tmp/firefox
 
-sed "s!URL!$url!g" package.webapp > dist/package.webapp
+sed -e "s!URL!$url!g" -e "s!VERSION!$version!g" package.webapp > dist/package.webapp
 
-## Build the packaged Chrome packaged app
+## Build the Chrome app
 # https://developer.chrome.com/extensions/apps
-# TODO Crop 128 image https://developer.chrome.com/webstore/images
-# Chrome >= 35 assumes apps are offline capable by default: https://developer.chrome.com/extensions/manifest/offline_enabled
 mkdir -p tmp/chrome/packaged
 
-sed -e '/BEGIN FAVICONS/,/END FAVICONS/d' dist/play_online.html > tmp/chrome/packaged/play.html
-cp app.css requestAnimationFrame.min.js stats.min.js observable.js canyoufillit.js canyoufillit_canvas_gui.js app.js tmp/chrome/packaged/
-cp dist/icon-128x128.png tmp/chrome/packaged/
-cp packaged.manifest.json tmp/chrome/packaged/manifest.json
+# https://developer.chrome.com/webstore/images
+convert tmp/icon-96x96.png -bordercolor transparent -border 16 tmp/chrome/icon-128x128.png
 
-./crxmake.sh tmp/chrome/packaged/ $2 dist/CanYouFillIt-ChromePackaged.crx
+## The packaged app
+# Chrome >= 35 assumes apps are offline capable by default: https://developer.chrome.com/extensions/manifest/offline_enabled
+cp tmp/packageable_play.html tmp/chrome/packaged/play.html
+cp dist/app.css dist/app.js tmp/chrome/packaged/
+cp tmp/chrome/icon-128x128.png tmp/chrome/packaged/
+sed -e "s!URL!$url!g" -e "s!VERSION!$version!g" packaged.manifest.json > tmp/chrome/packaged/manifest.json
+sed -e "s!URL!$url!g" -e "s!VERSION!$version!g" chrome-updates.xml > dist/chrome-updates.xml
 
-## Build the hosted Chrome packaged app
+./crxmake.sh tmp/chrome/packaged/ $chromePackagedKey dist/CanYouFillIt-ChromePackaged.crx
+
+# Package to be submitted to the chrome store
+sed -e "/update_url/d" tmp/chrome/packaged/manifest.json > tmp/chrome/packaged/manifest.json2
+mv tmp/chrome/packaged/manifest.json2 tmp/chrome/packaged/manifest.json
+zip dist/CanYouFillIt-Chrome.zip -j -r -q tmp/chrome/packaged/
+
+## The hosted one
 # https://developers.google.com/chrome/apps/docs/developers_guide
 mkdir -p tmp/chrome/hosted
 
-sed "s!URL!$url!g" hosted.manifest.json > tmp/chrome/hosted/manifest.json
-cp dist/icon-128x128.png tmp/chrome/hosted/
+sed -e "s!URL!$url!g" -e "s!VERSION!$version!g" hosted.manifest.json > tmp/chrome/hosted/manifest.json
+cp tmp/chrome/icon-128x128.png tmp/chrome/hosted/
 
-./crxmake.sh tmp/chrome/hosted/ $2 dist/CanYouFillIt-ChromeHosted.crx
+./crxmake.sh tmp/chrome/hosted/ $chromeHostedKey dist/CanYouFillIt-ChromeHosted.crx

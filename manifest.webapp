@@ -1,13 +1,11 @@
 {
 	"name": "CanYouFillIt",
-	"version": "0.1",
+	"version": "VERSION",
 	"description": "A breakout-syle game mixed with snooker.",
 	"launch_path": "PATH/play.html",
 	"appcache_path": "PATH/cache.manifest",
 	"icons": {
-		"128": "PATH/icon-128x128.png",
-		"512": "PATH/icon-512x512.png",
-		"64": "PATH/icon-64x64.png"
+		"512": "PATH/icon-512x512.png"
 	},
 	"developer": {
 		"name": "Cyrille Faucheux",

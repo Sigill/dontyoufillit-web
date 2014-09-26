@@ -1,6 +1,6 @@
 {
 	"name": "CanYouFillIt",
-	"version": "0.1",
+	"version": "VERSION",
 	"description": "A breakout-syle game mixed with snooker.",
 	"package_path": "URL/CanYouFillIt-FirefoxApp.zip",
 	"developer": {

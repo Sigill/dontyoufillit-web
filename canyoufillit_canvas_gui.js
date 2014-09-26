@@ -28,7 +28,7 @@ function CanYouFillItCanvasGui(game, canvasID) {
 		}
 	};
 
-	function drawCannon(cannon) {
+	function drawCannon() {
 		var r = Math.round(CANNON_BASE_WIDTH / 2);
 
 		ctx.fillStyle = 'white';
@@ -335,6 +335,6 @@ CanYouFillItCanvasGui.prototype.removeObserver = function(o) {
 	this.observable.removeObserver(o);
 };
 
-CanYouFillItCanvasGui.prototype.notifyObservers = function(o) {
+CanYouFillItCanvasGui.prototype.notifyObservers = function() {
 	this.observable.notifyObservers();
 };
