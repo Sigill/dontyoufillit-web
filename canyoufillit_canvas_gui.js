@@ -214,6 +214,7 @@ function CanYouFillItCanvasGui(game, canvasID) {
 	function handleVisibilityChange() {
 		if(document.hidden) {
 			game.pause();
+			setScreenVisible(pauseScreen, 1);
 		}
 	}
 

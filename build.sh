@@ -90,7 +90,7 @@ sed -e "s/# hash xyz/# hash $h/g" cache.manifest > dist/cache.manifest
 
 
 ## Build the hosted open web app manifest
-sed -e "s!PATH!$path!g" -e "s!URL!$url!g" -e "s!VERSION!$version!g" manifest.webapp > dist/manifest.webapp
+sed -e "s!PATH!$path!g" -e "s!VERSION!$version!g" manifest.webapp > dist/manifest.webapp
 
 # Icons are useless in a packaged app
 sed -e '/BEGIN FAVICONS/,/END FAVICONS/d' dist/play_online.html > tmp/packageable_play.html
