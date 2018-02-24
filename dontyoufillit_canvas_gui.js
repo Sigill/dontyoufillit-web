@@ -3,19 +3,22 @@ function DontYouFillItCanvasGui(game, canvasID) {
 	var PlayPauseButton = {
 		draw: function() {
 			ctx.fillStyle = 'white';
-			if(game.state == game.RUNNING()) {
-				ctx.fillRect(canvas.width - Math.floor(SCALE / 6 * 0.9),
-				             Math.floor(SCALE / 6 * 0.1),
-				             Math.floor(SCALE / 6 * 0.3),
-				             Math.floor(SCALE / 6 * 0.8));
-				ctx.fillRect(canvas.width - Math.floor(SCALE / 6 * 0.4),
-				             Math.floor(SCALE / 6 * 0.1),
-				             Math.floor(SCALE / 6 * 0.3),
-				             Math.floor(SCALE / 6 * 0.8));
-			}
+			ctx.fillRect(canvas.width - Math.floor(SCALE / 6 * 0.9),
+			             Math.floor(SCALE / 6 * 0.1),
+			             Math.floor(SCALE / 6 * 0.3),
+			             Math.floor(SCALE / 6 * 0.8));
+			ctx.fillRect(canvas.width - Math.floor(SCALE / 6 * 0.4),
+			             Math.floor(SCALE / 6 * 0.1),
+			             Math.floor(SCALE / 6 * 0.3),
+			             Math.floor(SCALE / 6 * 0.8));
 		},
 		handleClick: function(x, y) {
-			if((x > canvas.width - Math.floor(SCALE / 6)) && (y < Math.floor(SCALE / 6))) {
+			var xm = canvas.width - SCALE / 6,
+			    xM = canvas.width,
+			    ym = 0,
+			    yM = SCALE / 6;
+
+			if((x > xm) && (x <= xM) && (y > ym) && (y <= yM)) {
 				if(game.state == game.RUNNING()) {
 					game.pause();
 					setScreenVisible(pauseScreen, 1);
@@ -33,17 +36,17 @@ function DontYouFillItCanvasGui(game, canvasID) {
 
 		ctx.fillStyle = 'white';
 		ctx.beginPath();
-		ctx.moveTo(Math.round(H_OFFSET + SCALE / 2) - r,
+		ctx.moveTo(Math.round(SCALE / 2) - r,
 		           Math.round(BOTTOM_BORDER + SCALE / 6));
-		ctx.lineTo(Math.round(H_OFFSET + SCALE / 2) - r,
+		ctx.lineTo(Math.round(SCALE / 2) - r,
 		           Math.round(BOTTOM_BORDER + SCALE / 6 - CANNON_BASE_HEIGHT));
 		ctx.arc(
-		    Math.round(H_OFFSET + SCALE / 2),
+		    Math.round(SCALE / 2),
 		    Math.round(BOTTOM_BORDER + SCALE / 6 - CANNON_BASE_HEIGHT),
 		    r,
 		    Math.PI,
 		    0);
-		ctx.lineTo(Math.round(H_OFFSET + SCALE / 2) + r,
+		ctx.lineTo(Math.round(SCALE / 2) + r,
 		           Math.round(BOTTOM_BORDER + SCALE / 6));
 		ctx.closePath();
 		ctx.fill();
@@ -51,12 +54,12 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		ctx.lineWidth = CANNON_WIDTH;
 		ctx.lineCap = 'butt';
 		ctx.beginPath();
-		ctx.moveTo(H_OFFSET + SCALE / 2,
+		ctx.moveTo(SCALE / 2,
 		           BOTTOM_BORDER + SCALE / 6 - CANNON_BASE_HEIGHT);
-		ctx.lineTo(H_OFFSET + SCALE / 2 + Math.cos(game.cannon.getAngle()) * CANNON_LENGTH,
+		ctx.lineTo(SCALE / 2 + Math.cos(game.cannon.getAngle()) * CANNON_LENGTH,
 		           BOTTOM_BORDER + SCALE / 6 - CANNON_BASE_HEIGHT - Math.sin(game.cannon.getAngle()) * CANNON_LENGTH);
-		ctx.stroke();
 		ctx.closePath();
+		ctx.stroke();
 	};
 
 	function drawBall(ball) {
@@ -219,10 +222,12 @@ function DontYouFillItCanvasGui(game, canvasID) {
 	}
 
 	function resizeCanvas() {
-		canvas.width = container.clientWidth;
-		canvas.height = container.clientHeight;
-
 		computeGameDimensions();
+
+		canvas.width = Math.floor(GAME_WIDTH);
+		canvas.height = Math.floor(GAME_HEIGHT);
+		canvas.style.left = Math.floor(H_OFFSET) + "px";
+		canvas.style.top = Math.floor(V_OFFSET) + "px";
 
 		// Redraw event when the game is not running
 		if(game.state != game.RUNNING())
@@ -230,7 +235,7 @@ function DontYouFillItCanvasGui(game, canvasID) {
 	}
 
 	function computeGameDimensions() {
-		var w = canvas.width, h = canvas.height;
+		var w = container.clientWidth, h = container.clientHeight;
 
 		if(w / h < 3/4) {
 			GAME_WIDTH = w;
@@ -243,9 +248,9 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		SCALE              = GAME_WIDTH;
 		V_OFFSET           = (h - GAME_HEIGHT) / 2;
 		H_OFFSET           = (w - GAME_WIDTH) / 2;
-		TOP_BORDER         = V_OFFSET + SCALE / 6;
+		TOP_BORDER         = SCALE / 6;
 		BOTTOM_BORDER      = TOP_BORDER + SCALE;
-		LEFT_BORDER        = H_OFFSET;
+		LEFT_BORDER        = 0;
 		RIGHT_BORDER       = LEFT_BORDER + SCALE;
 		CANNON_BASE_WIDTH  = SCALE / 10;
 		CANNON_BASE_HEIGHT = SCALE / 15;
@@ -318,8 +323,10 @@ function DontYouFillItCanvasGui(game, canvasID) {
 	var that = this; // Allow to access this from the closure.
 
 	window.addEventListener('resize', resizeCanvas, false);
-	canvas.addEventListener('mousedown', handleClick, false);
-	canvas.addEventListener('touchstart', handleTouch, false);
+	[canvas, container].forEach(function(e) {
+		e.addEventListener('mousedown', handleClick, false);
+		e.addEventListener('touchstart', handleTouch, false);
+	});
 
 	document.addEventListener('visibilitychange', handleVisibilityChange, false);
 
