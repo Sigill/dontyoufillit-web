@@ -1,6 +1,6 @@
 # DontYouFillIt
 
-DontYouFillIt is a Breakout-style game mixed with snooker. It is freely inspired by the game available at [gimmefrictionbaby.com](http://gimmefrictionbaby.com). It has been developed with HTML5 technologies, so it should work on any modern browser (including mobile ones).
+DontYouFillIt is a Breakout-style game mixed with snooker. It has been developed with HTML5 technologies, so it should work on any modern browser (including mobile ones).
 
 ## How to build
 
