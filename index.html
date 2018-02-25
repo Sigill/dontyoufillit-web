@@ -55,11 +55,6 @@ h1 {
 		<h3>Every browser on every operating system</h3>
 		<p>Click on the blue <em>Play now</em> button above and ask your browser to bookmark the page.</p>
 
-		<h3>Firefox, Firefox for Android, Firefox OS</h3>
-		<p>Install CanYouFillIt as an Open Web App.</p>
-		<p><button id="firefox-install-hosted-btn" class="btn btn-default btn-lg btn-block">Install in Firefox (hosted)</button></p>
-		<p><button id="firefox-install-packaged-btn" class="btn btn-default btn-lg btn-block">Install in Firefox (packaged)</button></p>
-
 		<h3>Chrome, Chrome for Android</h3>
 		<p>Click on the blue <em>Play now</em> button above then, in the Chrome menu, click on the <em>Tools/Create applications shortcut</em> (Chrome) or <em>Add to homescreen</em> (Chrome for Android) entry.</p>
 
@@ -68,10 +63,6 @@ h1 {
 		<p>Install CanYouFillIt as a Chrome App.</p>
 		<p><a id="chrome-install-hosted-btn" class="btn btn-default btn-lg btn-block" href="CanYouFillIt-ChromeHosted.crx">Install in Chrome (hosted)</a></p>
 		<p><a id="chrome-install-packaged-btn" class="btn btn-default btn-lg btn-block" href="CanYouFillIt-ChromePackaged.crx">Install in Chrome (packaged)</a></p>
-		<!--
-		<p>You can also install it on your <strong>Android</strong> device.</p>
-		<p>Or on your <strong>FirefoxOS</strong> device.</p>
-		-->
 	</div>
 </div>
 <script>
@@ -82,50 +73,7 @@ function platform_only_message(platform) {
 	};
 }
 
-var firefox_platform_message_only = platform_only_message('Firefox'),
-     chrome_platform_message_only = platform_only_message('Chrome');
-
-var  firefox_install_hosted_button = document.getElementById('firefox-install-hosted-btn'),
-   firefox_install_packaged_button = document.getElementById('firefox-install-packaged-btn');
-
-if(navigator.mozApps) {
-	var hosted_manifest = 'URL/manifest.webapp';
-	var hostedInstallCheck = navigator.mozApps.checkInstalled(hosted_manifest);
-	hostedInstallCheck.onsuccess = function() {
-		if(hostedInstallCheck.result) {
-			firefox_install_hosted_button.disabled = true;
-		} else {
-			firefox_install_hosted_button.addEventListener('click', function(evt) {
-				var request = navigator.mozApps.install(hosted_manifest);
-				request.onsuccess = function() {};
-				request.onerror = function() {};
-			});
-		};
-	};
-
-	var packaged_manifest = 'URL/package.webapp';
-	var packagedInstallCheck = navigator.mozApps.checkInstalled(packaged_manifest);
-	packagedInstallCheck.onsuccess = function() {
-		if(packagedInstallCheck.result) {
-			firefox_install_packaged_button.disabled = true;
-		} else {
-			firefox_install_packaged_button.addEventListener('click', function(evt) {
-				var request = navigator.mozApps.installPackage(packaged_manifest);
-				request.onsuccess = function() {};
-				request.onerror = function() {};
-			});
-		};
-	};
-} else {
-	firefox_install_hosted_button.addEventListener('click', function(evt) {
-		firefox_platform_message_only();
-		return false;
-	});
-	firefox_install_packaged_button.addEventListener('click', function(evt) {
-		firefox_platform_message_only();
-		return false;
-	});
-}
+var chrome_platform_message_only = platform_only_message('Chrome');
 
 function allowChromeLink(evt) {
 	if(window.chrome) {

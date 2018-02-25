@@ -14,8 +14,8 @@ chromeHostedKey="$2"
 chromePackagedKey="$3"
 version="$4"
 
-rm -rf dist tmp/chrome tmp/firefox
-mkdir -p dist tmp/firefox tmp/chrome
+rm -rf dist tmp/chrome
+mkdir -p dist tmp/chrome
 
 ## Icons
 # 16: favicon
@@ -25,11 +25,10 @@ mkdir -p dist tmp/firefox tmp/chrome
 # 48, 72, 96, 144, 192: Android launcher (http://developer.android.com/design/style/iconography.html)
 # 128, 192: homescreen icons for Chrome for Android (https://developer.chrome.com/multidevice/android/installtohomescreen)
 # 70, 150, 310x150, 310: Windows 8 tiles (recommanded: 128, 270, 558x270, 558) (http://msdn.microsoft.com/en-us/library/ie/dn455106%28v=vs.85%29.aspx)
-# 128, 512: Firefox Marketplace
 
 # Inkscape does not export grayscale png, pngcrush does
 
-for S in 512 270 192 128 96
+for S in 270 192 128 96
 do
 	if [ img/icon.svg -nt tmp/icon-${S}x${S}.png ]; then
 		inkscape -z -e tmp/icon-${S}x${S}.png -w $S -h $S img/icon.svg
@@ -45,7 +44,7 @@ do
 	fi
 done
 
-for S in 512 270 192 128 64 32 16
+for S in 270 192 128 64 32 16
 do
 	cp tmp/icon-${S}x${S}.png dist/
 done
@@ -89,20 +88,9 @@ h=$(tar -c app.css play.html requestAnimationFrame.js stats.js observable.js can
 sed -e "s/# hash xyz/# hash $h/g" cache.manifest > dist/cache.manifest
 
 
-## Build the hosted open web app manifest
-sed -e "s!PATH!$path!g" -e "s!VERSION!$version!g" manifest.webapp > dist/manifest.webapp
-
 # Icons are useless in a packaged app
 sed -e '/BEGIN FAVICONS/,/END FAVICONS/d' dist/play_online.html > tmp/packageable_play.html
 
-## Build the packaged Open Web App
-cp tmp/packageable_play.html tmp/firefox/play.html
-cp dist/app.js app.css dist/icon-512x512.png tmp/firefox/
-sed -e "/appcache_path/d" -e "s!PATH!!g" -e "s!URL!!g" -e "s!VERSION!$version!g" manifest.webapp > tmp/firefox/manifest.webapp
-
-zip dist/CanYouFillIt-FirefoxApp.zip -j -r -q tmp/firefox
-
-sed -e "s!URL!$url!g" -e "s!VERSION!$version!g" package.webapp > dist/package.webapp
 
 ## Build the Chrome app
 # https://developer.chrome.com/extensions/apps
