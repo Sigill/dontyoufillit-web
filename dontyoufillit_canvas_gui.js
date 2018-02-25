@@ -1,5 +1,5 @@
 "use strict";
-function CanYouFillItCanvasGui(game, canvasID) {
+function DontYouFillItCanvasGui(game, canvasID) {
 	var PlayPauseButton = {
 		draw: function() {
 			ctx.fillStyle = 'white';
@@ -328,14 +328,14 @@ function CanYouFillItCanvasGui(game, canvasID) {
 	window.requestAnimationFrame(step);
 }
 
-CanYouFillItCanvasGui.prototype.addObserver = function(o) {
+DontYouFillItCanvasGui.prototype.addObserver = function(o) {
 	this.observable.addObserver(o);
 };
 
-CanYouFillItCanvasGui.prototype.removeObserver = function(o) {
+DontYouFillItCanvasGui.prototype.removeObserver = function(o) {
 	this.observable.removeObserver(o);
 };
 
-CanYouFillItCanvasGui.prototype.notifyObservers = function() {
+DontYouFillItCanvasGui.prototype.notifyObservers = function() {
 	this.observable.notifyObservers();
 };

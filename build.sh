@@ -68,10 +68,10 @@ d
 # Add the cache manifest to the game
 sed -e 's/<html>/<html manifest="cache.manifest">/g' -e 's/^[[:space:]]*//g' dist/play_online.html > dist/play.html
 
-for F in requestAnimationFrame.js stats.js observable.js canyoufillit.js canyoufillit_canvas_gui.js app.js
+for F in requestAnimationFrame.js stats.js observable.js dontyoufillit.js dontyoufillit_canvas_gui.js app.js
 do
 	if [ $F -nt tmp/app.js ]; then
-		closure-compiler --compilation_level SIMPLE_OPTIMIZATIONS requestAnimationFrame.js stats.js observable.js canyoufillit.js canyoufillit_canvas_gui.js app.js > tmp/app.js
+		closure-compiler --compilation_level SIMPLE_OPTIMIZATIONS requestAnimationFrame.js stats.js observable.js dontyoufillit.js dontyoufillit_canvas_gui.js app.js > tmp/app.js
 		break
 	fi
 done
@@ -82,7 +82,7 @@ cat bootstrap.css| cssmin -w 512 > dist/bootstrap.css
 cp .htaccess dist/
 
 # Compute a hash of all the files that need to be cached.
-h=$(tar -c app.css play.html requestAnimationFrame.js stats.js observable.js canyoufillit.js canyoufillit_canvas_gui.js app.js|sha1sum|cut -d ' ' -f1)
+h=$(tar -c app.css play.html requestAnimationFrame.js stats.js observable.js dontyoufillit.js dontyoufillit_canvas_gui.js app.js|sha1sum|cut -d ' ' -f1)
 
 # and put it in the cache manifest, in order to make it unique.
 sed -e "s/# hash xyz/# hash $h/g" cache.manifest > dist/cache.manifest
@@ -107,12 +107,12 @@ cp tmp/chrome/icon-128x128.png tmp/chrome/packaged/
 sed -e "s!URL!$url!g" -e "s!VERSION!$version!g" packaged.manifest.json > tmp/chrome/packaged/manifest.json
 sed -e "s!URL!$url!g" -e "s!VERSION!$version!g" chrome-updates.xml > dist/chrome-updates.xml
 
-./crxmake.sh tmp/chrome/packaged/ $chromePackagedKey dist/CanYouFillIt-ChromePackaged.crx
+./crxmake.sh tmp/chrome/packaged/ $chromePackagedKey dist/DontYouFillIt-ChromePackaged.crx
 
 # Package to be submitted to the chrome store
 sed -e "/update_url/d" tmp/chrome/packaged/manifest.json > tmp/chrome/packaged/manifest.json2
 mv tmp/chrome/packaged/manifest.json2 tmp/chrome/packaged/manifest.json
-zip dist/CanYouFillIt-Chrome.zip -j -r -q tmp/chrome/packaged/
+zip dist/DontYouFillIt-Chrome.zip -j -r -q tmp/chrome/packaged/
 
 ## The hosted one
 # https://developers.google.com/chrome/apps/docs/developers_guide
@@ -121,4 +121,4 @@ mkdir -p tmp/chrome/hosted
 sed -e "s!URL!$url!g" -e "s!VERSION!$version!g" hosted.manifest.json > tmp/chrome/hosted/manifest.json
 cp tmp/chrome/icon-128x128.png tmp/chrome/hosted/
 
-./crxmake.sh tmp/chrome/hosted/ $chromeHostedKey dist/CanYouFillIt-ChromeHosted.crx
+./crxmake.sh tmp/chrome/hosted/ $chromeHostedKey dist/DontYouFillIt-ChromeHosted.crx

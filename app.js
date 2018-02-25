@@ -1,6 +1,6 @@
 "use strict";
-var game = new CanYouFillItGame();
-var gui = new CanYouFillItCanvasGui(game, 'c');
+var game = new DontYouFillItGame();
+var gui = new DontYouFillItCanvasGui(game, 'c');
 
 function isDebug() {
 	var query = window.location.search.substring(1);

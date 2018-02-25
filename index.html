@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>CanYouFillIt</title>
+	<title>DontYouFillIt</title>
 	<link rel="stylesheet" href="bootstrap.css">
 
 	<link rel="icon" type="image/png" sizes="32x32" href="icon-32x32.png">
@@ -43,10 +43,10 @@ h1 {
 <div class="container">
 	<div class="col-xs-12 col-md-8 col-md-offset-2">
 		<div class="page-header text-center">
-			<h1>CanYouFillIt</h1>
+			<h1>DontYouFillIt</h1>
 		</div>
-		<p>CanYouFillIt is a Breakout-like game mixed with snooker. It is freely inspired by the game available at <a href="http://gimmefrictionbaby.com">gimmefrictionbaby.com</a>. It has been developed with HTML5 technologies, so it should work on any modern browser (including mobile ones).</p>
-		<p><a class="btn btn-primary btn-lg btn-block" href="play.html" title="Play CanYouFillIt"><strong>Play now</strong></a></p>
+		<p>DontYouFillIt is a Breakout-like game mixed with snooker. It is freely inspired by the game available at <a href="http://gimmefrictionbaby.com">gimmefrictionbaby.com</a>. It has been developed with HTML5 technologies, so it should work on any modern browser (including mobile ones).</p>
+		<p><a class="btn btn-primary btn-lg btn-block" href="play.html" title="Play DontYouFillIt"><strong>Play now</strong></a></p>
 
 		<h2>Play offline</h2>
 		<p>The game has been designed to be available <strong>offline</strong> (so that you don't need any internet connection to play).</p>
@@ -60,9 +60,9 @@ h1 {
 
 		<p>or</p>
 
-		<p>Install CanYouFillIt as a Chrome App.</p>
-		<p><a id="chrome-install-hosted-btn" class="btn btn-default btn-lg btn-block" href="CanYouFillIt-ChromeHosted.crx">Install in Chrome (hosted)</a></p>
-		<p><a id="chrome-install-packaged-btn" class="btn btn-default btn-lg btn-block" href="CanYouFillIt-ChromePackaged.crx">Install in Chrome (packaged)</a></p>
+		<p>Install DontYouFillIt as a Chrome OS App.</p>
+		<p><a id="chrome-install-hosted-btn" class="btn btn-default btn-lg btn-block" href="DontYouFillIt-ChromeHosted.crx">Install in Chrome (hosted)</a></p>
+		<p><a id="chrome-install-packaged-btn" class="btn btn-default btn-lg btn-block" href="DontYouFillIt-ChromePackaged.crx">Install in Chrome (packaged)</a></p>
 	</div>
 </div>
 <script>
@@ -73,10 +73,10 @@ function platform_only_message(platform) {
 	};
 }
 
-var chrome_platform_message_only = platform_only_message('Chrome');
+var chrome_platform_message_only = platform_only_message('Chrome OS');
 
 function allowChromeLink(evt) {
-	if(window.chrome) {
+	if(/\bCrOS\b/.test(navigator.userAgent)) {
 		return true;
 	} else {
 		chrome_platform_message_only();

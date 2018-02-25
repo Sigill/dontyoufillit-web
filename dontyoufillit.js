@@ -132,7 +132,7 @@ Ball.prototype.bounce = function(staticBalls) {
 	} else if (this.nx < this.nr) {
 		this.nx = this.nr;
 		this.direction = normalizeRadian(Math.PI - this.direction);
-	} 
+	}
 
 	if (this.ny > 1 - this.nr) {
 		this.ny = 1 - this.nr;
@@ -194,7 +194,7 @@ Ball.prototype.grow = function(staticBalls) {
 	this.nr = Math.abs(minRadius);
 };
 
-function CanYouFillItGame() {
+function DontYouFillItGame() {
 	this.state = this.PAUSED();
 	this.cannon = new Cannon();
 	this.staticBalls = [];
@@ -211,21 +211,21 @@ function CanYouFillItGame() {
 	this.newHighscore = false;
 }
 
-CanYouFillItGame.prototype.PAUSED   = function() { return 1; };
-CanYouFillItGame.prototype.RUNNING  = function() { return 2; };
-CanYouFillItGame.prototype.GAMEOVER = function() { return 3; };
+DontYouFillItGame.prototype.PAUSED   = function() { return 1; };
+DontYouFillItGame.prototype.RUNNING  = function() { return 2; };
+DontYouFillItGame.prototype.GAMEOVER = function() { return 3; };
 
 /*
  * Position of the current ball is important, so it will be calculated 1000 times per second.
  * Position of the cannon isn't, so it will be calculated only once every frame.
  */
-CanYouFillItGame.prototype.update = function(time) {
+DontYouFillItGame.prototype.update = function(time) {
 	if(this.currentBall) {
 		var last = this.lastUpdateTime,
 			steps = Math.floor(time - this.lastUpdateTime),
 			current;
 		for(var i = 1; i <= steps; ++i) {
-			current = (this.lastUpdateTime* (steps-i) + time * i) / steps;
+			current = (this.lastUpdateTime * (steps-i) + time * i) / steps;
 			this.currentBall.update(last / 1000, (current - last) / 1000, this.staticBalls);
 
 			for(var j = this.staticBalls.length - 1; j >= 0; --j) {
@@ -261,16 +261,16 @@ CanYouFillItGame.prototype.update = function(time) {
 	this.lastUpdateTime = time;
 }
 
-CanYouFillItGame.prototype.pause = function() {
+DontYouFillItGame.prototype.pause = function() {
 	this.state = this.PAUSED();
 };
 
-CanYouFillItGame.prototype.resume = function() {
+DontYouFillItGame.prototype.resume = function() {
 	this.lastUpdateTime = performance.now ? performance.now() : Date.now();
 	this.state = this.RUNNING();
 };
 
-CanYouFillItGame.prototype.reset = function() {
+DontYouFillItGame.prototype.reset = function() {
 	this.currentBall = null;
 	this.staticBalls = [];
 	this.cannon.state.u = 0;
@@ -278,7 +278,7 @@ CanYouFillItGame.prototype.reset = function() {
 	this.resume();
 };
 
-CanYouFillItGame.prototype.fire = function() {
+DontYouFillItGame.prototype.fire = function() {
 	this.currentBall = new Ball(
 	    1 / 40.0,
 	    0.5 + Math.cos(this.cannon.getAngle()) / 15.0,
