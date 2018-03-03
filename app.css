@@ -22,11 +22,11 @@ body, html {
 	height: 100%;
 }
 
-#c {
+#MainCanvas, #CannonCanvas, #BallCanvas {
 	display: block;
 	position: absolute;
-	background-color: transparent;
 }
+
 .modalScreen {
 	position: absolute;
 	display: none;
