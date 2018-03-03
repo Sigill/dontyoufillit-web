@@ -185,6 +185,13 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		}
 	}
 
+	function pauseGame() {
+		if(game.state == game.RUNNING()) {
+			game.pause();
+			setScreenVisible(pauseScreen, 1);
+		}
+	}
+
 	function handleTouch(evt) {
 		evt.preventDefault();
 		handleTouchOrClick(evt.touches[0].clientX, evt.touches[0].clientY);
@@ -216,8 +223,7 @@ function DontYouFillItCanvasGui(game, canvasID) {
 
 	function handleVisibilityChange() {
 		if(document.hidden) {
-			game.pause();
-			setScreenVisible(pauseScreen, 1);
+			pauseGame();
 		}
 	}
 
