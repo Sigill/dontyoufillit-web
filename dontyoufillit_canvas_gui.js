@@ -155,10 +155,21 @@ function DontYouFillItCanvasGui(game, canvasID) {
 	}
 
 	function draw() {
-		// clearRect doesn't work on android stock browser, fillRect is used instead
-		// ctx.clearRect(0, 0, canvas.width, canvas.height);
-		ctx.fillStyle = 'black';
-		ctx.fillRect(0, 0, canvas.width, canvas.height);
+		// clearRect might not work in android stock browser.
+		if (!that.androidStockCompat) {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+		} else {
+			ctx.fillStyle = 'black';
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+			// https://issuetracker.google.com/issues/36957795#comment16
+			// ctx.clearRect(0, 0, canvas.width, canvas.height);
+			// canvas.style.display = 'none';// Detach from DOM
+			// canvas.offsetHeight; // Force the detach
+			// canvas.style.display = 'inherit'; // Reattach to DOM
+
+			// canvas.width = canvas.width;
+		}
 
 		if(that.state == that.GAME) {
 			drawGame();

@@ -2,19 +2,22 @@
 var game = new DontYouFillItGame();
 var gui = new DontYouFillItCanvasGui(game, 'c');
 
-function isDebug() {
+function parseQueryString() {
+	var map = {};
+
 	var query = window.location.search.substring(1);
 	var vars = query.split('&');
 	for (var i = 0; i < vars.length; i++) {
-		var pair = vars[i].split('=');
-		if (pair[0] == 'debug') {
-			return true;
-		}
+		var pair = vars[i].split('=', 2);
+		map[pair[0]] = (pair.length == 2) ? pair[1] : true;
 	}
-	return false;
+
+	return map;
 }
 
-if(isDebug()) {
+var qs = parseQueryString();
+
+if(qs['debug']) {
 	var stats = new Stats();
 	stats.setMode(0); // 0: fps, 1: ms
 	stats.domElement.style.position = 'absolute';
@@ -30,3 +33,4 @@ if(isDebug()) {
 	});
 }
 
+gui.androidStockCompat = (qs['stock'] == true);
