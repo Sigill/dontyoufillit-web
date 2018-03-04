@@ -1,16 +1,27 @@
-* { margin: 0; padding: 0;}
+* {
+	margin: 0;
+	padding: 0;
 
-body, html { height:100%; }
+	/* Prevent text of buttons from being accidentally selected. */
+	user-select: none;
+}
 
-#d {
+body, html {
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
 	background-color: black;
 }
+
+#d {
+	width: 100%;
+	height: 100%;
+}
+
 #c {
 	display: block;
 	position: absolute;
+	background-color: transparent;
 }
 .modalScreen {
 	position: absolute;
