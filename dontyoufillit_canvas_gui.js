@@ -2,23 +2,23 @@
 function DontYouFillItCanvasGui(game, canvasID) {
 	var PlayPauseButton = {
 		draw: function() {
+			var x1 = canvas.width - Math.floor(SCALE / 6 * 0.9),
+			    x2 = canvas.width - Math.floor(SCALE / 6 * 0.4),
+			     y = Math.floor(SCALE / 6 * 0.1),
+			     w = Math.floor(SCALE / 6 * 0.3),
+			     h = Math.floor(SCALE / 6 * 0.8);
+
 			ctx.fillStyle = 'white';
-			ctx.fillRect(canvas.width - Math.floor(SCALE / 6 * 0.9),
-			             Math.floor(SCALE / 6 * 0.1),
-			             Math.floor(SCALE / 6 * 0.3),
-			             Math.floor(SCALE / 6 * 0.8));
-			ctx.fillRect(canvas.width - Math.floor(SCALE / 6 * 0.4),
-			             Math.floor(SCALE / 6 * 0.1),
-			             Math.floor(SCALE / 6 * 0.3),
-			             Math.floor(SCALE / 6 * 0.8));
+			ctx.fillRect(x1, y, w, h);
+			ctx.fillRect(x2, y, w, h);
 		},
 		handleClick: function(x, y) {
-			var xm = canvas.width - SCALE / 6,
-			    xM = canvas.width,
-			    ym = 0,
-			    yM = SCALE / 6;
+			var x1 = canvas.width - SCALE / 6,
+			    x2 = canvas.width,
+			    y1 = 0,
+			    y2 = SCALE / 6;
 
-			if((x > xm) && (x <= xM) && (y > ym) && (y <= yM)) {
+			if((x > x1) && (x <= x2) && (y > y1) && (y <= y2)) {
 				pauseGame();
 				return true;
 			}
@@ -28,87 +28,88 @@ function DontYouFillItCanvasGui(game, canvasID) {
 	};
 
 	function drawCannon() {
-		var r = Math.round(CANNON_BASE_WIDTH / 2);
+		var r = Math.round(CANNON_BASE_WIDTH / 2),
+		   xc = Math.round(SCALE / 2),
+		   x1 = xc - r,
+		   x2 = xc + r,
+		   y1 = Math.round(BOTTOM_BORDER + SCALE / 6),
+		   y2 = Math.round(BOTTOM_BORDER + SCALE / 6 - CANNON_BASE_HEIGHT);
 
+		ctx.lineWidth = CANNON_WIDTH;
 		ctx.fillStyle = 'white';
+		ctx.lineCap   = 'butt';
+
 		ctx.beginPath();
-		ctx.moveTo(Math.round(SCALE / 2) - r,
-		           Math.round(BOTTOM_BORDER + SCALE / 6));
-		ctx.lineTo(Math.round(SCALE / 2) - r,
-		           Math.round(BOTTOM_BORDER + SCALE / 6 - CANNON_BASE_HEIGHT));
-		ctx.arc(
-		    Math.round(SCALE / 2),
-		    Math.round(BOTTOM_BORDER + SCALE / 6 - CANNON_BASE_HEIGHT),
-		    r,
-		    Math.PI,
-		    0);
-		ctx.lineTo(Math.round(SCALE / 2) + r,
-		           Math.round(BOTTOM_BORDER + SCALE / 6));
+		ctx.moveTo(x1, y1);
+		ctx.lineTo(x1, y2);
+		ctx.arc(xc, y2, r, Math.PI, 0);
+		ctx.lineTo(x2, y1);
 		ctx.closePath();
 		ctx.fill();
 
-		ctx.lineWidth = CANNON_WIDTH;
-		ctx.lineCap = 'butt';
 		ctx.beginPath();
-		ctx.moveTo(SCALE / 2,
-		           BOTTOM_BORDER + SCALE / 6 - CANNON_BASE_HEIGHT);
-		ctx.lineTo(SCALE / 2 + Math.cos(game.cannon.getAngle()) * CANNON_LENGTH,
-		           BOTTOM_BORDER + SCALE / 6 - CANNON_BASE_HEIGHT - Math.sin(game.cannon.getAngle()) * CANNON_LENGTH);
+		ctx.moveTo(xc, y2);
+		ctx.lineTo(xc + Math.cos(game.cannon.getAngle()) * CANNON_LENGTH,
+		           y2 - Math.sin(game.cannon.getAngle()) * CANNON_LENGTH);
 		ctx.closePath();
 		ctx.stroke();
 	};
+
+	function id(v) { return v; }
+
+	function path(ctx) {
+		ctx.moveTo(arguments[1], arguments[2]);
+		for(var i = 3; i < arguments.length; i += 2)
+			ctx.lineTo(arguments[i], arguments[i+1]);
+	}
 
 	function drawBall(ball) {
 		var x = LEFT_BORDER + ball.nx * SCALE,
 		    y = BOTTOM_BORDER - ball.ny * SCALE,
 		    r = ball.nr * SCALE;
 
+		// Only floor/ceil if the ball is big enough, small numbers
+		// will otherwise have irregular shapes.
+		var f = (r > 20) ? Math.floor : id;
+		var c = (r > 20) ? Math.ceil : id;
+
 		ctx.fillStyle = 'white';
 		ctx.lineWidth = 1;
+
 		ctx.beginPath();
 		ctx.arc(x, y, r, 0, Math.PI*2, false);
 
 		if(ball.counter == 1) {
-			ctx.moveTo(x - r * 0.2, y - r * 0.7);
-			ctx.lineTo(x - r * 0.2, y + r * 0.7);
-			ctx.lineTo(x + r * 0.2, y + r * 0.7);
-			ctx.lineTo(x + r * 0.2, y - r * 0.7);
+			var x1 = f(x - r * 0.2), x2 = c(x + r * 0.2),
+			    y1 = f(y - r * 0.7), y2 = c(y + r * 0.7);
+			path(ctx, x1, y1, x1, y2, x2, y2, x2, y1);
 		} else if(ball.counter == 2) {
-			ctx.moveTo(x - r * 0.5, y - r * 0.7);
-			ctx.lineTo(x - r * 0.5, y - r * 0.3);
-			ctx.lineTo(x + r * 0.1, y - r * 0.3);
-			ctx.lineTo(x + r * 0.1, y - r * 0.15);
-			ctx.lineTo(x - r * 0.5, y - r * 0.15);
-			ctx.lineTo(x - r * 0.5, y + r * 0.7);
-			ctx.lineTo(x + r * 0.5, y + r * 0.7);
-			ctx.lineTo(x + r * 0.5, y + r * 0.3);
-			ctx.lineTo(x - r * 0.1, y + r * 0.3);
-			ctx.lineTo(x - r * 0.1, y + r * 0.15);
-			ctx.lineTo(x + r * 0.5, y + r * 0.15);
-			ctx.lineTo(x + r * 0.5, y - r * 0.7);
+			var x1 = f(x - r * 0.5), x2 = f(x - r * 0.1),
+			    x3 = c(x + r * 0.1), x4 = c(x + r * 0.5),
+			    y1 = f(y - r * 0.7), y2 = f(y - r * 0.3),
+			    y3 = f(y - r * 0.15), y4 = c(y + r * 0.15),
+			    y5 = c(y + r * 0.3), y6 = c(y + r * 0.7);
+			path(ctx, x4, y1, x1, y1, x1, y2, x3, y2, x3, y3, x1, y3,
+			          x1, y6, x4, y6, x4, y5, x2, y5, x2, y4, x4, y4);
 		} else if(ball.counter == 3) {
-			ctx.moveTo(x - r * 0.5, y - r * 0.7);
-			ctx.lineTo(x - r * 0.5, y - r * 0.3);
-			ctx.lineTo(x + r * 0.1, y - r * 0.3);
-			ctx.lineTo(x + r * 0.1, y - r * 0.15);
-			ctx.lineTo(x - r * 0.5, y - r * 0.15);
-			ctx.lineTo(x - r * 0.5, y + r * 0.15);
-			ctx.lineTo(x + r * 0.1, y + r * 0.15);
-			ctx.lineTo(x + r * 0.1, y + r * 0.3);
-			ctx.lineTo(x - r * 0.5, y + r * 0.3);
-			ctx.lineTo(x - r * 0.5, y + r * 0.7);
-			ctx.lineTo(x + r * 0.5, y + r * 0.7);
-			ctx.lineTo(x + r * 0.5, y - r * 0.7);
+			var x1 = f(x - r * 0.5), x2 = c(x + r * 0.1), x3 = c(x + r * 0.5),
+			    y1 = f(y - r * 0.7), y2 = f(y - r * 0.3), y3 = f(y - r * 0.15),
+			    y4 = c(y + r * 0.15), y5 = c(y + r * 0.3), y6 = c(y + r * 0.7);
+			path(ctx, x3, y1, x1, y1, x1, y2, x2, y2, x2, y3, x1, y3,
+			          x1, y4, x2, y4, x2, y5, x1, y5, x1, y6, x3, y6);
 		}
+
 		ctx.closePath();
 		ctx.fill();
 	}
 
 	function drawGame() {
-		// Always add 0.5 to coordinates of lines of width 1
-		// https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Canvas_tutorial/Applying_styles_and_colors#A_lineWidth_example
 		ctx.strokeStyle = 'white';
 		ctx.lineWidth = '1';
+
+		// Always add 0.5 to coordinates of lines of width 1
+		// https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Canvas_tutorial/Applying_styles_and_colors#A_lineWidth_example
+
 		ctx.beginPath();
 		ctx.moveTo(Math.floor(LEFT_BORDER) + 0.5, Math.floor(BOTTOM_BORDER) + 0.5);
 		ctx.lineTo(Math.floor(LEFT_BORDER) + 0.5, Math.floor(TOP_BORDER) + 0.5);
