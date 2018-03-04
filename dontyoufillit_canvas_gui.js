@@ -19,11 +19,7 @@ function DontYouFillItCanvasGui(game, canvasID) {
 			    yM = SCALE / 6;
 
 			if((x > xm) && (x <= xM) && (y > ym) && (y <= yM)) {
-				if(game.state == game.RUNNING()) {
-					game.pause();
-					setScreenVisible(pauseScreen, 1);
-				}
-
+				pauseGame();
 				return true;
 			}
 
