@@ -1,31 +1,16 @@
 "use strict";
 function DontYouFillItCanvasGui(game, canvasID) {
-	var PlayPauseButton = {
-		draw: function() {
-			var x1 = canvas.width - Math.floor(SCALE / 6 * 0.9),
-			    x2 = canvas.width - Math.floor(SCALE / 6 * 0.4),
-			     y = Math.floor(SCALE / 6 * 0.1),
-			     w = Math.floor(SCALE / 6 * 0.3),
-			     h = Math.floor(SCALE / 6 * 0.8);
+	function drawPauseButton() {
+		var x1 = canvas.width - Math.floor(SCALE / 6 * 0.9),
+		    x2 = canvas.width - Math.floor(SCALE / 6 * 0.4),
+		     y = Math.floor(SCALE / 6 * 0.1),
+		     w = Math.floor(SCALE / 6 * 0.3),
+		     h = Math.floor(SCALE / 6 * 0.8);
 
-			ctx.fillStyle = 'white';
-			ctx.fillRect(x1, y, w, h);
-			ctx.fillRect(x2, y, w, h);
-		},
-		handleClick: function(x, y) {
-			var x1 = canvas.width - SCALE / 6,
-			    x2 = canvas.width,
-			    y1 = 0,
-			    y2 = SCALE / 6;
-
-			if((x > x1) && (x <= x2) && (y > y1) && (y <= y2)) {
-				pauseGame();
-				return true;
-			}
-
-			return false;
-		}
-	};
+		ctx.fillStyle = 'white';
+		ctx.fillRect(x1, y, w, h);
+		ctx.fillRect(x2, y, w, h);
+	}
 
 	function drawCannon() {
 		var r = Math.round(CANNON_BASE_WIDTH / 2),
@@ -138,16 +123,16 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		if(game.currentBall)
 			drawBall(game.currentBall);
 
-		PlayPauseButton.draw();
+		drawPauseButton();
 
 		ctx.textAlign = 'left';
 		ctx.textBaseline = 'bottom';
 		ctx.font = Math.floor(SCALE / 12) + 'px Arial';
-		ctx.fillText('Highscore', LEFT_BORDER, TOP_BORDER - Math.floor(SCALE / 12) + Math.floor(SCALE / 120));
+		ctx.fillText('Highscore', LEFT_BORDER, TOP_BORDER - SCALE / 12 + SCALE / 120);
 		ctx.fillText('Score', LEFT_BORDER, TOP_BORDER);
 
 		var scoreOffset = ctx.measureText('Highscore ').width;
-		ctx.fillText(game.highscore, LEFT_BORDER + scoreOffset, TOP_BORDER - Math.floor(SCALE / 12) + Math.floor(SCALE / 120));
+		ctx.fillText(game.highscore, LEFT_BORDER + scoreOffset, TOP_BORDER - SCALE / 12 + SCALE / 120);
 		ctx.fillText(game.score, LEFT_BORDER + scoreOffset, TOP_BORDER);
 	}
 
@@ -220,8 +205,16 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		var x = evx - rect.left,
 		    y = evy - rect.top;
 
-		if(PlayPauseButton.handleClick(x, y))
+		// Pause button bbox.
+		var xp1 = canvas.width - SCALE / 6,
+		    xp2 = canvas.width,
+		    yp1 = 0,
+		    yp2 = SCALE / 6;
+
+		if ((x > xp1) && (x <= xp2) && (y > yp1) && (y <= yp2)) {
+			pauseGame();
 			return;
+		}
 
 		if((game.currentBall == null) && (game.state == game.RUNNING())) {
 			game.fire();
