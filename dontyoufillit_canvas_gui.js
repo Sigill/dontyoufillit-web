@@ -52,14 +52,14 @@ function DontYouFillItCanvasGui(game, canvasID) {
 	}
 
 	function drawBall(ctx, ball) {
-		var x = LEFT_BORDER + ball.nx * SCALE,
-		    y = BOTTOM_BORDER - ball.ny * SCALE,
-		    r = ball.nr * SCALE;
+		var x =  ball.nx * SCALE,
+		    y = -ball.ny * SCALE,
+		    r =  ball.nr * SCALE;
 
 		// Only floor/ceil if the ball is big enough, small numbers
 		// will otherwise have irregular shapes.
-		var f = (r > 20) ? Math.floor : id;
-		var c = (r > 20) ? Math.ceil : id;
+		var f = (r > 32) ? Math.floor : id;
+		var c = (r > 32) ? Math.ceil : id;
 
 		ctx.fillStyle = 'white';
 		ctx.strokeStyle = 'white';
@@ -143,8 +143,12 @@ function DontYouFillItCanvasGui(game, canvasID) {
 			ctx.setLineDash([]);
 		}
 
-		for(var i = 0; i < game.staticBalls.length; ++i)
+		for(var i = 0; i < game.staticBalls.length; ++i) {
+			ctx.save();
+			ctx.translate(Math.floor(LEFT_BORDER), Math.floor(BOTTOM_BORDER));
 			drawBall(ctx, game.staticBalls[i]);
+			ctx.restore();
+		}
 
 		drawPauseButton();
 
@@ -171,20 +175,26 @@ function DontYouFillItCanvasGui(game, canvasID) {
 
 	function drawCurrentBallCanvas() {
 		if(game.currentBall) {
-			var x = game.currentBall.nx * SCALE,
-			    y = game.currentBall.ny * SCALE,
-			    r = game.currentBall.nr * SCALE;
+			var x =  game.currentBall.nx * SCALE,
+			    y = -game.currentBall.ny * SCALE,
+			    r =  game.currentBall.nr * SCALE;
+			// Position of the ball canvas.
+			var dx = Math.floor(x - r - BALL_CANVAS_MARGIN),
+			    dy = Math.floor(y - r - BALL_CANVAS_MARGIN);
 
 			ballCtx.setTransform(1, 0, 0, 1, 0, 0);
 
 			clearCanvas(ballCtx);
 
-			// Ball is being drawn at LB+x/BB-y. Let's compensate, then center the ball on the canvas.
-			ballCtx.translate(-(LEFT_BORDER + x) + BALL_CANVAS_SIZE / 2, -(BOTTOM_BORDER - y) + BALL_CANVAS_SIZE / 2);
+			ballCtx.save();
+
+			ballCtx.translate(-dx, -dy);
 			drawBall(ballCtx, game.currentBall);
 
-			ballCtx.canvas.style.left = Math.floor(H_OFFSET) + Math.floor(LEFT_BORDER + x - BALL_CANVAS_SIZE / 2) + "px";
-			ballCtx.canvas.style.top = Math.floor(V_OFFSET) + Math.floor(BOTTOM_BORDER - y - BALL_CANVAS_SIZE / 2) + "px";
+			ballCtx.restore();
+
+			ballCtx.canvas.style.left = Math.floor(H_OFFSET) + Math.floor(LEFT_BORDER) + dx + "px";
+			ballCtx.canvas.style.top = Math.floor(V_OFFSET) + Math.floor(BOTTOM_BORDER) + dy + "px";
 			ballCtx.canvas.style.display = 'block';
 		} else {
 			ballCtx.canvas.style.display = 'none';
