@@ -1,5 +1,7 @@
 "use strict";
 function DontYouFillItCanvasGui(game, canvasID) {
+	var that = this; // Allow closures to access this.
+
 	function drawPauseButton() {
 		var x1 = canvas.width - Math.floor(SCALE / 6 * 0.9),
 		    x2 = canvas.width - Math.floor(SCALE / 6 * 0.4),
@@ -185,22 +187,7 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		}
 	}
 
-	function handleTouch(evt) {
-		evt.preventDefault();
-		handleTouchOrClick(evt.touches[0].clientX, evt.touches[0].clientY);
-	}
-
-	function handleClick(evt) {
-		evt.preventDefault();
-		handleTouchOrClick(evt.clientX, evt.clientY);
-	}
-
 	function handleTouchOrClick(evx, evy) {
-		if(Date.now() - lastClickDate < 500)
-			return;
-
-		lastClickDate = Date.now();
-
 		var rect = canvas.getBoundingClientRect();
 		var x = evx - rect.left,
 		    y = evy - rect.top;
@@ -287,35 +274,56 @@ function DontYouFillItCanvasGui(game, canvasID) {
 	 gameoverScreen = document.getElementById('gameoverScreen'),
 	  licenseScreen = document.getElementById('licenseScreen');
 
-	document.getElementById('startScreenPlayButton').addEventListener('click', function(evt) {
+	var lastClickDate = 0;
+
+	// Some browser (e.g. Android stock browser) might generate a click event after a touch one,
+	// even if preventDefault()/stopPropagation() has been called.
+	function isGhostEvent(evt) {
+		if (evt.timeStamp - lastClickDate < 500) return true;
+		lastClickDate = evt.timeStamp;
+		return false;
+	}
+
+	function addTouchOrClickEvent(elementId, callback) {
+		var e = document.getElementById(elementId);
+		e.addEventListener('click', callback);
+		e.addEventListener('touchstart', callback, supportsPassive ? { passive: false } : false);
+	}
+
+	addTouchOrClickEvent('startScreenPlayButton', function(evt) {
 		evt.preventDefault();
+		if (isGhostEvent(evt)) return;
 		game.resume();
 		that.state = that.GAME;
 		window.requestAnimationFrame(step);
 		setScreenVisible(startScreen, -1);
 	});
 
-	document.getElementById('pauseScreenContinueButton').addEventListener('click', function(evt) {
+	addTouchOrClickEvent('pauseScreenContinueButton', function(evt) {
 		evt.preventDefault();
+		if (isGhostEvent(evt)) return;
 		game.resume();
 		window.requestAnimationFrame(step);
 		setScreenVisible(pauseScreen, -1);
 	});
 
-	document.getElementById('gameoverScreenPlayAgainButton').addEventListener('click', function(evt) {
+	addTouchOrClickEvent('gameoverScreenPlayAgainButton', function(evt) {
 		evt.preventDefault();
+		if (isGhostEvent(evt)) return;
 		game.reset();
 		window.requestAnimationFrame(step);
 		setScreenVisible(gameoverScreen, -1);
 	});
 
-	document.getElementById('startScreenLicenseButton').addEventListener('click', function(evt) {
+	addTouchOrClickEvent('startScreenLicenseButton', function(evt) {
 		evt.preventDefault();
+		if (isGhostEvent(evt)) return;
 		setScreenVisible(licenseScreen, 2);
 	});
 
-	document.getElementById('licenseScreenBackButton').addEventListener('click', function(evt) {
+	addTouchOrClickEvent('licenseScreenBackButton', function(evt) {
 		evt.preventDefault();
+		if (isGhostEvent(evt)) return;
 		setScreenVisible(licenseScreen, -1);
 	});
 
@@ -325,14 +333,22 @@ function DontYouFillItCanvasGui(game, canvasID) {
 	    BOTTOM_BORDER, TOP_BORDER, LEFT_BORDER, RIGHT_BORDER,
 	    CANNON_BASE_WIDTH, CANNON_BASE_HEIGHT, CANNON_LENGTH, CANNON_WIDTH;
 
-	var lastClickDate = 0;
-
-	var that = this; // Allow to access this from the closure.
-
 	window.addEventListener('resize', resizeCanvas, false);
 	[canvas, container].forEach(function(e) {
-		e.addEventListener('mousedown', handleClick, false);
-		e.addEventListener('touchstart', handleTouch, false);
+		e.addEventListener('mousedown', function(evt) {
+			evt.preventDefault();
+			if (isGhostEvent(evt)) return;
+			handleTouchOrClick(evt.clientX, evt.clientY);
+		}, false);
+		// Flag the event handler as non-passive so it does not break scrolling. OK, there's no scrolling,
+		// but this will generate a warning if the passive option is left to true (the default value).
+		// https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md
+		// https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Improving_scrolling_performance_with_passive_listeners
+		e.addEventListener('touchstart', function(evt) {
+			evt.preventDefault();
+			if (isGhostEvent(evt)) return;
+			handleTouchOrClick(evt.touches[0].clientX, evt.touches[0].clientY);
+		}, supportsPassive ? { passive: false } : false);
 	});
 
 	document.addEventListener('visibilitychange', handleVisibilityChange, false);

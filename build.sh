@@ -82,7 +82,7 @@ cat bootstrap.css| cssmin -w 512 > dist/bootstrap.css
 cp .htaccess dist/
 
 # Compute a hash of all the files that need to be cached.
-h=$(tar -c app.css play.html requestAnimationFrame.js stats.js observable.js dontyoufillit.js dontyoufillit_canvas_gui.js app.js|sha1sum|cut -d ' ' -f1)
+h=$(tar -c app.css play.html requestAnimationFrame.js passiveEvent.js stats.js observable.js dontyoufillit.js dontyoufillit_canvas_gui.js app.js|sha1sum|cut -d ' ' -f1)
 
 # and put it in the cache manifest, in order to make it unique.
 sed -e "s/# hash xyz/# hash $h/g" cache.manifest > dist/cache.manifest
