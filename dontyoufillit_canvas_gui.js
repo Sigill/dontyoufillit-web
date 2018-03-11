@@ -2,16 +2,16 @@
 function DontYouFillItCanvasGui(game, canvasID) {
 	var that = this; // Allow closures to access this.
 
-	function drawPauseButton() {
-		var x1 = mainCtx.canvas.width - Math.floor(SCALE / 6 * 0.9),
-		    x2 = mainCtx.canvas.width - Math.floor(SCALE / 6 * 0.4),
+	function drawPauseButton(ctx) {
+		var x1 = Math.floor(SCALE / 6 * 0.1),
+		    x2 = Math.floor(SCALE / 6 * 0.6),
 		     y = Math.floor(SCALE / 6 * 0.1),
 		     w = Math.floor(SCALE / 6 * 0.3),
 		     h = Math.floor(SCALE / 6 * 0.8);
 
-		mainCtx.fillStyle = 'white';
-		mainCtx.fillRect(x1, y, w, h);
-		mainCtx.fillRect(x2, y, w, h);
+		ctx.fillStyle = 'white';
+		ctx.fillRect(x1, y, w, h);
+		ctx.fillRect(x2, y, w, h);
 	}
 
 	function drawCannon(ctx) {
@@ -113,47 +113,27 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		}
 	}
 
-	function drawMainCanvas(ctx) {
+	function drawScoreCanvas(ctx) {
 		ctx.fillStyle = 'black';
 		ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-		ctx.strokeStyle = 'white';
-		ctx.lineWidth = '1';
-
-		// Always add 0.5 to coordinates of lines of width 1
-		// https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Canvas_tutorial/Applying_styles_and_colors#A_lineWidth_example
-
-		ctx.beginPath();
-		ctx.moveTo(Math.floor(LEFT_BORDER) + 0.5, Math.floor(BOTTOM_BORDER) + 0.5);
-		ctx.lineTo(Math.floor(LEFT_BORDER) + 0.5, Math.floor(TOP_BORDER) + 0.5);
-		ctx.lineTo(Math.floor(RIGHT_BORDER) - 0.5, Math.floor(TOP_BORDER) + 0.5);
-		ctx.lineTo(Math.floor(RIGHT_BORDER) - 0.5, Math.floor(BOTTOM_BORDER) + 0.5);
-		if(!ctx.setLineDash)
-			ctx.closePath();
-		ctx.stroke();
-
-		// Android stock browser does not support setLineDash
-		// (at least on version <= 4.1.2)
-		if(ctx.setLineDash) {
-			ctx.beginPath();
-			ctx.setLineDash([5, 5]);
-			ctx.moveTo(Math.floor(RIGHT_BORDER) - 0.5, Math.floor(BOTTOM_BORDER) + 0.5);
-			ctx.lineTo(Math.floor(LEFT_BORDER) + 0.5, Math.floor(BOTTOM_BORDER) + 0.5);
-			ctx.stroke();
-			ctx.setLineDash([]);
-		}
-
-		drawPauseButton();
-
+		ctx.fillStyle = 'white';
 		ctx.textAlign = 'left';
 		ctx.textBaseline = 'bottom';
-		ctx.font = Math.floor(SCALE / 12) + 'px Arial';
+		ctx.font = FONT;
 		ctx.fillText('Highscore', LEFT_BORDER, TOP_BORDER - SCALE / 12 + SCALE / 120);
 		ctx.fillText('Score', LEFT_BORDER, TOP_BORDER);
 
 		var scoreOffset = ctx.measureText('Highscore ').width;
 		ctx.fillText(game.highscore, LEFT_BORDER + scoreOffset, TOP_BORDER - SCALE / 12 + SCALE / 120);
 		ctx.fillText(game.score, LEFT_BORDER + scoreOffset, TOP_BORDER);
+	}
+
+	function drawPauseCanvas(ctx) {
+		ctx.fillStyle = 'black';
+		ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+		drawPauseButton(ctx);
 	}
 
 	function drawCannonCanvas() {
@@ -238,8 +218,9 @@ function DontYouFillItCanvasGui(game, canvasID) {
 					hasBeenResized = true;
 				}
 
-				b.ctx.canvas.style.left = dx + "px";
-				b.ctx.canvas.style.top = Math.floor(SCALE) + dy + "px";
+				// -1 because of the border of the div.
+				b.ctx.canvas.style.left = (dx - 1) + "px";
+				b.ctx.canvas.style.top = Math.floor(SCALE - 1) + dy + "px";
 				b.ctx.canvas.style.display = 'block';
 			}
 
@@ -268,7 +249,11 @@ function DontYouFillItCanvasGui(game, canvasID) {
 	function draw() {
 		if(that.state == that.GAME) {
 			if (redrawUponResize || (gameState === undefined) || (gameState.score != game.score)) {
-				drawMainCanvas(mainCtx);
+				drawScoreCanvas(scoreCtx);
+			}
+
+			if (redrawUponResize){
+				drawPauseCanvas(pauseCtx);
 			}
 
 			drawStaticBalls();
@@ -313,28 +298,6 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		}
 	}
 
-	function handleTouchOrClick(evx, evy) {
-		var rect = mainCtx.canvas.getBoundingClientRect();
-		var x = evx - rect.left,
-		    y = evy - rect.top;
-
-		// Pause button bbox.
-		var xp1 = mainCtx.canvas.width - SCALE / 6,
-		    xp2 = mainCtx.canvas.width,
-		    yp1 = 0,
-		    yp2 = SCALE / 6;
-
-		if ((x > xp1) && (x <= xp2) && (y > yp1) && (y <= yp2)) {
-			pauseGame();
-			return;
-		}
-
-		if((game.currentBall == null) && (game.state == game.RUNNING())) {
-			game.fire();
-			return;
-		}
-	}
-
 	function handleVisibilityChange() {
 		if(document.hidden) {
 			pauseGame();
@@ -346,10 +309,16 @@ function DontYouFillItCanvasGui(game, canvasID) {
 	function resizeCanvas() {
 		computeGameDimensions();
 
-		mainCtx.canvas.width = Math.floor(GAME_WIDTH);
-		mainCtx.canvas.height = Math.floor(GAME_HEIGHT);
-		mainCtx.canvas.style.left = Math.floor(H_OFFSET) + "px";
-		mainCtx.canvas.style.top = Math.floor(V_OFFSET) + "px";
+		scoreCtx.font = FONT;
+		scoreCtx.canvas.width  = Math.ceil(scoreCtx.measureText('Highscore XXXX').width);
+		scoreCtx.canvas.height = Math.ceil(SCALE / 6);
+		scoreCtx.canvas.style.left = Math.floor(H_OFFSET) + "px";
+		scoreCtx.canvas.style.top  = Math.floor(V_OFFSET) + "px";
+
+		pauseCtx.canvas.width  = Math.ceil(SCALE / 6);
+		pauseCtx.canvas.height = Math.ceil(SCALE / 6);
+		pauseCtx.canvas.style.left = Math.floor(H_OFFSET) + Math.floor(GAME_WIDTH) - Math.ceil(SCALE / 6) + "px";
+		pauseCtx.canvas.style.top  = Math.floor(V_OFFSET) + "px";
 
 		cannonCtx.canvas.width = Math.ceil(CANNON_BBOX_WIDTH);
 		cannonCtx.canvas.height = Math.ceil(CANNON_BBOX_HEIGHT);
@@ -359,7 +328,7 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		ballCtx.canvas.width = BALL_CANVAS_SIZE;
 		ballCtx.canvas.height = BALL_CANVAS_SIZE;
 
-		ballContainer.style.width = Math.floor(SCALE) + "px";
+		ballContainer.style.width = Math.floor(SCALE - 2) + "px";
 		ballContainer.style.height = Math.floor(SCALE) + "px";
 		ballContainer.style.left = Math.floor(H_OFFSET) + "px";
 		ballContainer.style.top = Math.floor(V_OFFSET) + Math.floor(TOP_BORDER) + "px";
@@ -398,6 +367,8 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		var cannon_hypot = Math.sqrt((CANNON_WIDTH / 2) * (CANNON_WIDTH / 2) + CANNON_LENGTH * CANNON_LENGTH)
 		CANNON_BBOX_WIDTH  = cannon_hypot * 2;
 		CANNON_BBOX_HEIGHT = CANNON_BASE_HEIGHT + cannon_hypot;
+
+		FONT = Math.floor(SCALE / 12) + 'px Arial';
 	}
 
 	function setScreenVisible(screen, zindex) {
@@ -415,12 +386,11 @@ function DontYouFillItCanvasGui(game, canvasID) {
 	this.game = game;
 	this.observable = new Observable();
 
-
-
-	var     mainCtx = document.getElementById("MainCanvas").getContext('2d'),
+	var    scoreCtx = document.getElementById("ScoreCanvas").getContext('2d'),
+	       pauseCtx = document.getElementById("PauseCanvas").getContext('2d'),
 	      cannonCtx = document.getElementById("CannonCanvas").getContext('2d'),
 	        ballCtx = document.getElementById("BallCanvas").getContext('2d'),
-	      container = mainCtx.canvas.parentNode,
+	      container = scoreCtx.canvas.parentNode,
 	  ballContainer = document.getElementById('Balls'),
 	    startScreen = document.getElementById('startScreen'),
 	    pauseScreen = document.getElementById('pauseScreen'),
@@ -437,9 +407,17 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		return false;
 	}
 
-	function addTouchOrClickEvent(elementId, callback) {
-		var e = document.getElementById(elementId);
+	function addTouchOrClickEvent(element, callback) {
+		var e = (typeof element === 'string') ? document.getElementById(element) : element;
 		e.addEventListener('click', callback);
+		// A listener on touchstart is mandatory as some browser will wait 300ms before
+		// firing the click event associated to a touch action (in order to distinguish
+		// a click from a scrolling action).
+		// Flag touch event handler as non-passive so it does not break scrolling.
+		// OK, there's no scrolling, but this will generate a warning if the passive
+		// option is left to true (the default value).
+		// https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md
+		// https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Improving_scrolling_performance_with_passive_listeners
 		e.addEventListener('touchstart', callback, supportsPassive ? { passive: false } : false);
 	}
 
@@ -494,25 +472,24 @@ function DontYouFillItCanvasGui(game, canvasID) {
 	    CANNON_BASE_WIDTH, CANNON_BASE_HEIGHT, CANNON_LENGTH, CANNON_WIDTH,
 	    CANNON_BBOX_WIDTH, CANNON_BBOX_HEIGHT,
 	    BALL_CANVAS_SIZE,
-	    BALL_CANVAS_MARGIN = 8;
+	    BALL_CANVAS_MARGIN = 8,
+	    FONT;
 
 	window.addEventListener('resize', resizeCanvas, false);
 
-	[mainCtx.canvas, container].forEach(function(e) {
-		e.addEventListener('mousedown', function(evt) {
-			evt.preventDefault();
-			if (isGhostEvent(evt)) return;
-			handleTouchOrClick(evt.clientX, evt.clientY);
-		}, false);
-		// Flag the event handler as non-passive so it does not break scrolling. OK, there's no scrolling,
-		// but this will generate a warning if the passive option is left to true (the default value).
-		// https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md
-		// https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Improving_scrolling_performance_with_passive_listeners
-		e.addEventListener('touchstart', function(evt) {
-			evt.preventDefault();
-			if (isGhostEvent(evt)) return;
-			handleTouchOrClick(evt.touches[0].clientX, evt.touches[0].clientY);
-		}, supportsPassive ? { passive: false } : false);
+	addTouchOrClickEvent('PauseCanvas', function(evt) {
+		evt.preventDefault();
+		evt.stopPropagation(); // Otherwise canvas receives it on Firefox.
+		if (isGhostEvent(evt)) return;
+		pauseGame();
+	});
+
+	addTouchOrClickEvent(container, function(evt) {
+		evt.preventDefault();
+		if (isGhostEvent(evt)) return;
+		if((game.currentBall == null) && (game.state == game.RUNNING())) {
+			game.fire();
+		}
 	});
 
 	document.addEventListener('visibilitychange', handleVisibilityChange, false);
