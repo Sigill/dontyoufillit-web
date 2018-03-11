@@ -243,8 +243,7 @@ DontYouFillItGame.prototype.update = function(time) {
 					localStorage.setItem('highscore', this.score.toString(10));
 				}
 				this.state = this.GAMEOVER();
-			}
-			if(this.currentBall.state.s < 0.001) {
+			} else if(this.currentBall.state.s < 0.001) {
 				if(this.currentBall.ny >= 0) {
 					this.currentBall.grow(this.staticBalls);
 					this.staticBalls.push(this.currentBall);

@@ -143,13 +143,6 @@ function DontYouFillItCanvasGui(game, canvasID) {
 			ctx.setLineDash([]);
 		}
 
-		for(var i = 0; i < game.staticBalls.length; ++i) {
-			ctx.save();
-			ctx.translate(Math.floor(LEFT_BORDER), Math.floor(BOTTOM_BORDER));
-			drawBall(ctx, game.staticBalls[i]);
-			ctx.restore();
-		}
-
 		drawPauseButton();
 
 		ctx.textAlign = 'left';
@@ -201,39 +194,95 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		}
 	}
 
-	function gameNeedRedraw() {
-		if (gameState === 0) return true;
+	var recycledCtx = [];
 
-		if (gameState.previousBalls.length != game.staticBalls.length) return true;
-
-		for (var i = 0; i < game.staticBalls.length; ++i) {
-			var o1 = gameState.previousBalls[i],
-			    o2 = game.staticBalls[i];
-
-			if ((o1 != o2) || (gameState.previousCounters[i] != o2.counter)) return true;
+	function drawStaticBalls() {
+		if (gameState != undefined) {
+			for (var i = 0; i < gameState.previousBalls.length; ++i) {
+				var pb = gameState.previousBalls[i];
+				if (pb.counter == 0) {
+					recycledCtx.push(pb.ctx);
+					delete pb.ctx;
+				}
+			}
 		}
 
-		return false;
+		for(var i = 0; i < game.staticBalls.length; ++i) {
+			var b = game.staticBalls[i];
+			var x =  b.nx * SCALE,
+			    y = -b.ny * SCALE,
+			    r =  b.nr * SCALE;
+			// Position of the ball canvas.
+			var dx = Math.floor(x - r - 1),
+			    dy = Math.floor(y - r - 1);
+
+			var hasBeenResized = false;
+
+			if (redrawUponResize || (b.ctx === undefined)) {
+				if (b.ctx === undefined) {
+					if (recycledCtx.length == 0) { // No recycled canvas available, create a new one.
+						b.ctx = document.createElement('canvas').getContext('2d');
+						b.ctx.canvas.classList.add('ball');
+						ballContainer.appendChild(b.ctx.canvas);
+					} else {
+						b.ctx = recycledCtx.pop();
+					}
+				}
+
+				var s = Math.ceil(r * 2) + 2;
+				var c = b.ctx.canvas;
+
+				if (c.width != s || c.height != s) {
+					c.width = s;
+					c.height = s;
+					hasBeenResized = true;
+				}
+
+				b.ctx.canvas.style.left = dx + "px";
+				b.ctx.canvas.style.top = Math.floor(SCALE) + dy + "px";
+				b.ctx.canvas.style.display = 'block';
+			}
+
+			if (redrawUponResize || (b.was === undefined) || (b.was != b.counter)) {
+				b.was = b.counter;
+
+				b.ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+				// Clearing the canvas might be an expensive operation (thank you, Android stock browser).
+				// Don't do it if the canvas has been resized (which already cleared it).
+				if (!hasBeenResized)
+					clearCanvas(b.ctx);
+
+				b.ctx.translate(-dx, -dy);
+				drawBall(b.ctx, b);
+			}
+		}
+
+		// Hide any unused context
+		for (var i = 0; i < recycledCtx.length; ++i) {
+			if (recycledCtx[i].canvas.style.display != "none")
+				recycledCtx[i].canvas.style.display = "none";
+		}
 	}
 
 	function draw() {
 		if(that.state == that.GAME) {
-			if (gameNeedRedraw()) {
-				gameState = {
-					previousBalls: game.staticBalls.slice(),
-					previousCounters: new Array(game.staticBalls.length)
-				};
-
-				// We could have used Array.map, but Android stock browser might no support it.
-				for (var i = 0; i < game.staticBalls.length; ++i)
-					gameState.previousCounters[i] = game.staticBalls[i].counter;
-
+			if (redrawUponResize || (gameState === undefined) || (gameState.score != game.score)) {
 				drawMainCanvas(mainCtx);
 			}
+
+			drawStaticBalls();
+
+			redrawUponResize = false;
 
 			drawCannonCanvas();
 
 			drawCurrentBallCanvas();
+
+			gameState = {
+				previousBalls: game.staticBalls.slice(),
+				score: game.score
+			};
 		}
 	}
 
@@ -292,11 +341,13 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		}
 	}
 
+	var redrawUponResize = true;
+
 	function resizeCanvas() {
 		computeGameDimensions();
 
-		mainCtx.canvas.width = GAME_WIDTH;
-		mainCtx.canvas.height = GAME_HEIGHT;
+		mainCtx.canvas.width = Math.floor(GAME_WIDTH);
+		mainCtx.canvas.height = Math.floor(GAME_HEIGHT);
 		mainCtx.canvas.style.left = Math.floor(H_OFFSET) + "px";
 		mainCtx.canvas.style.top = Math.floor(V_OFFSET) + "px";
 
@@ -308,7 +359,12 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		ballCtx.canvas.width = BALL_CANVAS_SIZE;
 		ballCtx.canvas.height = BALL_CANVAS_SIZE;
 
-		gameState = 0;
+		ballContainer.style.width = Math.floor(SCALE) + "px";
+		ballContainer.style.height = Math.floor(SCALE) + "px";
+		ballContainer.style.left = Math.floor(H_OFFSET) + "px";
+		ballContainer.style.top = Math.floor(V_OFFSET) + Math.floor(TOP_BORDER) + "px";
+
+		redrawUponResize = true;
 
 		// Redraw event when the game is not running
 		if(game.state != game.RUNNING())
@@ -365,6 +421,7 @@ function DontYouFillItCanvasGui(game, canvasID) {
 	      cannonCtx = document.getElementById("CannonCanvas").getContext('2d'),
 	        ballCtx = document.getElementById("BallCanvas").getContext('2d'),
 	      container = mainCtx.canvas.parentNode,
+	  ballContainer = document.getElementById('Balls'),
 	    startScreen = document.getElementById('startScreen'),
 	    pauseScreen = document.getElementById('pauseScreen'),
 	 gameoverScreen = document.getElementById('gameoverScreen'),
@@ -386,7 +443,7 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		e.addEventListener('touchstart', callback, supportsPassive ? { passive: false } : false);
 	}
 
-	var gameState = 0;
+	var gameState = undefined;
 
 	addTouchOrClickEvent('startScreenPlayButton', function(evt) {
 		evt.preventDefault();
@@ -408,6 +465,13 @@ function DontYouFillItCanvasGui(game, canvasID) {
 	addTouchOrClickEvent('gameoverScreenPlayAgainButton', function(evt) {
 		evt.preventDefault();
 		if (isGhostEvent(evt)) return;
+
+		for(var i = 0; i < game.staticBalls.length; ++i) {
+			recycledCtx.push(game.staticBalls[i].ctx);
+			delete game.staticBalls[i].ctx;
+		}
+
+		gameState = undefined;
 		game.reset();
 		window.requestAnimationFrame(step);
 		setScreenVisible(gameoverScreen, -1);
