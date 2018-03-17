@@ -140,8 +140,8 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		clearCanvas(cannonCtx);
 
 		cannonCtx.setTransform(1, 0, 0, 1, 0, 0);
-		cannonCtx.translate(-SCALE / 2 + Math.ceil(CANNON_BBOX_WIDTH) / 2,
-		                    -GAME_HEIGHT + Math.ceil(CANNON_BBOX_HEIGHT));
+		cannonCtx.translate(-SCALE / 2 + CANNON_BBOX_WIDTH / 2,
+		                    -GAME_HEIGHT + CANNON_BBOX_HEIGHT);
 		drawCannon(cannonCtx, game.cannon);
 		cannonCtx.setTransform(1, 0, 0, 1, 0, 0);
 	}
@@ -166,8 +166,8 @@ function DontYouFillItCanvasGui(game, canvasID) {
 
 			ballCtx.restore();
 
-			ballCtx.canvas.style.left = Math.floor(H_OFFSET) + Math.floor(LEFT_BORDER) + dx + "px";
-			ballCtx.canvas.style.top = Math.floor(V_OFFSET) + Math.floor(BOTTOM_BORDER) + dy + "px";
+			ballCtx.canvas.style.left    = H_OFFSET + Math.floor(LEFT_BORDER) + dx + "px";
+			ballCtx.canvas.style.top     = V_OFFSET + Math.floor(BOTTOM_BORDER) + dy + "px";
 			ballCtx.canvas.style.display = 'block';
 		} else {
 			ballCtx.canvas.style.display = 'none';
@@ -220,7 +220,7 @@ function DontYouFillItCanvasGui(game, canvasID) {
 
 				// -1 because of the border of the div.
 				b.ctx.canvas.style.left = (dx - 1) + "px";
-				b.ctx.canvas.style.top = Math.floor(SCALE - 1) + dy + "px";
+				b.ctx.canvas.style.top = (SCALE - 1) + dy + "px";
 				b.ctx.canvas.style.display = 'block';
 			}
 
@@ -309,29 +309,30 @@ function DontYouFillItCanvasGui(game, canvasID) {
 	function resizeCanvas() {
 		computeGameDimensions();
 
-		scoreCtx.font = FONT;
-		scoreCtx.canvas.width  = Math.ceil(scoreCtx.measureText('Highscore XXXX').width);
-		scoreCtx.canvas.height = Math.ceil(SCALE / 6);
-		scoreCtx.canvas.style.left = Math.floor(H_OFFSET) + "px";
-		scoreCtx.canvas.style.top  = Math.floor(V_OFFSET) + "px";
+		scoreCtx.font              = FONT;
+		scoreCtx.canvas.width      = Math.ceil(scoreCtx.measureText('Highscore XXXX').width);
+		scoreCtx.canvas.height     = Math.ceil(SCALE / 6);
+		scoreCtx.canvas.style.left = H_OFFSET + "px";
+		scoreCtx.canvas.style.top  = V_OFFSET + "px";
 
-		pauseCtx.canvas.width  = Math.ceil(SCALE / 6);
-		pauseCtx.canvas.height = Math.ceil(SCALE / 6);
-		pauseCtx.canvas.style.left = Math.floor(H_OFFSET) + Math.floor(GAME_WIDTH) - Math.ceil(SCALE / 6) + "px";
-		pauseCtx.canvas.style.top  = Math.floor(V_OFFSET) + "px";
+		pauseCtx.canvas.width      = Math.ceil(SCALE / 6);
+		pauseCtx.canvas.height     = Math.ceil(SCALE / 6);
+		pauseCtx.canvas.style.left = H_OFFSET + GAME_WIDTH - Math.ceil(SCALE / 6) + "px";
+		pauseCtx.canvas.style.top  = V_OFFSET + "px";
 
-		cannonCtx.canvas.width = Math.ceil(CANNON_BBOX_WIDTH);
-		cannonCtx.canvas.height = Math.ceil(CANNON_BBOX_HEIGHT);
+		cannonCtx.canvas.width      = CANNON_BBOX_WIDTH;
+		cannonCtx.canvas.height     = CANNON_BBOX_HEIGHT;
 		cannonCtx.canvas.style.left = Math.ceil(H_OFFSET + (SCALE - CANNON_BBOX_WIDTH) / 2) + "px";
-		cannonCtx.canvas.style.top = Math.floor(V_OFFSET + GAME_HEIGHT - CANNON_BBOX_HEIGHT) + "px";
+		cannonCtx.canvas.style.top  = Math.floor(V_OFFSET + GAME_HEIGHT - CANNON_BBOX_HEIGHT) + "px";
 
-		ballCtx.canvas.width = BALL_CANVAS_SIZE;
+		ballCtx.canvas.width  = BALL_CANVAS_SIZE;
 		ballCtx.canvas.height = BALL_CANVAS_SIZE;
 
-		ballContainer.style.width = Math.floor(SCALE - 2) + "px";
-		ballContainer.style.height = Math.floor(SCALE) + "px";
-		ballContainer.style.left = Math.floor(H_OFFSET) + "px";
-		ballContainer.style.top = Math.floor(V_OFFSET) + Math.floor(TOP_BORDER) + "px";
+		// -2 because of the 1px border
+		ballContainer.style.width  = SCALE - 2 + "px";
+		ballContainer.style.height = SCALE - 2 + "px";
+		ballContainer.style.left   = H_OFFSET + "px";
+		ballContainer.style.top    = V_OFFSET + TOP_BORDER + "px";
 
 		redrawUponResize = true;
 
@@ -344,17 +345,16 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		var w = container.clientWidth, h = container.clientHeight;
 
 		if(w / h < 3/4) {
-			GAME_WIDTH = w;
-			GAME_HEIGHT = 4/3 * GAME_WIDTH;
+			SCALE = w;
 		} else {
-			GAME_HEIGHT = h;
-			GAME_WIDTH = 3/4 * GAME_HEIGHT;
+			SCALE = Math.floor(3/4 * h);
 		}
 
-		SCALE              = GAME_WIDTH;
-		V_OFFSET           = (h - GAME_HEIGHT) / 2;
-		H_OFFSET           = (w - GAME_WIDTH) / 2;
-		TOP_BORDER         = SCALE / 6;
+		GAME_WIDTH         = SCALE;
+		GAME_HEIGHT        = Math.floor(4/3 * SCALE);
+		V_OFFSET           = Math.floor((h - GAME_HEIGHT) / 2);
+		H_OFFSET           = Math.floor((w - GAME_WIDTH) / 2);
+		TOP_BORDER         = Math.floor(SCALE / 6);
 		BOTTOM_BORDER      = TOP_BORDER + SCALE;
 		LEFT_BORDER        = 0;
 		RIGHT_BORDER       = LEFT_BORDER + SCALE;
@@ -364,9 +364,9 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		CANNON_WIDTH       = SCALE / 18;
 		BALL_CANVAS_SIZE   = Math.ceil(SCALE / 20.0) + BALL_CANVAS_MARGIN * 2;
 
-		var cannon_hypot = Math.sqrt((CANNON_WIDTH / 2) * (CANNON_WIDTH / 2) + CANNON_LENGTH * CANNON_LENGTH)
-		CANNON_BBOX_WIDTH  = cannon_hypot * 2;
-		CANNON_BBOX_HEIGHT = CANNON_BASE_HEIGHT + cannon_hypot;
+		var cannon_hypot   = Math.sqrt((CANNON_WIDTH / 2) * (CANNON_WIDTH / 2) + CANNON_LENGTH * CANNON_LENGTH)
+		CANNON_BBOX_WIDTH  = Math.ceil(cannon_hypot * 2);
+		CANNON_BBOX_HEIGHT = Math.ceil(CANNON_BASE_HEIGHT + cannon_hypot);
 
 		FONT = Math.floor(SCALE / 12) + 'px Arial';
 	}
