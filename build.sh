@@ -68,10 +68,10 @@ d
 # Add the cache manifest to the game
 sed -e 's/<html>/<html manifest="cache.manifest">/g' -e 's/^[[:space:]]*//g' dist/play_online.html > dist/play.html
 
-for F in requestAnimationFrame.js stats.js observable.js dontyoufillit.js dontyoufillit_canvas_gui.js app.js
+for F in requestAnimationFrame.js passiveEvent.js stats.js observable.js dontyoufillit.js dontyoufillit_canvas_gui.js app.js
 do
 	if [ $F -nt tmp/app.js ]; then
-		closure-compiler --compilation_level SIMPLE_OPTIMIZATIONS requestAnimationFrame.js stats.js observable.js dontyoufillit.js dontyoufillit_canvas_gui.js app.js > tmp/app.js
+		closure-compiler --compilation_level SIMPLE_OPTIMIZATIONS requestAnimationFrame.js passiveEvent.js stats.js observable.js dontyoufillit.js dontyoufillit_canvas_gui.js app.js > tmp/app.js
 		break
 	fi
 done
