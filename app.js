@@ -19,11 +19,12 @@ var qs = parseQueryString();
 
 if(qs['debug']) {
 	var stats = new Stats();
-	stats.setMode(0); // 0: fps, 1: ms
-	stats.domElement.style.position = 'absolute';
-	stats.domElement.style.left = '0px';
-	stats.domElement.style.bottom = '0px';
-	document.body.appendChild( stats.domElement );
+	stats.showPanel(0); // 0: fps, 1: ms
+	stats.dom.style.removeProperty('top');
+	stats.dom.style.position = 'absolute';
+	stats.dom.style.left = '0px';
+	stats.dom.style.bottom = '0px';
+	document.body.appendChild( stats.dom );
 
 	gui.addObserver(function(message) {
 		if(message == 'beginStep')
