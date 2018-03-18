@@ -33,6 +33,5 @@ This game is released under the terms of the MIT License. See the LICENSE file f
 
 Some parts of the game use:
 
-- The Bootstrap framework, which is licensed under MIT (see [license](https://github.com/twbs/bootstrap/blob/master/LICENSE)).
 - The stats.js library, which is licensed under MIT (see [license](https://github.com/mrdoob/stats.js/blob/master/LICENSE)).
 - The requestAnimationFrame polyfill, which is licensed under MIT (see [license](https://raw.githubusercontent.com/darius/requestAnimationFrame/master/LICENSE)).

@@ -51,8 +51,6 @@ done
 
 convert tmp/icon-16x16.png tmp/icon-32x32.png tmp/icon-48x48.png tmp/icon-256x256.png dist/favicon.ico
 
-sed -e "s!URL!$url!g" index.html > dist/index.html
-
 ## Add paragraph markup to license file
 # Removes empty lines and add paragraph tags to each lines
 sed -e '/^\s*$/d' -e 's/^/<p>/g' -e 's/$/<\/p>/g' LICENSE > tmp/LICENSE
@@ -78,7 +76,6 @@ done
 cp tmp/app.js dist/app.js
 
 cat app.css| cssmin -w 512 > dist/app.css
-cat bootstrap.css| cssmin -w 512 > dist/bootstrap.css
 cp .htaccess dist/
 
 # Compute a hash of all the files that need to be cached.
