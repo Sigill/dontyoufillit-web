@@ -25,41 +25,50 @@
 <!-- END FAVICONS -->
 </head>
 <body>
-<div id="d">
+<div id="game">
 	<canvas id="ScoreCanvas"></canvas>
 	<canvas id="PauseCanvas"></canvas>
 	<canvas id="CannonCanvas"></canvas>
 	<canvas id="BallCanvas"></canvas>
 	<div id="Balls"></div>
 </div>
-<div id="startScreen" class="modalScreen">
-	<div class="container">
-		<p class="title">DontYouFillIt</p>
-		<p>Developped by Cyrille&nbsp;Faucheux</p>
-		<p class="button"><span id="startScreenPlayButton">Play</span></p>
-		<p class="button"><span id="startScreenLicenseButton">License</span></p>
-	</div>
-</div>
-<div id="pauseScreen" class="modalScreen">
-	<div class="container">
-		<p class="title">Game paused</p>
-		<p class="button"><span id="pauseScreenContinueButton">Continue</span></p>
-	</div>
-</div>
-<div id="gameoverScreen" class="modalScreen">
-	<div class="container">
-		<p class="title">Game Over</p>
-		<p class="score"><span id="gameoverScreenScoreMessage">Your score</span><span id="gameoverScreenHighscoreMessage">New highscore</span>: <span id="gameoverScreenScore"></span></p>
-		<p class="button"><span id="gameoverScreenPlayAgainButton">Play again</span></p>
-	</div>
-</div>
-<div id="licenseScreen" class="modalScreen">
-	<div class="container">
-		<p class="title">License</p>
-		<div class="leftAligned">
-		$LICENSE$
+<div id="screenContainer">
+	<div id="screenWrapper">
+		<div id="startScreen" class="screen">
+			<p class="title">DontYouFillIt</p>
+			<p class="button"><span id="startScreenPlayButton">Play</span></p>
+			<p class="button"><span id="startScreenLicenseButton">License</span></p>
 		</div>
-		<p class="button"><span id="licenseScreenBackButton">Back</span></p>
+		<div id="pauseScreen" class="screen">
+			<p class="title">Game paused</p>
+			<p class="button"><span id="pauseScreenContinueButton">Continue</span></p>
+		</div>
+		<div id="gameoverScreen" class="screen">
+			<p class="title">Game Over</p>
+			<p class="score"><span id="gameoverScreenScoreMessage">Your score</span><span id="gameoverScreenHighscoreMessage">New highscore</span>: <span id="gameoverScreenScore"></span></p>
+			<p class="button"><span id="gameoverScreenPlayAgainButton">Play again</span></p>
+		</div>
+		<div id="licenseScreen" class="screen">
+			<p class="title">License</p>
+			<p>DontYouFillIt is free software. Source code is available at <a href="https://github.com/Sigill/dontyoufillit">https://github.com/Sigill/dontyoufillit</a>. You can redistribute it and/or modify it under the terms of the MIT License.</p>
+			$LICENSE$
+
+			<h2>Third parties</h2>
+			<h3>stats.js</h3>
+			<p>The MIT License</p>
+			<p>Copyright (c) 2009-2016 stats.js authors</p>
+			<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+			<p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
+			<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+
+			<h3>requestAnimationFrame polyfill</h3>
+			<p>The MIT License (MIT)</p>
+			<p>Copyright (c) 2013 Darius Bacon</p>
+			<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+			<p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
+			<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+			<p class="button"><span id="licenseScreenBackButton">Back</span></p>
+		</div>
 	</div>
 </div>
 <!-- BEGIN JS -->

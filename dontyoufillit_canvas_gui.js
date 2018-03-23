@@ -287,14 +287,14 @@ function DontYouFillItCanvasGui(game, canvasID) {
 			document.getElementById('gameoverScreenScoreMessage').style.display = (game.newHighscore ? 'none' : 'inline');
 			document.getElementById('gameoverScreenHighscoreMessage').style.display = (game.newHighscore ? 'inline' : 'none');
 			document.getElementById('gameoverScreenScore').innerHTML = game.score;
-			setScreenVisible(gameoverScreen, 1);
+			pushScreen(gameoverScreen);
 		}
 	}
 
 	function pauseGame() {
 		if(game.state == game.RUNNING()) {
 			game.pause();
-			setScreenVisible(pauseScreen, 1);
+			pushScreen(pauseScreen);
 		}
 	}
 
@@ -336,6 +336,9 @@ function DontYouFillItCanvasGui(game, canvasID) {
 
 		redrawUponResize = true;
 
+		document.getElementById('screenWrapper').style.width = GAME_WIDTH + "px";
+		document.getElementById('screenWrapper').style.marginLeft = Math.floor(H_OFFSET) + "px";
+
 		// Redraw event when the game is not running
 		if(game.state != game.RUNNING())
 			window.requestAnimationFrame(step);
@@ -371,13 +374,6 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		FONT = Math.floor(SCALE / 12) + 'px Arial';
 	}
 
-	function setScreenVisible(screen, zindex) {
-		screen.style.zIndex = (zindex >= 0 ? zindex : -1);
-		screen.scrollTop = 0;
-		// Prevent flickering
-		screen.style.display = (zindex >= 0 ? 'block' : 'none');
-	}
-
 	this.MENU = 1;
 	this.GAME = 2;
 
@@ -392,6 +388,7 @@ function DontYouFillItCanvasGui(game, canvasID) {
 	        ballCtx = document.getElementById("BallCanvas").getContext('2d'),
 	      container = scoreCtx.canvas.parentNode,
 	  ballContainer = document.getElementById('Balls'),
+	screenContainer = document.getElementById('screenContainer'),
 	    startScreen = document.getElementById('startScreen'),
 	    pauseScreen = document.getElementById('pauseScreen'),
 	 gameoverScreen = document.getElementById('gameoverScreen'),
@@ -423,13 +420,50 @@ function DontYouFillItCanvasGui(game, canvasID) {
 
 	var gameState = undefined;
 
+	var screens = [];
+
+	function pushScreen(screen) {
+		if (screens.length != 0) screens[screens.length - 1].style.display = 'none';
+
+		screens.push(screen);
+		screen.style.zIndex = screens.length;
+		document.getElementById('screenWrapper').scrollTop = 0;
+		// Prevent flickering
+		screen.style.display = 'block';
+
+		screenContainer.style.display = 'block';
+		screenContainer.style.backgroundColor = (screen == pauseScreen) ? 'rgba(0, 0, 0, 0.85)' : 'black';
+	}
+
+	function popScreen() {
+		if (screens.length == 0) return;
+
+		screens.pop().style.display = 'none';
+
+		document.getElementById('screenWrapper').scrollTop = 0;
+
+		if (screens.length == 0) {
+			screenContainer.style.display = 'none';
+		} else {
+			screens[screens.length - 1].style.display = 'block';
+		}
+
+	}
+
+	function popAllScreens() {
+		while(screens.length > 0)
+			screens.pop().style.display = 'none';
+
+		screenContainer.style.display = 'none';
+	}
+
 	addTouchOrClickEvent('startScreenPlayButton', function(evt) {
 		evt.preventDefault();
 		if (isGhostEvent(evt)) return;
 		game.resume();
 		that.state = that.GAME;
 		window.requestAnimationFrame(step);
-		setScreenVisible(startScreen, -1);
+		popAllScreens();
 	});
 
 	addTouchOrClickEvent('pauseScreenContinueButton', function(evt) {
@@ -437,7 +471,7 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		if (isGhostEvent(evt)) return;
 		game.resume();
 		window.requestAnimationFrame(step);
-		setScreenVisible(pauseScreen, -1);
+		popScreen();
 	});
 
 	addTouchOrClickEvent('gameoverScreenPlayAgainButton', function(evt) {
@@ -452,19 +486,19 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		gameState = undefined;
 		game.reset();
 		window.requestAnimationFrame(step);
-		setScreenVisible(gameoverScreen, -1);
+		popAllScreens();
 	});
 
 	addTouchOrClickEvent('startScreenLicenseButton', function(evt) {
 		evt.preventDefault();
 		if (isGhostEvent(evt)) return;
-		setScreenVisible(licenseScreen, 2);
+		pushScreen(licenseScreen);
 	});
 
 	addTouchOrClickEvent('licenseScreenBackButton', function(evt) {
 		evt.preventDefault();
 		if (isGhostEvent(evt)) return;
-		setScreenVisible(licenseScreen, -1);
+		popScreen();
 	});
 
 	var SCALE, GAME_WIDTH, GAME_HEIGHT, V_OFFSET, H_OFFSET,
@@ -495,6 +529,8 @@ function DontYouFillItCanvasGui(game, canvasID) {
 	document.addEventListener('visibilitychange', handleVisibilityChange, false);
 
 	resizeCanvas();
+
+	pushScreen(startScreen);
 
 	window.requestAnimationFrame(step);
 }

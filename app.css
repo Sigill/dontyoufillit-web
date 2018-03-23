@@ -4,6 +4,7 @@
 
 	/* Prevent text of buttons from being accidentally selected. */
 	user-select: none;
+	-moz-user-select: none;
 
 	outline: 0;
 	outline: none;
@@ -13,13 +14,16 @@
 body, html {
 	width: 100%;
 	height: 100%;
-	overflow: hidden;
+	overflow: auto;
 	background-color: black;
 }
 
-#d {
-	width: 100%;
-	height: 100%;
+#game {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right:0;
 }
 
 #ScoreCanvas, #PauseCanvas, #CannonCanvas, #BallCanvas, #Balls, .ball {
@@ -33,44 +37,53 @@ body, html {
 	border-style: solid solid dotted;
 }
 
-.modalScreen {
+#screenContainer {
 	position: absolute;
 	display: none;
 	top: 0;
 	left: 0;
 	bottom: 0;
 	right: 0;
-	padding: 0 1ex;
-	overflow-x: hidden;
-	overflow-y: auto;
-	background-color: black;
+	overflow: auto;
+}
+
+#screenWrapper {
+	position: relative;
+	top: 0;
+	/* Otherwise the content will be hidden by the scrollbar. */
+	max-width: 100%;
+}
+
+.screen {
+	box-sizing: border-box;
+	margin: 0 1ex;
+	display: none;
+	background-color: transparent;
 	color: white;
 	z-index: -1;
-	text-align: center;
 	font-family: 'Arial';
 	cursor: default;
+	text-align: justify;
 }
-.modalScreen p {
-	font-size: 1.5em;
+.screen * {
 	margin: 0.5em 0;
 }
-#startScreen {
-	z-index: 1;
-	display: block;
-}
-#pauseScreen {
-	background-color: rgba(0, 0, 0, 0.85);
-}
-.modalScreen .title {
+.screen .title {
 	margin: 1em auto;
 	font-size: 3.5em;
 	font-weight: bold;
+	text-align: center;
 }
-.modalScreen .button {
+.screen h2, .screen h3 {
+	font-size: 1em;
+	margin: 0.8em 0;
+}
+.screen .button {
 	font-size: 3em;
 	margin: 2em auto;
+	text-align: center;
 }
-.modalScreen .button span {
+.screen .button span {
 	background-color: white;
 	color: black;
 	border-radius: 0.25em;
@@ -79,12 +92,20 @@ body, html {
 	cursor: pointer;
 	line-height: 1.6;
 }
-.modalScreen .score {
+.screen .score {
 	font-size: 2em;
+	text-align: center;
 }
-.modalScreen .leftAligned {
-	text-align: left;
+
+a {
+	color: #428bca;
+	text-decoration: none;
 }
-.modalScreen .leftAligned p {
-	margin: 1em 0;
+a:hover, a:focus {
+	color: #2a6496;
+	text-decoration: underline;
+}
+a:focus {
+	outline: 5px auto -webkit-focus-ring-color;
+	outline-offset: -2px;
 }
