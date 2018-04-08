@@ -336,9 +336,6 @@ function DontYouFillItCanvasGui(game, canvasID) {
 
 		redrawUponResize = true;
 
-		document.getElementById('screenWrapper').style.width = GAME_WIDTH + "px";
-		document.getElementById('screenWrapper').style.marginLeft = Math.floor(H_OFFSET) + "px";
-
 		// Redraw event when the game is not running
 		if(game.state != game.RUNNING())
 			window.requestAnimationFrame(step);
@@ -427,9 +424,11 @@ function DontYouFillItCanvasGui(game, canvasID) {
 
 		screens.push(screen);
 		screen.style.zIndex = screens.length;
-		document.getElementById('screenWrapper').scrollTop = 0;
 		// Prevent flickering
+		screen.style.visibility = 'hidden';
 		screen.style.display = 'block';
+		screen.scrollTop = 0;
+		screen.style.visibility = 'visible';
 
 		screenContainer.style.display = 'block';
 		screenContainer.style.backgroundColor = (screen == pauseScreen) ? 'rgba(0, 0, 0, 0.85)' : 'black';
@@ -440,14 +439,11 @@ function DontYouFillItCanvasGui(game, canvasID) {
 
 		screens.pop().style.display = 'none';
 
-		document.getElementById('screenWrapper').scrollTop = 0;
-
 		if (screens.length == 0) {
 			screenContainer.style.display = 'none';
 		} else {
 			screens[screens.length - 1].style.display = 'block';
 		}
-
 	}
 
 	function popAllScreens() {
@@ -499,6 +495,7 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		evt.preventDefault();
 		if (isGhostEvent(evt)) return;
 		popScreen();
+		licenseScreen.reset();
 	});
 
 	var SCALE, GAME_WIDTH, GAME_HEIGHT, V_OFFSET, H_OFFSET,

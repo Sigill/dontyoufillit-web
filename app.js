@@ -35,3 +35,42 @@ if(qs['debug']) {
 }
 
 gui.androidStockCompat = (qs['stock'] == true);
+
+function setNodeText(node, text) {
+	var child = node.firstChild;
+	do {
+		if (3 == child.nodeType) child.nodeValue = text;
+	} while (child = child.nextSibling);
+}
+
+Array.prototype.forEach.call(document.getElementsByClassName('hideable'), function(hideable) {
+	var foreach_enablers = function(cbk) {
+		Array.prototype.forEach.call(document.getElementsByClassName(hideable.getAttribute('data-toggle')), cbk);
+	};
+
+	hideable.reset = function() {
+		this.style.display = 'none';
+		foreach_enablers(function(e) {
+			setNodeText(e, "Show details");
+		});
+	};
+
+	foreach_enablers(function(enabler) {
+		enabler.addEventListener('click', function(evt) {
+			var visible = hideable.style.display != 'none';
+			foreach_enablers(function(e) {
+				setNodeText(e, visible ? "Show details" : "Hide details");
+			});
+			hideable.style.display = visible ? 'none' : 'block';
+			evt.preventDefault();
+		});
+	});
+
+	hideable.style.display = 'none';
+});
+
+document.getElementById('licenseScreen').reset = function() {
+	Array.prototype.forEach.call(this.getElementsByClassName('hideable'), function(hideable) {
+		hideable.reset();
+	});
+};
