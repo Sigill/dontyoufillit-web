@@ -284,17 +284,19 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		if(game.state == game.RUNNING()) {
 			window.requestAnimationFrame(step);
 		} else if(game.state == game.GAMEOVER()) {
-			document.getElementById('gameoverScreenScoreMessage').style.display = (game.newHighscore ? 'none' : 'inline');
-			document.getElementById('gameoverScreenHighscoreMessage').style.display = (game.newHighscore ? 'inline' : 'none');
-			document.getElementById('gameoverScreenScore').innerHTML = game.score;
-			pushScreen(gameoverScreen);
+			that.observable.notifyObservers('gameover', game.score, game.newHighscore);
+
+			for(var i = 0; i < game.staticBalls.length; ++i) {
+				recycledCtx.push(game.staticBalls[i].ctx);
+				delete game.staticBalls[i].ctx;
+			}
 		}
 	}
 
 	function pauseGame() {
 		if(game.state == game.RUNNING()) {
 			game.pause();
-			pushScreen(pauseScreen);
+			that.observable.notifyObservers('pause');
 		}
 	}
 
@@ -384,12 +386,7 @@ function DontYouFillItCanvasGui(game, canvasID) {
 	      cannonCtx = document.getElementById("CannonCanvas").getContext('2d'),
 	        ballCtx = document.getElementById("BallCanvas").getContext('2d'),
 	      container = scoreCtx.canvas.parentNode,
-	  ballContainer = document.getElementById('Balls'),
-	screenContainer = document.getElementById('screenContainer'),
-	    startScreen = document.getElementById('startScreen'),
-	    pauseScreen = document.getElementById('pauseScreen'),
-	 gameoverScreen = document.getElementById('gameoverScreen'),
-	  licenseScreen = document.getElementById('licenseScreen');
+	  ballContainer = document.getElementById('Balls');
 
 	var lastClickDate = 0;
 
@@ -416,87 +413,6 @@ function DontYouFillItCanvasGui(game, canvasID) {
 	}
 
 	var gameState = undefined;
-
-	var screens = [];
-
-	function pushScreen(screen) {
-		if (screens.length != 0) screens[screens.length - 1].style.display = 'none';
-
-		screens.push(screen);
-		screen.style.zIndex = screens.length;
-		// Prevent flickering
-		screen.style.visibility = 'hidden';
-		screen.style.display = 'block';
-		screen.scrollTop = 0;
-		screen.style.visibility = 'visible';
-
-		screenContainer.style.display = 'block';
-		screenContainer.style.backgroundColor = (screen == pauseScreen) ? 'rgba(0, 0, 0, 0.85)' : 'black';
-	}
-
-	function popScreen() {
-		if (screens.length == 0) return;
-
-		screens.pop().style.display = 'none';
-
-		if (screens.length == 0) {
-			screenContainer.style.display = 'none';
-		} else {
-			screens[screens.length - 1].style.display = 'block';
-		}
-	}
-
-	function popAllScreens() {
-		while(screens.length > 0)
-			screens.pop().style.display = 'none';
-
-		screenContainer.style.display = 'none';
-	}
-
-	addTouchOrClickEvent('startScreenPlayButton', function(evt) {
-		evt.preventDefault();
-		if (isGhostEvent(evt)) return;
-		game.resume();
-		that.state = that.GAME;
-		window.requestAnimationFrame(step);
-		popAllScreens();
-	});
-
-	addTouchOrClickEvent('pauseScreenContinueButton', function(evt) {
-		evt.preventDefault();
-		if (isGhostEvent(evt)) return;
-		game.resume();
-		window.requestAnimationFrame(step);
-		popScreen();
-	});
-
-	addTouchOrClickEvent('gameoverScreenPlayAgainButton', function(evt) {
-		evt.preventDefault();
-		if (isGhostEvent(evt)) return;
-
-		for(var i = 0; i < game.staticBalls.length; ++i) {
-			recycledCtx.push(game.staticBalls[i].ctx);
-			delete game.staticBalls[i].ctx;
-		}
-
-		gameState = undefined;
-		game.reset();
-		window.requestAnimationFrame(step);
-		popAllScreens();
-	});
-
-	addTouchOrClickEvent('startScreenLicenseButton', function(evt) {
-		evt.preventDefault();
-		if (isGhostEvent(evt)) return;
-		pushScreen(licenseScreen);
-	});
-
-	addTouchOrClickEvent('licenseScreenBackButton', function(evt) {
-		evt.preventDefault();
-		if (isGhostEvent(evt)) return;
-		popScreen();
-		licenseScreen.reset();
-	});
 
 	var SCALE, GAME_WIDTH, GAME_HEIGHT, V_OFFSET, H_OFFSET,
 	    BOTTOM_BORDER, TOP_BORDER, LEFT_BORDER, RIGHT_BORDER,
@@ -525,9 +441,19 @@ function DontYouFillItCanvasGui(game, canvasID) {
 
 	document.addEventListener('visibilitychange', handleVisibilityChange, false);
 
-	resizeCanvas();
+	this.resume = function() {
+		game.resume();
+		this.state = this.GAME;
+		window.requestAnimationFrame(step);
+	};
 
-	pushScreen(startScreen);
+	this.reset = function() {
+		gameState = undefined;
+		game.reset();
+		window.requestAnimationFrame(step);
+	};
+
+	resizeCanvas();
 
 	window.requestAnimationFrame(step);
 }

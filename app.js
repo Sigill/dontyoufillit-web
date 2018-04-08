@@ -36,6 +36,94 @@ if(qs['debug']) {
 
 gui.androidStockCompat = (qs['stock'] == true);
 
+
+var screenContainer = document.getElementById('screenContainer'),
+        startScreen = document.getElementById('startScreen'),
+        pauseScreen = document.getElementById('pauseScreen'),
+     gameoverScreen = document.getElementById('gameoverScreen'),
+      licenseScreen = document.getElementById('licenseScreen');
+
+var screens = [];
+
+function pushScreen(screen) {
+	if (screens.length != 0) screens[screens.length - 1].style.display = 'none';
+
+	screens.push(screen);
+	screen.style.zIndex = screens.length;
+	// Prevent flickering
+	screen.style.visibility = 'hidden';
+	screen.style.display = 'block';
+	screen.scrollTop = 0;
+	screen.style.visibility = 'visible';
+
+	screenContainer.style.display = 'block';
+	screenContainer.style.backgroundColor = (screen == pauseScreen) ? 'rgba(0, 0, 0, 0.85)' : 'black';
+}
+
+function popScreen() {
+	if (screens.length == 0) return;
+
+	screens.pop().style.display = 'none';
+
+	if (screens.length == 0) {
+		screenContainer.style.display = 'none';
+	} else {
+		screens[screens.length - 1].style.display = 'block';
+	}
+}
+
+function popAllScreens() {
+	while(screens.length > 0)
+		screens.pop().style.display = 'none';
+
+	screenContainer.style.display = 'none';
+}
+
+document.getElementById('startScreenPlayButton').addEventListener('click', function(evt) {
+	evt.preventDefault();
+	gui.resume();
+	popAllScreens();
+});
+
+document.getElementById('pauseScreenContinueButton').addEventListener('click', function(evt) {
+	evt.preventDefault();
+	gui.resume();
+	popScreen();
+});
+
+document.getElementById('gameoverScreenPlayAgainButton').addEventListener('click', function(evt) {
+	evt.preventDefault();
+	gui.reset();
+	popAllScreens();
+});
+
+document.getElementById('startScreenLicenseButton').addEventListener('click', function(evt) {
+	evt.preventDefault();
+	pushScreen(licenseScreen);
+});
+
+document.getElementById('licenseScreenBackButton').addEventListener('click', function(evt) {
+	evt.preventDefault();
+	popScreen();
+	licenseScreen.reset();
+});
+
+gui.addObserver(function(message) {
+	if(message == 'pause') pushScreen(pauseScreen);
+});
+
+gui.addObserver(function(message, score, newHighscore) {
+	if(message == 'gameover') {
+		document.getElementById('gameoverScreenScoreMessage').style.display = (newHighscore ? 'none' : 'inline');
+		document.getElementById('gameoverScreenHighscoreMessage').style.display = (newHighscore ? 'inline' : 'none');
+		document.getElementById('gameoverScreenScore').innerHTML = score;
+		pushScreen(gameoverScreen);
+	}
+});
+
+pushScreen(startScreen);
+
+
 function setNodeText(node, text) {
 	var child = node.firstChild;
 	do {

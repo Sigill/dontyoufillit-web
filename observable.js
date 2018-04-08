@@ -13,8 +13,8 @@ Observable.prototype.removeObserver = function(observer) {
 	}
 };
 
-Observable.prototype.notifyObservers = function(message) {
+Observable.prototype.notifyObservers = function() {
 	for(var i = this.observers.length - 1; i >= 0; i--) {
-		this.observers[i](message)
+		this.observers[i].apply(null, arguments);
 	};
 };
