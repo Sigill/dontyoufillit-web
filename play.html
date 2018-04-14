@@ -25,27 +25,39 @@
 <!-- END FAVICONS -->
 </head>
 <body>
-<div id="game">
+<div id="game" class="fullscreen">
 	<canvas id="ScoreCanvas"></canvas>
 	<canvas id="PauseCanvas"></canvas>
 	<canvas id="CannonCanvas"></canvas>
 	<canvas id="BallCanvas"></canvas>
 	<div id="Balls"></div>
 </div>
-<div id="screenContainer">
-	<div id="startScreen" class="screen">
-		<p class="title">DontYouFillIt</p>
-		<p class="button"><span id="startScreenPlayButton">Play</span></p>
-		<p class="button"><span id="startScreenLicenseButton">License</span></p>
+<div id="screenContainer" class="fullscreen">
+	<div id="startScreen" class="fullscreen screen">
+		<div class="fullscreen vcentered">
+			<div class="vcentered-inner">
+				<p class="title">DontYouFillIt</p>
+				<p class="button"><span id="startScreenPlayButton">Play</span></p>
+				<p class="button"><span id="startScreenLicenseButton">License</span></p>
+			</div>
+		</div>
 	</div>
-	<div id="pauseScreen" class="screen">
-		<p class="title">Game paused</p>
-		<p class="button"><span id="pauseScreenContinueButton">Continue</span></p>
+	<div id="pauseScreen" class="fullscreen screen">
+		<div class="fullscreen vcentered">
+			<div class="vcentered-inner">
+				<p class="title">Game paused</p>
+				<p class="button"><span id="pauseScreenContinueButton">Continue</span></p>
+			</div>
+		</div>
 	</div>
-	<div id="gameoverScreen" class="screen">
-		<p class="title">Game Over</p>
-		<p class="score"><span id="gameoverScreenScoreMessage">Your score</span><span id="gameoverScreenHighscoreMessage">New highscore</span>: <span id="gameoverScreenScore"></span></p>
-		<p class="button"><span id="gameoverScreenPlayAgainButton">Play again</span></p>
+	<div id="gameoverScreen" class="fullscreen screen">
+		<div class="fullscreen vcentered">
+			<div class="vcentered-inner">
+				<p class="title">Game Over</p>
+				<p class="score"><span id="gameoverScreenScoreMessage">Your score</span><span id="gameoverScreenHighscoreMessage">New highscore</span>: <span id="gameoverScreenScore"></span></p>
+				<p class="button"><span id="gameoverScreenPlayAgainButton">Play again</span></p>
+			</div>
+		</div>
 	</div>
 	<div id="licenseScreen" class="screen">
 		<p class="title">License</p>
@@ -53,7 +65,7 @@
 		$LICENSE$
 
 		<h2>Third parties</h2>
-		<h3>stats.js (<a href="https://github.com/mrdoob/stats.js">link</a>) / MIT License</h3>
+		<h3>stats.js (<a href="https://github.com/mrdoob/stats.js">website</a>) / MIT License</h3>
 		<p><a class="stats-js-details">Show details</a></p>
 		<div class="hideable" data-toggle="stats-js-details">
 			<p>Copyright (c) 2009-2016 stats.js authors</p>
@@ -62,7 +74,7 @@
 			<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
 		</div>
 
-		<h3>requestAnimationFrame polyfill (<a href="https://github.com/darius/requestAnimationFrame">link</a>) / MIT License</h3>
+		<h3>requestAnimationFrame polyfill (<a href="https://github.com/darius/requestAnimationFrame">website</a>) / MIT License</h3>
 		<p><a class="raf-details">Show details</a></p>
 		<div class="hideable" data-toggle="raf-details">
 			<p>Copyright (c) 2013 Darius Bacon</p>

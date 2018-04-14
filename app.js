@@ -21,7 +21,7 @@ if(qs['debug']) {
 	var stats = new Stats();
 	stats.showPanel(0); // 0: fps, 1: ms
 	stats.dom.style.removeProperty('top');
-	stats.dom.style.position = 'absolute';
+	stats.dom.style.position = 'fixed';
 	stats.dom.style.left = '0px';
 	stats.dom.style.bottom = '0px';
 	document.body.appendChild( stats.dom );
@@ -127,7 +127,10 @@ pushScreen(startScreen);
 function setNodeText(node, text) {
 	var child = node.firstChild;
 	do {
-		if (3 == child.nodeType) child.nodeValue = text;
+		if (3 == child.nodeType) {
+			child.nodeValue = text;
+			break;
+		}
 	} while (child = child.nextSibling);
 }
 
