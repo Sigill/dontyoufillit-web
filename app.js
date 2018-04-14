@@ -142,7 +142,7 @@ Array.prototype.forEach.call(document.getElementsByClassName('hideable'), functi
 	hideable.reset = function() {
 		this.style.display = 'none';
 		foreach_enablers(function(e) {
-			setNodeText(e, "Show details");
+			setNodeText(e, "[-]");
 		});
 	};
 
@@ -150,7 +150,7 @@ Array.prototype.forEach.call(document.getElementsByClassName('hideable'), functi
 		enabler.addEventListener('click', function(evt) {
 			var visible = hideable.style.display != 'none';
 			foreach_enablers(function(e) {
-				setNodeText(e, visible ? "Show details" : "Hide details");
+				setNodeText(e, visible ? "[+]" : "[-]");
 			});
 			hideable.style.display = visible ? 'none' : 'block';
 			evt.preventDefault();
