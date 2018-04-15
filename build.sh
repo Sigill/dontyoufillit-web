@@ -14,8 +14,8 @@ chromeHostedKey="$2"
 chromePackagedKey="$3"
 version="$4"
 
-rm -rf dist tmp/chrome
-mkdir -p dist tmp/chrome
+rm -rf dist tmp/chrome android
+mkdir -p dist tmp/chrome android
 
 ## Icons
 # 16: favicon
@@ -121,3 +121,44 @@ sed -e "s!URL!$url!g" -e "s!VERSION!$version!g" hosted.manifest.json > tmp/chrom
 cp tmp/chrome/icon-128x128.png tmp/chrome/hosted/
 
 ./crxmake.sh tmp/chrome/hosted/ $chromeHostedKey dist/DontYouFillIt-ChromeHosted.crx
+
+
+## Build android version
+# Add license, remove favicons
+sed -e '/\$LICENSE\$/ {
+r tmp/LICENSE
+d
+}' -e '/BEGIN FAVICONS/,/END FAVICONS/d' play.html > android/play.html
+
+cp app.css android/
+cp $JAVASCRIPT_FILES android/
+
+mkdir -p android/res/mipmap-mdpi android/res/mipmap-hdpi android/res/mipmap-xdpi android/res/mipmap-xxdpi android/res/mipmap-xxxdpi
+
+for S in 48 72 96 144 192
+do
+	if [ img/android.svg -nt tmp/android-${S}x${S}.png ]; then
+		inkscape -z -e tmp/android-${S}x${S}.png -w $S -h $S img/android.svg
+		pngcrush -brute -c 4 -q -ow tmp/android-${S}x${S}.png
+	fi
+done
+
+mv tmp/android-48x48.png android/res/mipmap-mdpi/ic_launcher.png
+mv tmp/android-72x72.png android/res/mipmap-hdpi/ic_launcher.png
+mv tmp/android-96x96.png android/res/mipmap-xdpi/ic_launcher.png
+mv tmp/android-144x144.png android/res/mipmap-xxdpi/ic_launcher.png
+mv tmp/android-192x192.png android/res/mipmap-xxxdpi/ic_launcher.png
+
+for S in 48 72 96 144 192
+do
+	if [ img/android.round.svg -nt tmp/android-${S}x${S}.png ]; then
+		inkscape -z -e tmp/android-${S}x${S}.png -w $S -h $S img/android.round.svg
+		pngcrush -brute -c 4 -q -ow tmp/android-${S}x${S}.png
+	fi
+done
+
+mv tmp/android-48x48.png android/res/mipmap-mdpi/ic_launcher_round.png
+mv tmp/android-72x72.png android/res/mipmap-hdpi/ic_launcher_round.png
+mv tmp/android-96x96.png android/res/mipmap-xdpi/ic_launcher_round.png
+mv tmp/android-144x144.png android/res/mipmap-xxdpi/ic_launcher_round.png
+mv tmp/android-192x192.png android/res/mipmap-xxxdpi/ic_launcher_round.png
