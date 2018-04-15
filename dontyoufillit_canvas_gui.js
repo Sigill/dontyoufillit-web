@@ -466,6 +466,10 @@ DontYouFillItCanvasGui.prototype.removeObserver = function(o) {
 	this.observable.removeObserver(o);
 };
 
+DontYouFillItCanvasGui.prototype.hasObserver = function(o) {
+	return this.observable.hasObserver(o);
+};
+
 DontYouFillItCanvasGui.prototype.notifyObservers = function() {
 	this.observable.notifyObservers();
 };

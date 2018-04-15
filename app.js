@@ -2,43 +2,70 @@
 var game = new DontYouFillItGame();
 var gui = new DontYouFillItCanvasGui(game, 'c');
 
-function parseQueryString() {
-	var map = {};
+var stats = new Stats();
+stats.showPanel(0); // 0: fps, 1: ms
+stats.dom.style.removeProperty('top');
+stats.dom.style.position = 'fixed';
+stats.dom.style.left = '0px';
+stats.dom.style.bottom = '0px';
+stats.dom.style.display = 'none';
+document.body.appendChild( stats.dom );
 
-	var query = window.location.search.substring(1);
-	var vars = query.split('&');
-	for (var i = 0; i < vars.length; i++) {
-		var pair = vars[i].split('=', 2);
-		map[pair[0]] = (pair.length == 2) ? pair[1] : true;
+function statsObserver(message) {
+	if(message == 'beginStep')
+		stats.begin();
+	else if(message == 'endStep')
+		stats.end();
+}
+
+
+function setStockCompatibilityMode(compatible) {
+	localStorage.setItem('stockCompatibility', compatible);
+	gui.androidStockCompat = compatible;
+}
+
+function setDebugMode(enabled) {
+	localStorage.setItem('debug', enabled);
+
+	if (enabled) {
+		stats.dom.style.display = 'block';
+		gui.addObserver(statsObserver);
+	} else {
+		stats.dom.style.display = 'none';
+		gui.removeObserver(statsObserver);
 	}
-
-	return map;
 }
 
-var qs = parseQueryString();
-
-if(qs['debug']) {
-	var stats = new Stats();
-	stats.showPanel(0); // 0: fps, 1: ms
-	stats.dom.style.removeProperty('top');
-	stats.dom.style.position = 'fixed';
-	stats.dom.style.left = '0px';
-	stats.dom.style.bottom = '0px';
-	document.body.appendChild( stats.dom );
-
-	gui.addObserver(function(message) {
-		if(message == 'beginStep')
-			stats.begin();
-		else if(message == 'endStep')
-			stats.end();
-	});
+function asBool(v) {
+	return v === true || v ==='true';
 }
 
-gui.androidStockCompat = (qs['stock'] == true);
+var query_string = {};
+window.location.search.substring(1).split('&').forEach(function(e) {
+	var pair = e.split('=', 2);
+	query_string[pair[0]] = (pair.length == 2) ? pair[1] : true;
+});
+
+if (query_string['stock'] !== undefined) {
+	setStockCompatibilityMode(asBool(query_string['stock']));
+} else if (localStorage.getItem('stockCompatibility') !== null) {
+	setStockCompatibilityMode(asBool(localStorage.getItem('stockCompatibility')));
+} else {
+	setStockCompatibilityMode(false);
+}
+
+if (query_string['debug'] !== undefined) {
+	setDebugMode(asBool(query_string['debug']));
+} else if (localStorage.getItem('debug') !== null) {
+	setDebugMode(asBool(localStorage.getItem('debug')));
+} else {
+	setDebugMode(false);
+}
 
 
 var screenContainer = document.getElementById('screenContainer'),
         startScreen = document.getElementById('startScreen'),
+      optionsScreen = document.getElementById('optionsScreen'),
         pauseScreen = document.getElementById('pauseScreen'),
      gameoverScreen = document.getElementById('gameoverScreen'),
       licenseScreen = document.getElementById('licenseScreen');
@@ -85,10 +112,26 @@ document.getElementById('startScreenPlayButton').addEventListener('click', funct
 	popAllScreens();
 });
 
+document.getElementById('startScreenOptionsButton').addEventListener('click', function(evt) {
+	evt.preventDefault();
+	optionsScreen.init();
+	pushScreen(optionsScreen);
+});
+
+document.getElementById('optionsScreenBackButton').addEventListener('click', function(evt) {
+	evt.preventDefault();
+	popScreen();
+});
+
 document.getElementById('pauseScreenContinueButton').addEventListener('click', function(evt) {
 	evt.preventDefault();
 	gui.resume();
 	popScreen();
+});
+
+document.getElementById('pauseScreenOptionsButton').addEventListener('click', function(evt) {
+	evt.preventDefault();
+	pushScreen(optionsScreen);
 });
 
 document.getElementById('gameoverScreenPlayAgainButton').addEventListener('click', function(evt) {
@@ -106,6 +149,14 @@ document.getElementById('licenseScreenBackButton').addEventListener('click', fun
 	evt.preventDefault();
 	popScreen();
 	licenseScreen.reset();
+});
+
+document.getElementById('compatibilityModeCheckbox').addEventListener('change', function(evt) {
+	setStockCompatibilityMode(evt.target.checked);
+});
+
+document.getElementById('framerateCheckbox').addEventListener('change', function(evt) {
+	setDebugMode(evt.target.checked);
 });
 
 gui.addObserver(function(message) {
@@ -160,7 +211,12 @@ Array.prototype.forEach.call(document.getElementsByClassName('hideable'), functi
 	hideable.style.display = 'none';
 });
 
-document.getElementById('licenseScreen').reset = function() {
+optionsScreen.init = function() {
+	document.getElementById('compatibilityModeCheckbox').checked = gui.androidStockCompat;
+	document.getElementById('framerateCheckbox').checked = gui.hasObserver(statsObserver);
+};
+
+licenseScreen.reset = function() {
 	Array.prototype.forEach.call(this.getElementsByClassName('hideable'), function(hideable) {
 		hideable.reset();
 	});

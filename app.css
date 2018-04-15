@@ -82,11 +82,17 @@ body, html {
 }
 
 .screen .title {
-	margin: 1em auto;
+	margin: 0.8em auto;
 	font-size: 300%;
 	font-weight: bold;
 	text-align: center;
 }
+
+.option {
+	font-weight: bold;
+	text-align: center;
+}
+
 .screen h2 {
 	font-size: 150%;
 	margin: 0.8em 0;
@@ -97,7 +103,7 @@ body, html {
 }
 .screen .button {
 	font-size: 250%;
-	margin: 1.5em auto;
+	margin: 1.2em auto;
 	text-align: center;
 }
 .screen .button span {
@@ -107,7 +113,7 @@ body, html {
 	padding: 0.25em;
 	font-weight: bold;
 	cursor: pointer;
-	line-height: 1.6;
+	line-height: 1.5;
 }
 .screen .score {
 	font-size: 200%;
@@ -130,4 +136,63 @@ a:focus {
 a.plain, a.plain:hover, a.plain:focus {
 	text-decoration: none;
 	font-family: monospace;
+}
+
+table.centered {
+	margin: 0 auto;
+	border-collapse: separate;
+	border-spacing: 1em;
+}
+
+table.centered tr td p {
+	margin: 0 1em;
+	text-align: right;
+}
+
+.switch {
+	position: relative;
+	display: inline-block;
+	vertical-align: middle;
+	width: 60px;
+	height: 34px;
+}
+
+.switch input {display:none;}
+
+.slider {
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: #ccc;
+	-webkit-transition: .4s;
+	transition: .4s;
+}
+
+.slider:before {
+	position: absolute;
+	content: "";
+	height: 26px;
+	width: 26px;
+	left: 4px;
+	bottom: 4px;
+	background-color: white;
+	-webkit-transition: .4s;
+	transition: .4s;
+}
+
+input:checked + .slider {
+	background-color: #2196F3;
+}
+
+input:focus + .slider {
+	box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+	-webkit-transform: translateX(26px);
+	-ms-transform: translateX(26px);
+	transform: translateX(26px);
 }
