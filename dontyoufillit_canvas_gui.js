@@ -1,5 +1,5 @@
 "use strict";
-function DontYouFillItCanvasGui(game, canvasID) {
+function DontYouFillItCanvasGui(game, highscore) {
 	var that = this; // Allow closures to access this.
 
 	function drawPauseButton(ctx) {
@@ -125,7 +125,7 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		ctx.fillText('Score', LEFT_BORDER, TOP_BORDER);
 
 		var scoreOffset = ctx.measureText('Highscore ').width;
-		ctx.fillText(game.highscore, LEFT_BORDER + scoreOffset, TOP_BORDER - SCALE / 12 + SCALE / 120);
+		ctx.fillText(highscore, LEFT_BORDER + scoreOffset, TOP_BORDER - SCALE / 12 + SCALE / 120);
 		ctx.fillText(game.score, LEFT_BORDER + scoreOffset, TOP_BORDER);
 	}
 
@@ -284,7 +284,9 @@ function DontYouFillItCanvasGui(game, canvasID) {
 		if(game.state == game.RUNNING()) {
 			window.requestAnimationFrame(step);
 		} else if(game.state == game.GAMEOVER()) {
-			that.observable.notifyObservers('gameover', game.score, game.newHighscore);
+			highscore = Math.max(game.score, highscore);
+
+			that.observable.notifyObservers('gameover', game.score);
 
 			for(var i = 0; i < game.staticBalls.length; ++i) {
 				recycledCtx.push(game.staticBalls[i].ctx);

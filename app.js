@@ -1,6 +1,6 @@
 "use strict";
 var game = new DontYouFillItGame();
-var gui = new DontYouFillItCanvasGui(game, 'c');
+var gui = new DontYouFillItCanvasGui(game, parseInt(localStorage.getItem('highscore'), 10) || 0);
 
 var stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms
@@ -163,11 +163,17 @@ gui.addObserver(function(message) {
 	if(message == 'pause') pushScreen(pauseScreen);
 });
 
-gui.addObserver(function(message, score, newHighscore) {
+gui.addObserver(function(message, score) {
 	if(message == 'gameover') {
+		var highscore = parseInt(localStorage.getItem('highscore'), 10) || 0;
+		var newHighscore = score > highscore;
+
+		if (newHighscore) localStorage.setItem('highscore', score.toString(10));
+
 		document.getElementById('gameoverScreenScoreMessage').style.display = (newHighscore ? 'none' : 'inline');
 		document.getElementById('gameoverScreenHighscoreMessage').style.display = (newHighscore ? 'inline' : 'none');
 		document.getElementById('gameoverScreenScore').innerHTML = score;
+
 		pushScreen(gameoverScreen);
 	}
 });

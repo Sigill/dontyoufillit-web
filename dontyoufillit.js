@@ -203,12 +203,7 @@ function DontYouFillItGame() {
 	// Browsers supporting high resolution timestamps will use them in requestAnimationFrame
 	this.lastUpdateTime = performance.now ? performance.now() : Date.now();
 
-	this.highscore = localStorage.getItem('highscore');
-	this.highscore = (this.highscore == null) ? 0 : parseInt(this.highscore, 10);
-
 	this.score = 0;
-
-	this.newHighscore = false;
 }
 
 DontYouFillItGame.prototype.PAUSED   = function() { return 1; };
@@ -237,11 +232,6 @@ DontYouFillItGame.prototype.update = function(time) {
 
 			if(this.currentBall.ny < this.currentBall.nr && normalizeRadian(this.currentBall.direction) > Math.PI) {
 				this.currentBall.state.s = 0;
-				this.newHighscore = this.score > this.highscore;
-				if(this.newHighscore) {
-					this.highscore = this.score;
-					localStorage.setItem('highscore', this.score.toString(10));
-				}
 				this.state = this.GAMEOVER();
 			} else if(this.currentBall.state.s < 0.001) {
 				if(this.currentBall.ny >= 0) {
