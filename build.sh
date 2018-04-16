@@ -124,14 +124,15 @@ cp tmp/chrome/icon-128x128.png tmp/chrome/hosted/
 
 
 ## Build android version
+mkdir -p android/assets
 # Add license, remove favicons
 sed -e '/\$LICENSE\$/ {
 r tmp/LICENSE
 d
-}' -e '/BEGIN FAVICONS/,/END FAVICONS/d' play.html > android/play.html
+}' -e '/BEGIN FAVICONS/,/END FAVICONS/d' play.html > android/assets/play.html
 
-cp app.css android/
-cp $JAVASCRIPT_FILES android/
+cp app.css android/assets/
+cp $JAVASCRIPT_FILES android/assets/
 
 mkdir -p android/res/mipmap-mdpi android/res/mipmap-hdpi android/res/mipmap-xhdpi android/res/mipmap-xxhdpi android/res/mipmap-xxxhdpi
 
