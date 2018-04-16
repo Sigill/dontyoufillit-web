@@ -4,16 +4,34 @@
 	version="1.1"
 	width="48"
 	height="48">
+	<defs>
+		<filter id="dropShadow" style="color-interpolation-filters:sRGB;">
+			<feFlood result="flood" flood-color="rgb(0,0,0)" flood-opacity="0.8" />
+			<feComposite result="composite1" operator="in" in2="SourceGraphic" in="flood" />
+			<feGaussianBlur result="blur" stdDeviation="1" in="composite1" />
+			<feOffset result="offset" dy="1" dx="0" />
+			<feComposite result="composite2" operator="over" in2="offset" in="SourceGraphic" />
+		</filter>
+	</defs>
+	<g style="filter:url(#dropShadow)">
+		<rect
+			width="36"
+			height="36"
+			x="6"
+			y="6"
+			ry="4" rx="4"
+			style="fill:black;" />
+	</g>
 	<g>
 		<rect
-			width="44"
-			height="44"
-			x="2"
-			y="2"
-			style="fill:black;"
-			rx="4" ry="4" />
+			width="38"
+			height="38"
+			x="5"
+			y="5"
+			ry="4" rx="4"
+			style="fill:black;" />
 	</g>
-	<g transform="translate(0)" style="fill:white;">
+	<g transform="translate(0, 1)" style="fill:white;">
 		<g transform="translate(16, 40)">
 			<path
 				d="M 0 0

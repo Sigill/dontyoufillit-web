@@ -133,9 +133,9 @@ d
 cp app.css android/
 cp $JAVASCRIPT_FILES android/
 
-mkdir -p android/res/mipmap-mdpi android/res/mipmap-hdpi android/res/mipmap-xdpi android/res/mipmap-xxdpi android/res/mipmap-xxxdpi
+mkdir -p android/res/mipmap-mdpi android/res/mipmap-hdpi android/res/mipmap-xhdpi android/res/mipmap-xxhdpi android/res/mipmap-xxxhdpi
 
-for S in 48 72 96 144 192
+for S in 48 72 96 144 192 512
 do
 	if [ img/android.svg -nt tmp/android-${S}x${S}.png ]; then
 		inkscape -z -e tmp/android-${S}x${S}.png -w $S -h $S img/android.svg
@@ -145,9 +145,11 @@ done
 
 mv tmp/android-48x48.png android/res/mipmap-mdpi/ic_launcher.png
 mv tmp/android-72x72.png android/res/mipmap-hdpi/ic_launcher.png
-mv tmp/android-96x96.png android/res/mipmap-xdpi/ic_launcher.png
-mv tmp/android-144x144.png android/res/mipmap-xxdpi/ic_launcher.png
-mv tmp/android-192x192.png android/res/mipmap-xxxdpi/ic_launcher.png
+mv tmp/android-96x96.png android/res/mipmap-xhdpi/ic_launcher.png
+mv tmp/android-144x144.png android/res/mipmap-xxhdpi/ic_launcher.png
+mv tmp/android-192x192.png android/res/mipmap-xxxhdpi/ic_launcher.png
+
+mv tmp/android-512x512.png android/res/ic_launcher-web.png
 
 for S in 48 72 96 144 192
 do
@@ -159,6 +161,6 @@ done
 
 mv tmp/android-48x48.png android/res/mipmap-mdpi/ic_launcher_round.png
 mv tmp/android-72x72.png android/res/mipmap-hdpi/ic_launcher_round.png
-mv tmp/android-96x96.png android/res/mipmap-xdpi/ic_launcher_round.png
-mv tmp/android-144x144.png android/res/mipmap-xxdpi/ic_launcher_round.png
-mv tmp/android-192x192.png android/res/mipmap-xxxdpi/ic_launcher_round.png
+mv tmp/android-96x96.png android/res/mipmap-xhdpi/ic_launcher_round.png
+mv tmp/android-144x144.png android/res/mipmap-xxhdpi/ic_launcher_round.png
+mv tmp/android-192x192.png android/res/mipmap-xxxhdpi/ic_launcher_round.png
