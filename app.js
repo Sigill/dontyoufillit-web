@@ -19,11 +19,6 @@ function statsObserver(message) {
 }
 
 
-function setStockCompatibilityMode(compatible) {
-	localStorage.setItem('stockCompatibility', compatible);
-	gui.androidStockCompat = compatible;
-}
-
 function setDebugMode(enabled) {
 	localStorage.setItem('debug', enabled);
 
@@ -46,13 +41,6 @@ window.location.search.substring(1).split('&').forEach(function(e) {
 	query_string[pair[0]] = (pair.length == 2) ? pair[1] : true;
 });
 
-if (query_string['stock'] !== undefined) {
-	setStockCompatibilityMode(asBool(query_string['stock']));
-} else if (localStorage.getItem('stockCompatibility') !== null) {
-	setStockCompatibilityMode(asBool(localStorage.getItem('stockCompatibility')));
-} else {
-	setStockCompatibilityMode(false);
-}
 
 if (query_string['debug'] !== undefined) {
 	setDebugMode(asBool(query_string['debug']));
@@ -151,10 +139,6 @@ document.getElementById('licenseScreenBackButton').addEventListener('click', fun
 	licenseScreen.reset();
 });
 
-document.getElementById('compatibilityModeCheckbox').addEventListener('change', function(evt) {
-	setStockCompatibilityMode(evt.target.checked);
-});
-
 document.getElementById('framerateCheckbox').addEventListener('change', function(evt) {
 	setDebugMode(evt.target.checked);
 });
@@ -218,7 +202,6 @@ Array.prototype.forEach.call(document.getElementsByClassName('hideable'), functi
 });
 
 optionsScreen.init = function() {
-	document.getElementById('compatibilityModeCheckbox').checked = gui.androidStockCompat;
 	document.getElementById('framerateCheckbox').checked = gui.hasObserver(statsObserver);
 };
 

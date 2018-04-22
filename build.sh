@@ -66,7 +66,7 @@ d
 # Add the cache manifest to the game
 sed -e 's/<html>/<html manifest="cache.manifest">/g' -e 's/^[[:space:]]*//g' dist/play_online.html > dist/play.html
 
-JAVASCRIPT_FILES="requestAnimationFrame.js passiveEvent.js stats.js observable.js dontyoufillit.js dontyoufillit_canvas_gui.js app.js"
+JAVASCRIPT_FILES="requestAnimationFrame.js passiveEvent.js stats.js observable.js dontyoufillit.js dontyoufillit_css_gui.js app.js"
 
 for F in $JAVASCRIPT_FILES
 do
@@ -81,7 +81,7 @@ cat app.css| cssmin -w 512 > dist/app.css
 cp .htaccess dist/
 
 # Compute a hash of all the files that need to be cached.
-h=$(tar -c app.css play.html requestAnimationFrame.js passiveEvent.js stats.js observable.js dontyoufillit.js dontyoufillit_canvas_gui.js app.js|sha1sum|cut -d ' ' -f1)
+h=$(tar -c app.css play.html requestAnimationFrame.js passiveEvent.js stats.js observable.js dontyoufillit.js dontyoufillit_css_gui.js app.js|sha1sum|cut -d ' ' -f1)
 
 # and put it in the cache manifest, in order to make it unique.
 sed -e "s/# hash xyz/# hash $h/g" cache.manifest > dist/cache.manifest
