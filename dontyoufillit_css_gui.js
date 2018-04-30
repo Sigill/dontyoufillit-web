@@ -42,7 +42,7 @@ function DontYouFillItCanvasGui(game, highscore) {
 
 			if (newBall) {
 				b.css = DefaultBall.cloneNode(true);
-				ballLayer.appendChild(b.css);
+				staticBallLayer.appendChild(b.css);
 			}
 
 			if ((b.was === undefined) || (b.was != b.counter)) {
@@ -179,7 +179,8 @@ function DontYouFillItCanvasGui(game, highscore) {
 
 	var    container = document.getElementById('Game'),
 	           board = document.getElementById('Board'),
-	       ballLayer = document.getElementById('BallLayer');
+	  staticBallLayer = document.getElementById('StaticBallLayer'),
+	    liveBallLayer = document.getElementById('LiveBallLayer');
 
 	var DefaultBall = document.getElementById('DefaultBall');
 	DefaultBall.removeAttribute('id');
@@ -188,7 +189,7 @@ function DontYouFillItCanvasGui(game, highscore) {
 	LiveBall.setAttribute('id', 'LiveBall');
 	LiveBall.classList.add('B3');
 	LiveBall.style.display = 'none';
-	ballLayer.appendChild(LiveBall);
+	liveBallLayer.appendChild(LiveBall);
 
 	var Turret = document.getElementById('Turret');
 	var Highscore = document.getElementById('highscore');
