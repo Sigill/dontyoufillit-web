@@ -9,8 +9,12 @@ function DontYouFillItCanvasGui(game, highscore) {
 
 	function drawCurrentBall() {
 		if(game.currentBall) {
-			LiveBall.style.left    = 100 * game.currentBall.nx + '%';
-			LiveBall.style.top     = 100 * (1 - game.currentBall.ny) + '%';
+			var dx = (game.currentBall.nx - game.currentBall.nr) * (SCALE-2);
+			var dy = (1 - game.currentBall.ny - game.currentBall.nr) * (SCALE-2);
+			// Using exact values will cause the numbers to not be pixel-perfect.
+			// Rounding the values fill fix it, that's OK at a pixelratio of 1,
+			// but will cause the balls to "jump" for higher pixelratio.
+			LiveBall.style.transform = LiveBall.style["webkitTransform"] = 'translate(' + dx + 'px, '+ dy + 'px)';
 			LiveBall.style.display = 'block';
 		} else {
 			LiveBall.style.display = 'none';
@@ -52,8 +56,11 @@ function DontYouFillItCanvasGui(game, highscore) {
 			}
 
 			if (redrawUponResize || newBall) {
-				b.css.style.left    = 100 * b.nx + '%';
-				b.css.style.top     = 100 * (1 - b.ny) + '%';
+				var dx = (b.nx - b.nr) * (SCALE-2);
+				var dy = (1 - b.ny - b.nr) * (SCALE-2);
+
+				b.css.style.left    = dx + 'px';
+				b.css.style.top     = dy + 'px';
 				b.css.style.width   = b.css.style.height = 200 * b.nr + '%';
 				b.css.style.display = 'block';
 			}
