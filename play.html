@@ -5,24 +5,36 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<title>DontYouFillIt</title>
 	<link rel="stylesheet" href="app.css">
-<!-- BEGIN FAVICONS -->
+<!-- BEGIN WEB -->
+	<link rel="icon" type="image/png" sizes="16x16" href="icon-16x16.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="icon-32x32.png">
 	<link rel="icon" type="image/x-icon" sizes="16x16 32x32 48x48 256x256" href="favicon.ico">
 
-	<link rel="apple-touch-icon" sizes="192x192" href="icon-192x192.png">
-
-	<link rel="icon" type="image/png" sizes="192x192" href="icon-192x192.png">
-	<link rel="icon" type="image/png" sizes="128x128" href="icon-128x128.png">
-	<link rel="icon" type="image/png" sizes="32x32" href="icon-32x32.png">
-	<link rel="icon" type="image/png" sizes="16x16" href="icon-16x16.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="touch-icon-iphone.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="touch-icon-iphone-retina.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="touch-icon-ipad.png">
+	<link rel="apple-touch-icon" sizes="167x167" href="touch-icon-ipad-retina.png">
+	<meta name="apple-mobile-web-app-capable" content="yes">
 
 	<meta name="application-name" content="DontYouFillIt"/>
 	<meta name="msapplication-TileColor" content="#000000">
-	<meta name="msapplication-square70x70logo" content="icon-128x128.png" />
-	<meta name="msapplication-square150x150logo" content="icon-270x270.png" />
+	<meta name="msapplication-square70x70logo" content="mstile-70x70.png" />
+	<meta name="msapplication-square150x150logo" content="mstile-150x150.png" />
+	<meta name="msapplication-wide310x150logo" content="mstile-310x150.png" />
+	<meta name="msapplication-square310x310logo" content="mstile-310x310.png" />
 
 	<meta name="mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-capable" content="yes">
-<!-- END FAVICONS -->
+	<link rel="manifest" href="manifest.json">
+
+	<script>
+		// Dummy service worker for Progressive Web App
+		if ("serviceWorker" in navigator) {
+			window.addEventListener("load", function () {
+				navigator.serviceWorker.register("service-worker.js");
+			});
+		}
+	</script>
+<!-- END WEB -->
 </head>
 <body>
 <div id="Game" class="fullscreen">

@@ -1,3 +1,5 @@
 AddType text/cache-manifest .manifest
 ExpiresActive On
 ExpiresByType text/cache-manifest "access plus 0 seconds"
+
+AddType application/manifest+json .json

@@ -4,11 +4,9 @@ CACHE:
 play.html
 app.css
 app.js
+service-worker.js
 # BEGIN FAVICONS
 favicon.ico
-icon-270x270.png
-icon-192x192.png
-icon-128x128.png
 icon-32x32.png
 icon-16x16.png
 # END FAVICONS
