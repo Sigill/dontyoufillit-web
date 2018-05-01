@@ -205,10 +205,10 @@ function DontYouFillItGame() {
 
 	this.score = 0;
 
-	this.DEFAULT_BALL_SIZE  =  1/40.0;
-	this.CANNON_Y_POSITION  = -1/6.0;
-	this.CANNON_BASE_HEIGHT =  1/15.0;
-	this.CANNON_LENGTH      =  1/15.0;
+	this.DEFAULT_BALL_RADIUS =  1/40.0;
+	this.CANNON_Y_POSITION   = -1/6.0;
+	this.CANNON_BASE_HEIGHT  =  1/15.0;
+	this.CANNON_LENGTH       =  1/15.0;
 }
 
 DontYouFillItGame.prototype.PAUSED   = function() { return 1; };
@@ -274,7 +274,7 @@ DontYouFillItGame.prototype.reset = function() {
 
 DontYouFillItGame.prototype.fire = function() {
 	this.currentBall = new Ball(
-	    this.DEFAULT_BALL_SIZE,
+	    this.DEFAULT_BALL_RADIUS,
 	    0.5 + Math.cos(this.cannon.getAngle()) * this.CANNON_LENGTH,
 	    this.CANNON_Y_POSITION + this.CANNON_BASE_HEIGHT + Math.sin(this.cannon.getAngle()) * this.CANNON_LENGTH,
 	    this.cannon.getAngle());

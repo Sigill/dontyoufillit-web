@@ -82,34 +82,22 @@ body, html {
 	left: 60%;
 }
 
-#BallArea {
-	position: absolute;
-	left: 0;
-	top: 12.5%;
-	width: 100%;
-	height: 87.5%;
-	box-sizing: border-box;
-	border: 1px solid white;
-}
-
 #StaticBallLayer, #LiveBallLayer {
 	box-sizing: border-box;
 	position: absolute;
-	left: 0;
-	top: 12.5%;
-	width: 100%;
-	height: 75%;
 }
 
 #StaticBallLayer {
+	border: 1px solid black;
+}
+
+#LiveBallLayer {
 	border-width: 1px;
 	border-color: white;
 	border-style: solid solid dotted;
 }
 
 #LiveBall {
-	width: 5%;
-	height: 5%;
 	will-change: transform;
 }
 

@@ -2,6 +2,8 @@
 function DontYouFillItCanvasGui(game, highscore) {
 	var that = this; // Allow closures to access this.
 
+	function px(v) { return v + 'px'; }
+
 	function drawCannon() {
 		// Old android stock browser needs the webkit prefix.
 		Turret.style.transform = Turret.style["webkitTransform"] = "rotate(-" + game.cannon.getAngle() + "rad)";
@@ -59,8 +61,8 @@ function DontYouFillItCanvasGui(game, highscore) {
 				var dx = (b.nx - b.nr) * (SCALE-2);
 				var dy = (1 - b.ny - b.nr) * (SCALE-2);
 
-				b.css.style.left    = dx + 'px';
-				b.css.style.top     = dy + 'px';
+				b.css.style.left    = px(dx);
+				b.css.style.top     = px(dy);
 				b.css.style.width   = b.css.style.height = 200 * b.nr + '%';
 				b.css.style.display = 'block';
 			}
@@ -132,13 +134,16 @@ function DontYouFillItCanvasGui(game, highscore) {
 	function resizeCanvas() {
 		computeGameDimensions();
 
-		// -2 because of the 1px border
-		board.style.width  = GAME_WIDTH + "px";
-		board.style.height = GAME_HEIGHT + "px";
-		board.style.left   = H_OFFSET + "px";
-		board.style.top    = V_OFFSET + "px";
+		board.style.width  = px(GAME_WIDTH);
+		board.style.height = px(GAME_HEIGHT);
+		board.style.left   = px(H_OFFSET);
+		board.style.top    = px(V_OFFSET);
 
-		LiveBall.style.width   = LiveBall.style.height = 200 * game.DEFAULT_BALL_SIZE + '%';
+		staticBallLayer.style.width = staticBallLayer.style.height = px(SCALE);
+		liveBallLayer.style.width = liveBallLayer.style.height = px(SCALE);
+		staticBallLayer.style.top = liveBallLayer.style.top = px(TOP_BORDER);
+
+		LiveBall.style.width   = LiveBall.style.height = 200 * game.DEFAULT_BALL_RADIUS + '%';
 
 		redrawUponResize = true;
 
@@ -179,8 +184,9 @@ function DontYouFillItCanvasGui(game, highscore) {
 
 	var    container = document.getElementById('Game'),
 	           board = document.getElementById('Board'),
-	  staticBallLayer = document.getElementById('StaticBallLayer'),
-	    liveBallLayer = document.getElementById('LiveBallLayer');
+	 staticBallLayer = document.getElementById('StaticBallLayer'),
+	   liveBallLayer = document.getElementById('LiveBallLayer'),
+	          cannon = document.getElementById('Cannon');
 
 	var DefaultBall = document.getElementById('DefaultBall');
 	DefaultBall.removeAttribute('id');
