@@ -33,14 +33,18 @@ body, html {
 .Score {
 	position: absolute;
 	color: white;
+	top: 0;
+	left: 0;
+	height: 12.5%;
+	width: 14ex;
 }
 
 .Score .L1 {
-	top: 0;
+	bottom: 0.9em;
 }
 
 .Score .L2 {
-	top: 0.9em;
+	bottom: 0.1em;
 }
 
 .Score .C1 {

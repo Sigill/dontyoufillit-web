@@ -171,7 +171,7 @@ function DontYouFillItCanvasGui(game, highscore) {
 		RIGHT_BORDER       = LEFT_BORDER + SCALE;
 
 		// Until text-size-adjust is supported
-		document.getElementById('Score').style.font = SCALE / 12 + "px Arial";
+		document.getElementById('Score').style.font = SCALE / 12 + 'px/1 Arial';
 	}
 
 	this.MENU = 1;
@@ -185,8 +185,7 @@ function DontYouFillItCanvasGui(game, highscore) {
 	var    container = document.getElementById('Game'),
 	           board = document.getElementById('Board'),
 	 staticBallLayer = document.getElementById('StaticBallLayer'),
-	   liveBallLayer = document.getElementById('LiveBallLayer'),
-	          cannon = document.getElementById('Cannon');
+	   liveBallLayer = document.getElementById('LiveBallLayer');
 
 	var DefaultBall = document.getElementById('DefaultBall');
 	DefaultBall.removeAttribute('id');
