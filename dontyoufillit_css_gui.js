@@ -9,14 +9,34 @@ function DontYouFillItCanvasGui(game, highscore) {
 		Turret.style.transform = Turret.style["webkitTransform"] = "rotate(-" + game.cannon.getAngle() + "rad)";
 	}
 
+	var minimumBallSize = 16;
+
+	function computeBallUpscaleRatio(ballRadiusInPx) {
+		if (ballRadiusInPx < minimumBallSize)
+			return minimumBallSize / ballRadiusInPx;
+		else
+			return undefined;
+	}
+
+	function transformBall(b, s, r) {
+		var size = b.nr * (SCALE-2);
+
+		if (r !== undefined)
+			size = minimumBallSize;
+
+		var dx = b.nx * (SCALE-2) - size;
+		var dy = (1 - b.ny) * (SCALE-2) - size;
+
+		var transform = 'translate(' + dx + 'px, '+ dy + 'px)';
+		if (r !== undefined)
+			transform = transform + ' scale(' + (1/r) + ')'
+		s.transform = s['webkitTransform'] = transform;
+	}
+
 	function drawCurrentBall() {
 		if(game.currentBall) {
-			var dx = (game.currentBall.nx - game.currentBall.nr) * (SCALE-2);
-			var dy = (1 - game.currentBall.ny - game.currentBall.nr) * (SCALE-2);
-			// Using exact values will cause the numbers to not be pixel-perfect.
-			// Rounding the values fill fix it, that's OK at a pixelratio of 1,
-			// but will cause the balls to "jump" for higher pixelratio.
-			LiveBall.style.transform = LiveBall.style["webkitTransform"] = 'translate(' + dx + 'px, '+ dy + 'px)';
+			transformBall(game.currentBall, LiveBall.style, liveBallUpscaleRatio);
+
 			LiveBall.style.display = 'block';
 		} else {
 			LiveBall.style.display = 'none';
@@ -58,12 +78,15 @@ function DontYouFillItCanvasGui(game, highscore) {
 			}
 
 			if (redrawUponResize || newBall) {
-				var dx = (b.nx - b.nr) * (SCALE-2);
-				var dy = (1 - b.ny - b.nr) * (SCALE-2);
+				var upscaleRatio = computeBallUpscaleRatio(b.nr * (SCALE-2));
 
-				b.css.style.left    = px(dx);
-				b.css.style.top     = px(dy);
-				b.css.style.width   = b.css.style.height = 200 * b.nr + '%';
+				transformBall(b, b.css.style, upscaleRatio);
+
+				var ballRadiusInPercent = 200 * b.nr;
+				if (upscaleRatio !== undefined)
+					ballRadiusInPercent *= upscaleRatio;
+
+				b.css.style.width   = b.css.style.height = ballRadiusInPercent + '%';
 				b.css.style.display = 'block';
 			}
 		}
@@ -131,6 +154,8 @@ function DontYouFillItCanvasGui(game, highscore) {
 
 	var redrawUponResize = true;
 
+	var liveBallUpscaleRatio = undefined;
+
 	function resizeCanvas() {
 		computeGameDimensions();
 
@@ -143,7 +168,10 @@ function DontYouFillItCanvasGui(game, highscore) {
 		liveBallLayer.style.width = liveBallLayer.style.height = px(SCALE);
 		staticBallLayer.style.top = liveBallLayer.style.top = px(TOP_BORDER);
 
-		LiveBall.style.width   = LiveBall.style.height = 200 * game.DEFAULT_BALL_RADIUS + '%';
+		var liveBallSizeInPercent = 200 * game.DEFAULT_BALL_RADIUS;
+		if (liveBallUpscaleRatio !== undefined)
+			liveBallSizeInPercent *= liveBallUpscaleRatio;
+		LiveBall.style.width   = LiveBall.style.height = liveBallSizeInPercent + '%';
 
 		redrawUponResize = true;
 
@@ -169,6 +197,8 @@ function DontYouFillItCanvasGui(game, highscore) {
 		BOTTOM_BORDER      = TOP_BORDER + SCALE;
 		LEFT_BORDER        = 0;
 		RIGHT_BORDER       = LEFT_BORDER + SCALE;
+
+		liveBallUpscaleRatio = computeBallUpscaleRatio(game.DEFAULT_BALL_RADIUS * (SCALE-2));
 
 		// Until text-size-adjust is supported
 		document.getElementById('Score').style.font = SCALE / 12 + 'px/1 Arial';
