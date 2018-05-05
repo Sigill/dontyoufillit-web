@@ -177,7 +177,8 @@ body, html {
 .B .b {
 	position: absolute;
 	background-color: white;
-	width: 30%;
+	/* Should be 30%, but this might create stitching issues */
+	width: 35%;
 	height: 7.5%;
 }
 
@@ -198,7 +199,7 @@ body, html {
 }
 
 .B2 .b1, .B3 .b1 {
-	left: 25%;
+	left: 20%;
 	top: 35%;
 }
 
@@ -208,7 +209,7 @@ body, html {
 }
 
 .B3 .b2 {
-	left: 25%;
+	left: 20%;
 	top: 57.5%;
 }
 
