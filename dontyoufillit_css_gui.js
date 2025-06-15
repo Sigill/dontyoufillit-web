@@ -251,7 +251,7 @@ function DontYouFillItCanvasGui(game, highscore) {
 		// option is left to true (the default value).
 		// https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md
 		// https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Improving_scrolling_performance_with_passive_listeners
-		e.addEventListener('touchstart', callback, supportsPassive ? { passive: false } : false);
+		e.addEventListener('touchstart', callback, { passive: false });
 	}
 
 	var gameState = undefined;

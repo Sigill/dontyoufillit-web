@@ -66,8 +66,7 @@ AND_LAUNCHER_ICONS = $(MDPI)/$(SQ_ICON) \
 
 AND_AST = android/assets
 
-AND_JS = $(AND_AST)/passiveEvent.js \
-         $(AND_AST)/stats.js \
+AND_JS = $(AND_AST)/stats.js \
          $(AND_AST)/observable.js \
          $(AND_AST)/dontyoufillit.js \
          $(AND_AST)/dontyoufillit_css_gui.js \
@@ -178,7 +177,7 @@ dist/service-worker.js: service-worker.js
 dist/manifest.json: manifest.json
 	cp $< $@
 
-dist/app.js: passiveEvent.js stats.js observable.js dontyoufillit.js dontyoufillit_css_gui.js app.js
+dist/app.js: stats.js observable.js dontyoufillit.js dontyoufillit_css_gui.js app.js
 	closure-compiler --compilation_level SIMPLE_OPTIMIZATIONS $^ > $@
 
 
