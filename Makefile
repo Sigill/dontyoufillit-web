@@ -153,7 +153,6 @@ tmp/LICENSE: LICENSE
 dist/play_online.html: play.html tmp/LICENSE
 	# Add license, strip unneeded js files (due to minimization)
 	sed -e '/\$$LICENSE\$$/{r tmp/LICENSE' -e 'd}' \
-	    -e '/BEGIN JS/,/END JS/d' \
 	    -e '/BEGIN WEB/d' \
 	    -e '/END WEB/d' \
 	    $< > $@
@@ -177,8 +176,8 @@ dist/service-worker.js: service-worker.js
 dist/manifest.json: manifest.json
 	cp $< $@
 
-dist/app.js: stats.js observable.js dontyoufillit.js dontyoufillit_css_gui.js app.js
-	closure-compiler --compilation_level SIMPLE_OPTIMIZATIONS $^ > $@
+dist/app.js: app.js
+	cp $^ $@
 
 
 dist/app.css: app.css

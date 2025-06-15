@@ -1,269 +1,280 @@
-"use strict";
-
-function vectorLength(x, y) {
-	return Math.sqrt(x * x + y * y);
+function vectorLength(x: number, y: number): number {
+  return Math.sqrt(x * x + y * y);
 }
 
-function RK41DObject_State(u, s) {
-	this.u = u;
-	this.s = s;
+interface RK41DObject_State {
+  u: number;
+  s: number;
 }
 
-function RK41DObject_Derivative(du, ds) {
-	this.du = du;
-	this.ds = ds;
+interface RK41DObject_Derivative {
+  du: number;
+  ds: number;
 }
 
-function RK41DObject() {
-	this.state = new RK41DObject_State(0, 0);
+abstract class RK41DObject {
+  state: RK41DObject_State = { u: 0, s: 0 };
+
+  abstract acceleration(state: RK41DObject_State, t: number): number;
+
+  evaluate(initialState: RK41DObject_State, t: number, dt: number, derivative: RK41DObject_Derivative): RK41DObject_Derivative {
+    const state: RK41DObject_State = {
+      u: initialState.u + derivative.du * dt,
+      s: initialState.s + derivative.ds * dt,
+    };
+
+    return {
+      du: state.s,
+      ds: this.acceleration(state, t + dt),
+    };
+  }
+
+  integrate(t: number, dt: number): void {
+    const a = this.evaluate(this.state, t, 0, {du: 0, ds: 0});
+    const b = this.evaluate(this.state, t, dt * 0.5, a);
+    const c = this.evaluate(this.state, t, dt * 0.5, b);
+    const d = this.evaluate(this.state, t, dt, c);
+
+    const dxdt = 1 / 6 * (a.du + 2 * (b.du + c.du) + d.du);
+    const dvdt = 1 / 6 * (a.ds + 2 * (b.ds + c.ds) + d.ds);
+
+    this.state.u = this.state.u + dxdt * dt;
+    this.state.s = this.state.s + dvdt * dt;
+  }
 }
-
-RK41DObject.prototype.evaluate = function(initialState, t, dt, derivative) {
-	if(typeof dt == 'undefined') {
-		return new RK41DObject_Derivative(initialState.s, this.acceleration(initialState, t));
-	} else {
-		var state = new RK41DObject_State(initialState.u + derivative.du * dt,
-		                                  initialState.s + derivative.ds * dt);
-
-		return new RK41DObject_Derivative(state.s, this.acceleration(state, t + dt));
-	}
-};
-
-RK41DObject.prototype.integrate = function(t, dt) {
-	var a = this.evaluate(this.state, t),
-	    b = this.evaluate(this.state, t, dt * 0.5, a),
-	    c = this.evaluate(this.state, t, dt * 0.5, b),
-	    d = this.evaluate(this.state, t, dt, c);
-
-	var dxdt = 1/6 * (a.du + 2 * (b.du + c.du) + d.du),
-	    dvdt = 1/6 * (a.ds + 2 * (b.ds + c.ds) + d.ds);
-
-	this.state.u = this.state.u + dxdt * dt;
-	this.state.s = this.state.s + dvdt * dt;
-};
 
 // TODO Improve this
-function normalizeRadian(a) {
-	while(a > 2 * Math.PI) {
-		a -= 2 * Math.PI;
-	}
+function normalizeRadian(a: number) {
+  while(a > 2 * Math.PI) {
+    a -= 2 * Math.PI;
+  }
 
-	while(a < 0) {
-		a += 2 * Math.PI;
-	}
+  while(a < 0) {
+    a += 2 * Math.PI;
+  }
 
-	return a;
+  return a;
 }
 
-function Cannon() {
-	RK41DObject.call(this);
-	this.state.u = 0;
-	this.state.s = Math.PI / 3;
+class Cannon extends RK41DObject {
+  constructor() {
+    super();
+    this.state.u = 0;
+    this.state.s = Math.PI / 3;
+  }
+
+  acceleration(): number {
+    return 0;
+  }
+
+  getAngle(): number {
+    return this.state.u + Math.PI / 2;
+  }
+
+  update(t: number, dt: number) {
+    this.integrate(t, dt);
+
+    if (Math.abs(this.state.u) >= Math.PI / 2) {
+      this.state.u = ((Math.PI / 2) - Math.abs(Math.PI / 2 - Math.abs(this.state.u))) * Math.sign(this.state.u);
+      this.state.s *= -1;
+    }
+  }
 }
 
-Cannon.prototype = new RK41DObject();
-Cannon.prototype.constructor = RK41DObject;
+export class Ball extends RK41DObject {
+  nr: number;
+  nx: number;
+  ny: number;
+  direction: number;
+  counter: number;
 
-Cannon.prototype.acceleration = function(state, t) {
-	return 0;
-};
+  constructor(r: number, x: number, y: number, a: number) {
+    super();
 
-Cannon.prototype.getAngle = function() {
-	return this.state.u + Math.PI / 2;
-};
+    this.nr = r; // Normalized radius and coordinates
+    this.nx = x;
+    this.ny = y;
 
-Cannon.prototype.update = function(t, dt) {
-	this.integrate(t, dt);
+    this.direction = a;
+    this.state.u = 0;
+    this.state.s = 1;
 
-	if(Math.abs(this.state.u) >= Math.PI / 2) {
-		this.state.u = ((Math.PI / 2) - Math.abs(Math.PI / 2 - Math.abs(this.state.u))) * Math.sign(this.state.u);
-		this.state.s *= -1;
-	}
-};
+    this.counter = 3;
+  }
 
-function Ball(r, x, y, a) {
-	RK41DObject.call(this);
-	this.nr = r; // Normalized radius and coordinates
-	this.nx = x;
-	this.ny = y;
+  acceleration(state: RK41DObject_State, t: number) {
+    return -0.4;
+  }
 
-	this.direction = a;
-	this.state.u = 0;
-	this.state.s = 1;
+  update(t: number, dt: number, staticBalls: Array<Ball>) {
+    const previousStateU = this.state.u;
 
-	this.counter = 3;
+    this.integrate(t, dt);
+
+    var d = this.state.u - previousStateU;
+    this.nx += d * Math.cos(this.direction);
+    this.ny += d * Math.sin(this.direction);
+
+    this.bounce(staticBalls);
+  }
+
+  bounce(staticBalls: Array<Ball>) {
+    if (this.nx > 1 - this.nr) {
+      this.nx = 1 - this.nr;
+      this.direction = normalizeRadian(Math.PI - this.direction);
+    } else if (this.nx < this.nr) {
+      this.nx = this.nr;
+      this.direction = normalizeRadian(Math.PI - this.direction);
+    }
+
+    if (this.ny > 1 - this.nr) {
+      this.ny = 1 - this.nr;
+      this.direction = normalizeRadian(-this.direction);
+    }
+
+    for (var i = 0; i < staticBalls.length; ++i) {
+      var o = staticBalls[i];
+
+      var normalX = this.nx - o.nx, normalY = this.ny - o.ny, dist = vectorLength(normalX, normalY);
+
+      if (dist <= o.nr + this.nr) {
+        --o.counter;
+
+        // Move it back to prevent clipping
+        this.nx = o.nx + normalX * (this.nr + o.nr) / dist;
+        this.ny = o.ny + normalY * (this.nr + o.nr) / dist;
+
+        // http://en.wikipedia.org/wiki/Elastic_collision#Two-Dimensional_Collision_With_Two_Moving_Objects
+        // Assuming no speed and an infinite mass for the second ball.
+        var phi = Math.atan2(normalY, normalX), theta = this.direction, speed = this.state.s;
+
+        var velocityX = -speed * Math.cos(theta - phi) * Math.cos(phi) + speed * Math.sin(theta - phi) * Math.cos(phi + Math.PI / 2), velocityY = -speed * Math.cos(theta - phi) * Math.sin(phi) + speed * Math.sin(theta - phi) * Math.sin(phi + Math.PI / 2);
+
+        // Linear speed doesn't change, only the direction.
+        this.direction = Math.atan2(velocityY, velocityX);
+      }
+    }
+  }
+
+  grow(staticBalls: Array<Ball>) {
+    var minRadius = Number.MAX_VALUE, available, o;
+
+    for (var i = 0; i < staticBalls.length; ++i) {
+      o = staticBalls[i];
+      available = vectorLength(this.nx - o.nx, this.ny - o.ny) - o.nr;
+      if (minRadius > available) minRadius = available;
+    }
+
+    available = this.nx;
+    if (minRadius > available) minRadius = available;
+
+    available = 1 - this.nx;
+    if (minRadius > available) minRadius = available;
+
+    available = Math.abs(this.ny);
+    if (minRadius > available) minRadius = available;
+
+    available = Math.abs(1 - this.ny);
+    if (minRadius > available) minRadius = available;
+
+    this.nr = Math.abs(minRadius);
+  }
 }
 
-Ball.prototype = new RK41DObject();
-Ball.prototype.constructor = RK41DObject;
+export class DontYouFillItGame {
+  state: number;
+  cannon: Cannon;
+  staticBalls: Array<Ball>;
+  currentBall: Ball | null;
+  lastUpdateTime: number;
+  score: number;
 
-Ball.prototype.acceleration = function(state, t) {
-	return -0.4;
-};
+  DEFAULT_BALL_RADIUS: number;
+  CANNON_Y_POSITION: number;
+  CANNON_BASE_HEIGHT: number;
+  CANNON_LENGTH: number;
 
-Ball.prototype.update = function(t, dt, staticBalls) {
-	var previousStateU = this.state.u;
+  constructor() {
+    this.state = DontYouFillItGame.PAUSED;
+    this.cannon = new Cannon();
+    this.staticBalls = [];
+    this.currentBall = null;
 
-	this.integrate(t, dt);
+    // Browsers supporting high resolution timestamps will use them in requestAnimationFrame
+    this.lastUpdateTime = performance.now ? performance.now() : Date.now();
 
-	var d = this.state.u - previousStateU;
-	this.nx += d * Math.cos(this.direction);
-	this.ny += d * Math.sin(this.direction);
+    this.score = 0;
 
-	this.bounce(staticBalls);
-};
+    this.DEFAULT_BALL_RADIUS = 1 / 40.0;
+    this.CANNON_Y_POSITION = -1 / 6.0;
+    this.CANNON_BASE_HEIGHT = 1 / 15.0;
+    this.CANNON_LENGTH = 1 / 15.0;
+  }
 
-Ball.prototype.bounce = function(staticBalls) {
-	if (this.nx > 1 - this.nr) {
-		this.nx = 1 - this.nr;
-		this.direction = normalizeRadian(Math.PI - this.direction);
-	} else if (this.nx < this.nr) {
-		this.nx = this.nr;
-		this.direction = normalizeRadian(Math.PI - this.direction);
-	}
+  static PAUSED = 1;
+  static RUNNING = 2;
+  static GAMEOVER = 3;
 
-	if (this.ny > 1 - this.nr) {
-		this.ny = 1 - this.nr;
-		this.direction = normalizeRadian(-this.direction);
-	}
+  /*
+   * Position of the current ball is important, so it will be calculated 1000 times per second.
+   * Position of the cannon isn't, so it will be calculated only once every frame.
+   */
+  update(time: number) {
+    if (this.currentBall) {
+      var last = this.lastUpdateTime, steps = Math.floor(time - this.lastUpdateTime), current;
+      for (var i = 1; i <= steps; ++i) {
+        current = (this.lastUpdateTime * (steps - i) + time * i) / steps;
+        this.currentBall.update(last / 1000, (current - last) / 1000, this.staticBalls);
 
-	for(var i = 0; i < staticBalls.length; ++i) {
-		var o = staticBalls[i];
+        for (var j = this.staticBalls.length - 1; j >= 0; --j) {
+          if (this.staticBalls[j].counter == 0) {
+            ++this.score;
+            this.staticBalls.splice(j, 1);
+          }
+        }
 
-		var normalX = this.nx - o.nx,
-			normalY = this.ny - o.ny,
-			dist = vectorLength(normalX, normalY);
+        if (this.currentBall.ny < this.currentBall.nr && normalizeRadian(this.currentBall.direction) > Math.PI) {
+          this.currentBall.state.s = 0;
+          this.state = DontYouFillItGame.GAMEOVER;
+        } else if (this.currentBall.state.s < 0.001) {
+          if (this.currentBall.ny >= 0) {
+            this.currentBall.grow(this.staticBalls);
+            this.staticBalls.push(this.currentBall);
+          }
+          this.currentBall = null;
+          break;
+        }
+        last = current;
+      }
+    }
 
-		if(dist <= o.nr + this.nr) {
-			--o.counter;
+    this.cannon.update(this.lastUpdateTime / 1000, (time - this.lastUpdateTime) / 1000);
 
-			// Move it back to prevent clipping
-			this.nx = o.nx + normalX * (this.nr + o.nr) / dist;
-			this.ny = o.ny + normalY * (this.nr + o.nr) / dist;
+    this.lastUpdateTime = time;
+  }
 
-			// http://en.wikipedia.org/wiki/Elastic_collision#Two-Dimensional_Collision_With_Two_Moving_Objects
-			// Assuming no speed and an infinite mass for the second ball.
-			var phi = Math.atan2(normalY, normalX),
-			  theta = this.direction,
-			  speed = this.state.s;
+  pause() {
+    this.state = DontYouFillItGame.PAUSED;
+  }
 
-			var velocityX = -speed * Math.cos(theta - phi) * Math.cos(phi) + speed * Math.sin(theta - phi) * Math.cos(phi + Math.PI / 2),
-			    velocityY = -speed * Math.cos(theta - phi) * Math.sin(phi) + speed * Math.sin(theta - phi) * Math.sin(phi + Math.PI / 2);
+  resume() {
+    this.lastUpdateTime = performance.now ? performance.now() : Date.now();
+    this.state = DontYouFillItGame.RUNNING;
+  }
 
-			// Linear speed doesn't change, only the direction.
-			this.direction = Math.atan2(velocityY, velocityX);
-		}
-	}
-};
+  reset() {
+    this.currentBall = null;
+    this.staticBalls = [];
+    this.cannon.state.u = 0;
+    this.score = 0;
+    this.resume();
+  }
 
-Ball.prototype.grow = function(staticBalls) {
-	var minRadius = Number.MAX_VALUE,
-	    available,
-	    o;
-
-	for(var i = 0; i < staticBalls.length; ++i) {
-		o = staticBalls[i];
-		available = vectorLength(this.nx - o.nx, this.ny - o.ny) - o.nr;
-		if(minRadius > available) minRadius = available;
-	}
-
-	available = this.nx;
-	if(minRadius > available) minRadius = available;
-
-	available = 1 - this.nx;
-	if(minRadius > available) minRadius = available;
-
-	available = Math.abs(this.ny);
-	if(minRadius > available) minRadius = available;
-
-	available = Math.abs(1 - this.ny);
-	if(minRadius > available) minRadius = available;
-
-	this.nr = Math.abs(minRadius);
-};
-
-function DontYouFillItGame() {
-	this.state = this.PAUSED();
-	this.cannon = new Cannon();
-	this.staticBalls = [];
-	this.currentBall = null;
-
-	// Browsers supporting high resolution timestamps will use them in requestAnimationFrame
-	this.lastUpdateTime = performance.now ? performance.now() : Date.now();
-
-	this.score = 0;
-
-	this.DEFAULT_BALL_RADIUS =  1/40.0;
-	this.CANNON_Y_POSITION   = -1/6.0;
-	this.CANNON_BASE_HEIGHT  =  1/15.0;
-	this.CANNON_LENGTH       =  1/15.0;
+  fire() {
+    this.currentBall = new Ball(
+      this.DEFAULT_BALL_RADIUS,
+      0.5 + Math.cos(this.cannon.getAngle()) * this.CANNON_LENGTH,
+      this.CANNON_Y_POSITION + this.CANNON_BASE_HEIGHT + Math.sin(this.cannon.getAngle()) * this.CANNON_LENGTH,
+      this.cannon.getAngle());
+  }
 }
-
-DontYouFillItGame.prototype.PAUSED   = function() { return 1; };
-DontYouFillItGame.prototype.RUNNING  = function() { return 2; };
-DontYouFillItGame.prototype.GAMEOVER = function() { return 3; };
-
-/*
- * Position of the current ball is important, so it will be calculated 1000 times per second.
- * Position of the cannon isn't, so it will be calculated only once every frame.
- */
-DontYouFillItGame.prototype.update = function(time) {
-	if(this.currentBall) {
-		var last = this.lastUpdateTime,
-			steps = Math.floor(time - this.lastUpdateTime),
-			current;
-		for(var i = 1; i <= steps; ++i) {
-			current = (this.lastUpdateTime * (steps-i) + time * i) / steps;
-			this.currentBall.update(last / 1000, (current - last) / 1000, this.staticBalls);
-
-			for(var j = this.staticBalls.length - 1; j >= 0; --j) {
-				if(this.staticBalls[j].counter == 0) {
-					++this.score;
-					this.staticBalls.splice(j, 1);
-				}
-			}
-
-			if(this.currentBall.ny < this.currentBall.nr && normalizeRadian(this.currentBall.direction) > Math.PI) {
-				this.currentBall.state.s = 0;
-				this.state = this.GAMEOVER();
-			} else if(this.currentBall.state.s < 0.001) {
-				if(this.currentBall.ny >= 0) {
-					this.currentBall.grow(this.staticBalls);
-					this.staticBalls.push(this.currentBall);
-				}
-				this.currentBall = null;
-				break;
-			}
-			last = current;
-		}
-	}
-
-	this.cannon.update(this.lastUpdateTime / 1000, (time - this.lastUpdateTime) / 1000);
-
-	this.lastUpdateTime = time;
-}
-
-DontYouFillItGame.prototype.pause = function() {
-	this.state = this.PAUSED();
-};
-
-DontYouFillItGame.prototype.resume = function() {
-	this.lastUpdateTime = performance.now ? performance.now() : Date.now();
-	this.state = this.RUNNING();
-};
-
-DontYouFillItGame.prototype.reset = function() {
-	this.currentBall = null;
-	this.staticBalls = [];
-	this.cannon.state.u = 0;
-	this.score = 0;
-	this.resume();
-};
-
-DontYouFillItGame.prototype.fire = function() {
-	this.currentBall = new Ball(
-	    this.DEFAULT_BALL_RADIUS,
-	    0.5 + Math.cos(this.cannon.getAngle()) * this.CANNON_LENGTH,
-	    this.CANNON_Y_POSITION + this.CANNON_BASE_HEIGHT + Math.sin(this.cannon.getAngle()) * this.CANNON_LENGTH,
-	    this.cannon.getAngle());
-};

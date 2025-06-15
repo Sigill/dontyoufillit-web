@@ -1,0 +1,24 @@
+{
+  "name": "dontyoufillit-web",
+  "version": "1.0.0",
+  "description": "DontYouFillIt is a Breakout-style game mixed with snooker.",
+  "private": true,
+  "scripts": {
+    "build-dev": "npx esbuild --bundle --outfile=app.js --sourcemap app.ts",
+    "build-watch": "npm run build-dev -- --watch",
+    "build": "make"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sigill/dontyoufillit-web.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "esbuild": "^0.25.5"
+  },
+  "devDependencies": {
+    "@types/stats.js": "^0.17.4",
+    "stats.js": "^0.17.0"
+  }
+}

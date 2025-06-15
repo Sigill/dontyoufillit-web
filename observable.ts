@@ -1,30 +1,27 @@
-function Observable() {
-	this.observers = [];
+export type Observer = (...args: any[]) => void;
+
+export class Observable {
+  #observers = new Array<Observer>();
+
+  addObserver(observer: Observer): void {
+    this.#observers.push(observer);
+  }
+
+  removeObserver(observer: Observer): void {
+    const index = this.#observers.indexOf(observer);
+    if (index !== -1) {
+      this.#observers.splice(index, 1);
+    }
+  }
+
+  hasObserver(observer: Observer): boolean {
+    const index = this.#observers.indexOf(observer);
+    return index !== -1;
+  }
+
+  notifyObservers(...args: any[]): void {
+    for (let i = this.#observers.length - 1; i >= 0; i--) {
+      this.#observers[i](...args);
+    }
+  }
 }
-Observable.prototype.addObserver = function(observer) {
-	this.observers.push(observer);
-};
-
-Observable.prototype.removeObserver = function(observer) {
-	var index = this.observers.indexOf(observer);
-
-	if(~index) {
-		this.observers.splice(index, 1);
-	}
-};
-
-Observable.prototype.hasObserver = function(observer) {
-	var index = this.observers.indexOf(observer);
-
-	if(~index) {
-		return true;
-	} else {
-		return false;
-	}
-};
-
-Observable.prototype.notifyObservers = function() {
-	for(var i = this.observers.length - 1; i >= 0; i--) {
-		this.observers[i].apply(null, arguments);
-	};
-};
