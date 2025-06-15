@@ -1,4 +1,3 @@
-
 # http://msdn.microsoft.com/en-us/library/windows/desktop/dn742485.aspx
 FAVICONS = dist/icon-16x16.png \
            dist/icon-32x32.png \
@@ -86,7 +85,7 @@ clean:
 	rm -rf android/ tmp/ dist/
 
 define svg-to-png =
-	inkscape -z -e $@ -w $(1) -h $(1) $< && pngcrush -brute -c $(2) -q -ow $@
+	inkscape -o $@ -w $(1) -h $(1) $< && pngcrush -brute -c $(2) -q -ow $@
 endef
 
 dist/icon-16x16.png: img/icon3.svg
@@ -119,16 +118,16 @@ dist/touch-icon-ipad-retina.png: img/icon.svg
 
 
 dist/mstile-70x70.png: img/android.adaptive.svg
-	inkscape -z -e $@ -w 70 -h 70 $<&& montage $@ -geometry +0+0 -background black $@ && pngcrush -brute -c 0 -q -ow $@
+	inkscape -o $@ -w 70 -h 70 $<&& montage $@ -geometry +0+0 -background black $@ && pngcrush -brute -c 0 -q -ow $@
 
 dist/mstile-150x150.png: img/android.adaptive.svg
-	inkscape -z -e $@ -w 150 -h 150 $< && montage $@ -geometry +0+0 -background black $@ && pngcrush -brute -c 0 -q -ow $@
+	inkscape -o $@ -w 150 -h 150 $< && montage $@ -geometry +0+0 -background black $@ && pngcrush -brute -c 0 -q -ow $@
 
 dist/mstile-310x150.png: img/android.adaptive.svg
-	inkscape -z -e $@ -w 150 -h 150 $< && montage $@ -geometry +80+0 -background black $@ && pngcrush -brute -c 0 -q -ow $@
+	inkscape -o $@ -w 150 -h 150 $< && montage $@ -geometry +80+0 -background black $@ && pngcrush -brute -c 0 -q -ow $@
 
 dist/mstile-310x310.png: img/android.adaptive.svg
-	inkscape -z -e $@ -w 310 -h 310 $< && montage $@ -geometry +0+0 -background black $@ && pngcrush -brute -c 0 -q -ow $@
+	inkscape -o $@ -w 310 -h 310 $< && montage $@ -geometry +0+0 -background black $@ && pngcrush -brute -c 0 -q -ow $@
 
 
 dist/ic_launcher_48.png: $(MDPI)/$(SQ_ICON)
@@ -163,7 +162,7 @@ dist/play_online.html: play.html tmp/LICENSE
 
 
 dist/play.html: dist/play_online.html
-	# Add the cache manifest to the game
+	# Add the cache manifest to the game
 	sed -e 's/<html>/<html manifest="cache.manifest">/g' $< > $@
 
 
