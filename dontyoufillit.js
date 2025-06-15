@@ -1,16 +1,4 @@
 "use strict";
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign#Polyfill
-if(!Math.sign) {
-	Math.__proto__.sign = function(x) {
-		if(isNaN(x)) {
-			return NaN;
-		} else if(x === 0) {
-			return x;
-		} else {
-			return (x > 0 ? 1 : -1);
-		}
-	}
-}
 
 function vectorLength(x, y) {
 	return Math.sqrt(x * x + y * y);
