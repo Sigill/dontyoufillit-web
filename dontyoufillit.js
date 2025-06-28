@@ -4,17 +4,17 @@ function vectorLength(x, y) {
 	return Math.sqrt(x * x + y * y);
 }
 
-function RK41DObject_State(u, s) {
+export function RK41DObject_State(u, s) {
 	this.u = u;
 	this.s = s;
 }
 
-function RK41DObject_Derivative(du, ds) {
+export function RK41DObject_Derivative(du, ds) {
 	this.du = du;
 	this.ds = ds;
 }
 
-function RK41DObject() {
+export function RK41DObject() {
 	this.state = new RK41DObject_State(0, 0);
 }
 
@@ -55,7 +55,7 @@ function normalizeRadian(a) {
 	return a;
 }
 
-function Cannon() {
+export function Cannon() {
 	RK41DObject.call(this);
 	this.state.u = 0;
 	this.state.s = Math.PI / 3;
@@ -81,7 +81,7 @@ Cannon.prototype.update = function(t, dt) {
 	}
 };
 
-function Ball(r, x, y, a) {
+export function Ball(r, x, y, a) {
 	RK41DObject.call(this);
 	this.nr = r; // Normalized radius and coordinates
 	this.nx = x;
@@ -182,7 +182,7 @@ Ball.prototype.grow = function(staticBalls) {
 	this.nr = Math.abs(minRadius);
 };
 
-function DontYouFillItGame() {
+export function DontYouFillItGame() {
 	this.state = this.PAUSED();
 	this.cannon = new Cannon();
 	this.staticBalls = [];

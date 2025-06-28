@@ -24,6 +24,10 @@ PWA_ICONS = www/ic_launcher_48.png \
 CACHED_FILES = cache.manifest \
                www/play.html \
                www/app.css \
+               www/stats.js \
+               www/observable.js \
+               www/dontyoufillit.js \
+               www/dontyoufillit_css_gui.js \
                www/app.js \
                www/service-worker.js \
                www/favicon.ico \
@@ -31,7 +35,7 @@ CACHED_FILES = cache.manifest \
                www/icon-32x32.png
 
 WEB_FILES = $(FAVICONS) $(APL_ICONS) $(PWA_ICONS) \
-            www/play_online.html www/play.html www/app.js www/app.css www/cache.manifest www/.htaccess www/manifest.json
+            www/play_online.html www/play.html www/stats.js www/observable.js www/dontyoufillit.js www/dontyoufillit_css_gui.js www/app.js www/app.css www/cache.manifest www/.htaccess www/manifest.json
 
 AND_RES = android/res
 MDPI = $(AND_RES)/mipmap-mdpi
@@ -133,7 +137,6 @@ tmp/LICENSE: LICENSE
 www/play_online.html: play.html tmp/LICENSE
 	# Add license, strip unneeded js files (due to minimization)
 	sed -e '/\$$LICENSE\$$/{r tmp/LICENSE' -e 'd}' \
-	    -e '/BEGIN JS/,/END JS/d' \
 	    -e '/BEGIN WEB/d' \
 	    -e '/END WEB/d' \
 	    $< > $@
@@ -157,9 +160,20 @@ www/service-worker.js: service-worker.js
 www/manifest.json: manifest.json
 	cp $< $@
 
-www/app.js: stats.js observable.js dontyoufillit.js dontyoufillit_css_gui.js app.js
-	closure-compiler --compilation_level SIMPLE_OPTIMIZATIONS $^ > $@
+www/stats.js: stats.js
+	cp $^ $@
 
+www/observable.js: observable.js
+	cp $^ $@
+
+www/dontyoufillit.js: dontyoufillit.js
+	cp $^ $@
+
+www/dontyoufillit_css_gui.js: dontyoufillit_css_gui.js
+	cp $^ $@
+
+www/app.js: app.js
+	cp $^ $@
 
 www/app.css: app.css
 	cat $< | cssmin -w 512 > $@

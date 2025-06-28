@@ -1,4 +1,4 @@
-function Observable() {
+export function Observable() {
 	this.observers = [];
 }
 Observable.prototype.addObserver = function(observer) {

@@ -3,7 +3,11 @@ CACHE MANIFEST
 CACHE:
 play.html
 app.css
-app.js
+dist/stats.js
+dist/observable.js
+dist/dontyoufillit.js
+dist/dontyoufillit_css_gui.js
+dist/app.js
 service-worker.js
 # BEGIN FAVICONS
 favicon.ico

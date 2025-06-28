@@ -1,4 +1,8 @@
 "use strict";
+
+import { DontYouFillItGame } from "./dontyoufillit.js";
+import { DontYouFillItCanvasGui } from "./dontyoufillit_css_gui.js";
+
 var game = new DontYouFillItGame();
 var gui = new DontYouFillItCanvasGui(game, parseInt(localStorage.getItem('highscore'), 10) || 0);
 

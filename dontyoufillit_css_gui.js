@@ -1,5 +1,8 @@
 "use strict";
-function DontYouFillItCanvasGui(game, highscore) {
+
+import { Observable } from "./observable.js";
+
+export function DontYouFillItCanvasGui(game, highscore) {
 	var that = this; // Allow closures to access this.
 
 	function px(v) { return v + 'px'; }
