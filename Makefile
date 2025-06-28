@@ -25,9 +25,6 @@ CACHED_FILES = cache.manifest \
                www/play.html \
                www/app.css \
                www/stats.js \
-               www/observable.js \
-               www/dontyoufillit.js \
-               www/dontyoufillit_css_gui.js \
                www/app.js \
                www/service-worker.js \
                www/favicon.ico \
@@ -35,7 +32,7 @@ CACHED_FILES = cache.manifest \
                www/icon-32x32.png
 
 WEB_FILES = $(FAVICONS) $(APL_ICONS) $(PWA_ICONS) \
-            www/play_online.html www/play.html www/stats.js www/observable.js www/dontyoufillit.js www/dontyoufillit_css_gui.js www/app.js www/app.css www/cache.manifest www/.htaccess www/manifest.json
+            www/play_online.html www/play.html www/stats.js www/app.js www/app.css www/cache.manifest www/.htaccess www/manifest.json
 
 AND_RES = android/res
 MDPI = $(AND_RES)/mipmap-mdpi
@@ -61,9 +58,6 @@ AND_LAUNCHER_ICONS = $(MDPI)/$(SQ_ICON) \
 AND_AST = android/assets
 
 AND_JS = $(AND_AST)/stats.js \
-         $(AND_AST)/observable.js \
-         $(AND_AST)/dontyoufillit.js \
-         $(AND_AST)/dontyoufillit_css_gui.js \
          $(AND_AST)/app.js
 
 AND_FILES = $(AND_LAUNCHER_ICONS) $(AND_JS) $(AND_AST)/app.css $(AND_AST)/play.html
@@ -163,17 +157,8 @@ www/manifest.json: manifest.json
 www/stats.js: stats.js
 	cp $^ $@
 
-www/observable.js: observable.js
-	cp $^ $@
-
-www/dontyoufillit.js: dontyoufillit.js
-	cp $^ $@
-
-www/dontyoufillit_css_gui.js: dontyoufillit_css_gui.js
-	cp $^ $@
-
-www/app.js: app.js
-	cp $^ $@
+www/app.js: observable.ts dontyoufillit.js dontyoufillit_css_gui.js app.js
+	npm run build-js
 
 www/app.css: app.css
 	cat $< | cssmin -w 512 > $@
@@ -186,14 +171,14 @@ $(AND_AST)/play.html: play.html tmp/LICENSE
 	# Add license, remove web specific content
 	sed -e '/\$$LICENSE\$$/{r tmp/LICENSE' -e 'd}' \
 	    -e '/BEGIN WEB/,/END WEB/d' \
-	    -e '/BEGIN JS/d' \
-	    -e '/END JS/d' \
 	    $< > $@
 
 
 $(AND_AST)/app.css: app.css
 	cp $< $@
 
+$(AND_AST)/app.js: www/app.js
+	cp $< $@
 
 $(AND_AST)/%.js: %.js
 	cp $< $@
