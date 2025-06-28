@@ -136,7 +136,7 @@ document.getElementById('startScreenLicenseButton').addEventListener('click', fu
 document.getElementById('licenseScreenBackButton').addEventListener('click', function(evt) {
 	evt.preventDefault();
 	popScreen();
-	licenseScreen.reset();
+	licenseScreen.querySelectorAll('details').forEach(function details() { details.open = false; });
 });
 
 document.getElementById('framerateCheckbox').addEventListener('change', function(evt) {
@@ -164,49 +164,6 @@ gui.addObserver(function(message, score) {
 
 pushScreen(startScreen);
 
-
-function setNodeText(node, text) {
-	var child = node.firstChild;
-	do {
-		if (3 == child.nodeType) {
-			child.nodeValue = text;
-			break;
-		}
-	} while (child = child.nextSibling);
-}
-
-Array.prototype.forEach.call(document.getElementsByClassName('hideable'), function(hideable) {
-	var foreach_enablers = function(cbk) {
-		Array.prototype.forEach.call(document.getElementsByClassName(hideable.getAttribute('data-toggle')), cbk);
-	};
-
-	hideable.reset = function() {
-		this.style.display = 'none';
-		foreach_enablers(function(e) {
-			setNodeText(e, "[-]");
-		});
-	};
-
-	foreach_enablers(function(enabler) {
-		enabler.addEventListener('click', function(evt) {
-			var visible = hideable.style.display != 'none';
-			foreach_enablers(function(e) {
-				setNodeText(e, visible ? "[+]" : "[-]");
-			});
-			hideable.style.display = visible ? 'none' : 'block';
-			evt.preventDefault();
-		});
-	});
-
-	hideable.style.display = 'none';
-});
-
 optionsScreen.init = function() {
 	document.getElementById('framerateCheckbox').checked = gui.hasObserver(statsObserver);
-};
-
-licenseScreen.reset = function() {
-	Array.prototype.forEach.call(this.getElementsByClassName('hideable'), function(hideable) {
-		hideable.reset();
-	});
 };
