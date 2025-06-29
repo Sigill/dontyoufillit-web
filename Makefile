@@ -24,7 +24,6 @@ PWA_ICONS = www/ic_launcher_48.png \
 CACHED_FILES = cache.manifest \
                www/play.html \
                www/app.css \
-               www/stats.js \
                www/app.js \
                www/service-worker.js \
                www/favicon.ico \
@@ -32,7 +31,7 @@ CACHED_FILES = cache.manifest \
                www/icon-32x32.png
 
 WEB_FILES = $(FAVICONS) $(APL_ICONS) $(PWA_ICONS) \
-            www/play_online.html www/play.html www/stats.js www/app.js www/app.css www/cache.manifest www/.htaccess www/manifest.json
+            www/play_online.html www/play.html www/app.js www/app.css www/cache.manifest www/.htaccess www/manifest.json
 
 AND_RES = android/res
 MDPI = $(AND_RES)/mipmap-mdpi
@@ -57,8 +56,7 @@ AND_LAUNCHER_ICONS = $(MDPI)/$(SQ_ICON) \
 
 AND_AST = android/assets
 
-AND_JS = $(AND_AST)/stats.js \
-         $(AND_AST)/app.js
+AND_JS = $(AND_AST)/app.js
 
 AND_FILES = $(AND_LAUNCHER_ICONS) $(AND_JS) $(AND_AST)/app.css $(AND_AST)/play.html
 
@@ -154,10 +152,7 @@ www/service-worker.js: service-worker.js
 www/manifest.json: manifest.json
 	cp $< $@
 
-www/stats.js: stats.js
-	cp $^ $@
-
-www/app.js: observable.ts dontyoufillit.js dontyoufillit_css_gui.js app.js
+www/app.js: ball.ts cannon.ts observable.ts rk4-integrator.ts utils.ts dontyoufillit.ts dontyoufillit_css_gui.ts app.ts
 	npm run build-js
 
 www/app.css: app.css

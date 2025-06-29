@@ -3,7 +3,6 @@ CACHE MANIFEST
 CACHE:
 play.html
 app.css
-stats.js
 app.js
 service-worker.js
 # BEGIN FAVICONS
