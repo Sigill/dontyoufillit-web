@@ -14,11 +14,12 @@ stats.dom.style.bottom = '0px';
 stats.dom.style.display = 'none';
 document.body.appendChild(stats.dom);
 
-function statsObserver(message: 'beginStep' | 'endStep') {
-  if (message === 'beginStep')
-    stats.begin();
-  else if (message === 'endStep')
-    stats.end();
+function beginStep() {
+  stats.begin();
+}
+
+function endStep() {
+  stats.end();
 }
 
 function setDebugMode(enabled: boolean) {
@@ -26,10 +27,12 @@ function setDebugMode(enabled: boolean) {
 
   if (enabled) {
     stats.dom.style.display = 'block';
-    gui.observable.addObserver(statsObserver);
+    gui.observable.addEventListener('beginStep', beginStep);
+    gui.observable.addEventListener('endStep', endStep);
   } else {
     stats.dom.style.display = 'none';
-    gui.observable.removeObserver(statsObserver);
+    gui.observable.removeEventListener('beginStep', beginStep);
+    gui.observable.removeEventListener('endStep', endStep);
   }
 }
 
@@ -107,7 +110,7 @@ document.getElementById('startScreenPlayButton')!.addEventListener('click', func
 
 document.getElementById('startScreenOptionsButton')!.addEventListener('click', function (evt) {
   evt.preventDefault();
-  document.querySelector<HTMLInputElement>('#framerateCheckbox')!.checked = gui.observable.hasObserver(statsObserver);
+  document.querySelector<HTMLInputElement>('#framerateCheckbox')!.checked = asBool(localStorage.getItem("debug"));
   pushScreen(optionsScreen);
 });
 
@@ -148,23 +151,21 @@ document.getElementById('framerateCheckbox')!.addEventListener('change', functio
   setDebugMode(asBool(this.checked));
 });
 
-gui.observable.addObserver(function (message) {
-  if (message === 'pause') pushScreen(pauseScreen);
+gui.observable.addEventListener('pause', () => {
+  pushScreen(pauseScreen);
 });
 
-gui.observable.addObserver(function (message, score) {
-  if (message === 'gameover') {
-    const highscore = parseInt(localStorage.getItem('highscore') || '0', 10);
-    const newHighscore = score > highscore;
+gui.observable.addEventListener('gameover', function (score) {
+  const highscore = parseInt(localStorage.getItem('highscore') || '0', 10);
+  const newHighscore = score > highscore;
 
-    if (newHighscore) localStorage.setItem('highscore', score.toString(10));
+  if (newHighscore) localStorage.setItem('highscore', score.toString(10));
 
-    document.getElementById('gameoverScreenScoreMessage')!.style.display = (newHighscore ? 'none' : 'inline');
-    document.getElementById('gameoverScreenHighscoreMessage')!.style.display = (newHighscore ? 'inline' : 'none');
-    document.getElementById('gameoverScreenScore')!.innerHTML = score;
+  document.getElementById('gameoverScreenScoreMessage')!.style.display = (newHighscore ? 'none' : 'inline');
+  document.getElementById('gameoverScreenHighscoreMessage')!.style.display = (newHighscore ? 'inline' : 'none');
+  document.getElementById('gameoverScreenScore')!.innerHTML = score.toString();
 
-    pushScreen(gameoverScreen);
-  }
+  pushScreen(gameoverScreen);
 });
 
 pushScreen(startScreen);

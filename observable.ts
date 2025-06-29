@@ -1,27 +1,41 @@
-export type Observer = (...args: any[]) => void;
+export interface EventMap {
+  [eventName: string]: Array<unknown>;
+};
 
-export class Observable {
-  #observers = new Array<Observer>();
+export type EventListener<Data extends Array<unknown>> = (...data: Data) => void;
 
-  addObserver(observer: Observer): void {
-    this.#observers.push(observer);
+export class Observable<Events extends EventMap> {
+  #listeners: {
+    [K in keyof Events]?: Array<EventListener<Events[K]>>;
+  } = {};
+
+  addEventListener<EventName extends keyof Events>(
+    eventName: EventName,
+    listener: EventListener<Events[EventName]>
+  ) {
+    (this.#listeners[eventName] ??= []).push(listener);
   }
 
-  removeObserver(observer: Observer): void {
-    const index = this.#observers.indexOf(observer);
-    if (index !== -1) {
-      this.#observers.splice(index, 1);
+  removeEventListener<EventName extends keyof Events>(
+    eventName: EventName,
+    listener: EventListener<Events[EventName]>
+  ) {
+    if (this.#listeners[eventName] !== undefined) {
+      const index = this.#listeners[eventName].indexOf(listener);
+      if (index !== -1) {
+        this.#listeners[eventName].splice(index, 1);
+      }
     }
   }
 
-  hasObserver(observer: Observer): boolean {
-    const index = this.#observers.indexOf(observer);
-    return index !== -1;
-  }
-
-  notifyObservers(...args: any[]): void {
-    for (let i = this.#observers.length - 1; i >= 0; i--) {
-      this.#observers[i](...args);
+  dispatchEvent<EventName extends keyof Events>(
+    eventName: EventName,
+    ...data: Events[EventName]
+  ) {
+    if (this.#listeners[eventName] !== undefined) {
+      for (const listener of this.#listeners[eventName]) {
+        listener(...data);
+      }
     }
   }
 }

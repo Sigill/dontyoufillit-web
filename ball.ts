@@ -70,7 +70,8 @@ export class Ball extends RK41DObject {
         // Assuming no speed and an infinite mass for the second ball.
         const phi = Math.atan2(normalY, normalX), theta = this.direction, speed = this.state.s;
 
-        const velocityX = -speed * Math.cos(theta - phi) * Math.cos(phi) + speed * Math.sin(theta - phi) * Math.cos(phi + Math.PI / 2), velocityY = -speed * Math.cos(theta - phi) * Math.sin(phi) + speed * Math.sin(theta - phi) * Math.sin(phi + Math.PI / 2);
+        const velocityX = -speed * Math.cos(theta - phi) * Math.cos(phi) + speed * Math.sin(theta - phi) * Math.cos(phi + Math.PI / 2);
+        const velocityY = -speed * Math.cos(theta - phi) * Math.sin(phi) + speed * Math.sin(theta - phi) * Math.sin(phi + Math.PI / 2);
 
         // Linear speed doesn't change, only the direction.
         this.direction = Math.atan2(velocityY, velocityX);

@@ -18,7 +18,12 @@ export class DontYouFillItCssGui {
 
   state: number;
   game: DontYouFillItHTMLGame;
-  observable: Observable;
+  observable = new Observable<{
+    beginStep: [];
+    endStep: [];
+    gameover: [number];
+    pause: [];
+  }>();
   highscore: number;
 
   private readonly container = document.getElementById('Game')!;
@@ -53,7 +58,6 @@ export class DontYouFillItCssGui {
   constructor(game: DontYouFillItGame, highscore: number) {
     this.state = DontYouFillItCssGui.MENU;
     this.game = game as DontYouFillItHTMLGame;
-    this.observable = new Observable();
     this.highscore = highscore;
 
     this.DefaultBall.removeAttribute('id');
@@ -203,7 +207,7 @@ export class DontYouFillItCssGui {
   }
 
   private step(time: number) {
-    this.observable.notifyObservers('beginStep');
+    this.observable.dispatchEvent('beginStep');
 
     if (this.game.state === DontYouFillItGame.RUNNING) {
       this.game.update(time);
@@ -211,14 +215,14 @@ export class DontYouFillItCssGui {
 
     this.draw();
 
-    this.observable.notifyObservers('endStep');
+    this.observable.dispatchEvent('endStep');
 
     if (this.game.state === DontYouFillItGame.RUNNING) {
       window.requestAnimationFrame((t) => this.step(t));
     } else if (this.game.state === DontYouFillItGame.GAMEOVER) {
       this.highscore = Math.max(this.game.score, this.highscore);
 
-      this.observable.notifyObservers('gameover', this.game.score);
+      this.observable.dispatchEvent('gameover', this.game.score);
 
       for (let i = 0; i < this.game.staticBalls.length; ++i) {
         const b = this.game.staticBalls[i];
@@ -230,7 +234,7 @@ export class DontYouFillItCssGui {
   private pauseGame() {
     if (this.game.state === DontYouFillItGame.RUNNING) {
       this.game.pause();
-      this.observable.notifyObservers('pause');
+      this.observable.dispatchEvent('pause');
     }
   }
 

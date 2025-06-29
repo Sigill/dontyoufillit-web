@@ -41,11 +41,11 @@ export class DontYouFillItGame {
    */
   update(time: number) {
     if (this.currentBall) {
-      let last = this.lastUpdateTime, current;
+      let last = this.lastUpdateTime;
       const steps = Math.floor(time - this.lastUpdateTime);
 
       for (let i = 1; i <= steps; ++i) {
-        current = (this.lastUpdateTime * (steps - i) + time * i) / steps;
+        const current = (this.lastUpdateTime * (steps - i) + time * i) / steps;
         this.currentBall.update(last / 1000, (current - last) / 1000, this.staticBalls);
 
         for (let j = this.staticBalls.length - 1; j >= 0; --j) {
