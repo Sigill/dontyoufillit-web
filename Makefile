@@ -156,7 +156,7 @@ www/app.js: ball.ts cannon.ts observable.ts rk4-integrator.ts utils.ts dontyoufi
 	npm run build-js
 
 www/app.css: app.css
-	cat $< | cssmin -w 512 > $@
+	npm run build-css
 
 
 www/.htaccess: .htaccess

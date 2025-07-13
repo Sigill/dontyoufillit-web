@@ -153,12 +153,12 @@ body, html {
 	/*transform: rotate(-45deg);*/
 }
 
-.B {
+.ball {
 	position: absolute;
 	background-color: transparent;
 }
 
-.B .disk {
+.ball .disk {
 	width: 100%;
 	height:0;
 	padding-bottom: 100%;
@@ -168,13 +168,13 @@ body, html {
 	background: white;
 }
 
-.B .num {
+.ball .num {
 	position: absolute;
 	background-color: black;
 	height: 70%;
 }
 
-.B .b {
+.ball .bar {
 	position: absolute;
 	background-color: white;
 	/* Should be 30%, but this might create stitching issues */
@@ -182,33 +182,33 @@ body, html {
 	height: 7.5%;
 }
 
-.B1 .num {
+.ball[data-counter="1"] .num {
 	width: 20%;
 	left: 40%;
 	top: 15%;
 }
 
-.B1 .b {
+.ball[data-counter="1"] .bar {
 	display: none;
 }
 
-.B2 .num, .B3 .num {
+.ball[data-counter="2"] .num, .ball[data-counter="3"] .num {
 	width: 50%;
 	left: 25%;
 	top: 15%;
 }
 
-.B2 .b1, .B3 .b1 {
+.ball[data-counter="2"] .bar-1, .ball[data-counter="3"] .bar-1 {
 	left: 20%;
 	top: 35%;
 }
 
-.B2 .b2 {
+.ball[data-counter="2"] .bar-2 {
 	left: 45%;
 	top: 57.5%;
 }
 
-.B3 .b2 {
+.ball[data-counter="3"] .bar-2 {
 	left: 20%;
 	top: 57.5%;
 }

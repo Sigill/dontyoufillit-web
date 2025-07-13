@@ -5,12 +5,16 @@ import { addTouchOrClickEvent, px } from "./utils";
 
 type HTMLBallDecoration = {
   dom: HTMLDivElement;
-  was?: number;
 };
 
 type HTMLBall = Ball & HTMLBallDecoration;
 
 type DontYouFillItHTMLGame = Omit<DontYouFillItGame, 'staticBalls'> & { staticBalls: Array<HTMLBall> };
+
+function makeBallDom() {
+  const template = document.querySelector<HTMLTemplateElement>('#default-ball')!.content.cloneNode(true) as HTMLElement;
+  return template.firstElementChild as HTMLDivElement;
+}
 
 export class DontYouFillItCssGui {
   static readonly MENU = 1;
@@ -30,7 +34,6 @@ export class DontYouFillItCssGui {
   private readonly board = document.getElementById('Board')!;
   private readonly staticBallLayer = document.getElementById('StaticBallLayer')!;
   private readonly liveBallLayer = document.getElementById('LiveBallLayer')!;
-  private readonly DefaultBall = document.getElementById('DefaultBall')!;
   private readonly LiveBall: HTMLElement;
   private readonly Turret = document.getElementById('Turret')!;
   private readonly Highscore = document.getElementById('highscore')!;
@@ -60,11 +63,8 @@ export class DontYouFillItCssGui {
     this.game = game as DontYouFillItHTMLGame;
     this.highscore = highscore;
 
-    this.DefaultBall.removeAttribute('id');
-
-    this.LiveBall = this.DefaultBall.cloneNode(true) as HTMLElement;
+    this.LiveBall = makeBallDom();
     this.LiveBall.setAttribute('id', 'LiveBall');
-    this.LiveBall.classList.add('B3');
     this.LiveBall.style.display = 'none';
     this.liveBallLayer.appendChild(this.LiveBall);
 
@@ -134,7 +134,7 @@ export class DontYouFillItCssGui {
 
   private decorateBall(b: Ball & Partial<HTMLBallDecoration>) {
     if (b.dom === undefined) {
-      b.dom = this.DefaultBall.cloneNode(true) as HTMLDivElement;
+      b.dom = makeBallDom();
       this.staticBallLayer.appendChild(b.dom);
     }
   }
@@ -158,15 +158,7 @@ export class DontYouFillItCssGui {
 
       this.decorateBall(b);
 
-      if ((b.was === undefined) || (b.was !== b.counter)) {
-        const klassList = b.dom.classList;
-        if (b.was !== undefined) {
-          klassList.remove('B' + b.was);
-        }
-
-        b.was = b.counter;
-        klassList.add('B' + b.counter);
-      }
+      b.dom.dataset.counter = b.counter.toString();
 
       if (this.redrawUponResize || newBall) {
         const upscaleRatio = this.computeBallUpscaleRatio(b.nr * (this.SCALE - 2));

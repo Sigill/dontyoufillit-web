@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "build-js": "npx esbuild --bundle --outfile=www/app.js --sourcemap app.ts",
+    "build-css": "npx esbuild --minify --outfile=www/app.css --sourcemap app.css",
     "build-watch": "npm run build-js -- --watch",
     "build": "make"
   },
