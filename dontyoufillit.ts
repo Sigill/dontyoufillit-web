@@ -7,33 +7,17 @@ export class DontYouFillItGame {
   static readonly RUNNING = 2;
   static readonly GAMEOVER = 3;
 
-  state: number;
-  cannon: Cannon;
-  staticBalls: Array<Ball>;
-  currentBall: Ball | null;
-  lastUpdateTime: number;
-  score: number;
+  static readonly DEFAULT_BALL_RADIUS = 1 / 40.0;
+  static readonly CANNON_Y_POSITION = -1 / 6.0;
+  static readonly CANNON_BASE_HEIGHT = 1 / 15.0;
+  static readonly CANNON_LENGTH = 1 / 15.0;
 
-  DEFAULT_BALL_RADIUS: number;
-  CANNON_Y_POSITION: number;
-  CANNON_BASE_HEIGHT: number;
-  CANNON_LENGTH: number;
-
-  constructor() {
-    this.state = DontYouFillItGame.PAUSED;
-    this.cannon = new Cannon();
-    this.staticBalls = [];
-    this.currentBall = null;
-
-    this.lastUpdateTime = now();
-
-    this.score = 0;
-
-    this.DEFAULT_BALL_RADIUS = 1 / 40.0;
-    this.CANNON_Y_POSITION = -1 / 6.0;
-    this.CANNON_BASE_HEIGHT = 1 / 15.0;
-    this.CANNON_LENGTH = 1 / 15.0;
-  }
+  state = DontYouFillItGame.PAUSED;
+  cannon = new Cannon();
+  staticBalls: Array<Ball> = [];
+  currentBall: Ball | null = null;
+  lastUpdateTime = now();
+  score = 0;
 
   /*
    * Position of the current ball is important, so it will be calculated 1000 times per second.
@@ -94,9 +78,9 @@ export class DontYouFillItGame {
 
   fire() {
     this.currentBall = new Ball(
-      this.DEFAULT_BALL_RADIUS,
-      0.5 + Math.cos(this.cannon.getAngle()) * this.CANNON_LENGTH,
-      this.CANNON_Y_POSITION + this.CANNON_BASE_HEIGHT + Math.sin(this.cannon.getAngle()) * this.CANNON_LENGTH,
+      DontYouFillItGame.DEFAULT_BALL_RADIUS,
+      0.5 + Math.cos(this.cannon.getAngle()) * DontYouFillItGame.CANNON_LENGTH,
+      DontYouFillItGame.CANNON_Y_POSITION + DontYouFillItGame.CANNON_BASE_HEIGHT + Math.sin(this.cannon.getAngle()) * DontYouFillItGame.CANNON_LENGTH,
       this.cannon.getAngle()
     );
   }

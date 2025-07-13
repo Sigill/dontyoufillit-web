@@ -248,7 +248,7 @@ export class DontYouFillItCssGui {
     this.liveBallLayer.style.width = this.liveBallLayer.style.height = px(this.SCALE);
     this.staticBallLayer.style.top = this.liveBallLayer.style.top = px(this.TOP_BORDER);
 
-    let liveBallSizeInPercent = 200 * this.game.DEFAULT_BALL_RADIUS;
+    let liveBallSizeInPercent = 200 * DontYouFillItGame.DEFAULT_BALL_RADIUS;
     if (this.liveBallUpscaleRatio !== undefined)
       liveBallSizeInPercent *= this.liveBallUpscaleRatio;
     this.LiveBall.style.width = this.LiveBall.style.height = liveBallSizeInPercent + '%';
@@ -277,7 +277,7 @@ export class DontYouFillItCssGui {
     this.LEFT_BORDER = 0;
     this.RIGHT_BORDER = this.LEFT_BORDER + this.SCALE;
 
-    this.liveBallUpscaleRatio = this.computeBallUpscaleRatio(this.game.DEFAULT_BALL_RADIUS * (this.SCALE - 2));
+    this.liveBallUpscaleRatio = this.computeBallUpscaleRatio(DontYouFillItGame.DEFAULT_BALL_RADIUS * (this.SCALE - 2));
 
     document.getElementById('Score')!.style.font = this.SCALE / 12 + 'px/1 Arial';
   }
