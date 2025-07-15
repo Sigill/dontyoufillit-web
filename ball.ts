@@ -1,6 +1,13 @@
 import { RK41DObject } from "./rk4-integrator.js";
 import { normalizeRadian, vectorLength } from "./utils.js";
 
+export interface StaticBall {
+  counter: number;
+  nr: number;
+  nx: number;
+  ny: number;
+}
+
 export class Ball extends RK41DObject {
   counter: number;
   nr: number;
@@ -38,7 +45,7 @@ export class Ball extends RK41DObject {
     this.bounce(staticBalls);
   }
 
-  private bounce(staticBalls: Array<Ball>) {
+  private bounce(staticBalls: Array<StaticBall>) {
     if (this.nx > 1 - this.nr) {
       this.nx = 1 - this.nr;
       this.direction = normalizeRadian(Math.PI - this.direction);
@@ -101,5 +108,14 @@ export class Ball extends RK41DObject {
     if (minRadius > available) minRadius = available;
 
     this.nr = Math.abs(minRadius);
+  }
+
+  staticSnapshot(): StaticBall {
+    return {
+      counter: this.counter,
+      nr: this.nr,
+      nx: this.nx,
+      ny: this.ny,
+    };
   }
 }

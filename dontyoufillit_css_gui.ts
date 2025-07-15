@@ -28,8 +28,9 @@ export class DontYouFillItCssGui {
   private readonly liveBallLayer = selectElement('#LiveBallLayer');
   private readonly LiveBall: HTMLElement;
   private readonly Turret = selectElement('#Turret');
-  private readonly Highscore = selectElement('#highscore');
-  private readonly Score = selectElement('#score');
+  private readonly highscoreSpan = selectElement('#Board #highscore');
+  private readonly scoreSpan = selectElement('#Board #score');
+  private readonly livesSpan = selectElement('#Board #lives');
 
   private lastClickDate = 0;
   private ballsDom = new Map<Ball, HTMLDivElement>();
@@ -158,8 +159,9 @@ export class DontYouFillItCssGui {
 
   private draw() {
     if (this.state === DontYouFillItCssGui.GAME) {
-      lazyAttrAssign(this.Highscore, this.highscore.toString());
-      lazyAttrAssign(this.Score, this.game.score.toString());
+      lazyAttrAssign(this.highscoreSpan, this.highscore.toString());
+      lazyAttrAssign(this.scoreSpan, this.game.score.toString());
+      lazyAttrAssign(this.livesSpan.dataset, this.game.lives.toString(), 'counter');
 
       this.drawStaticBalls();
       this.drawCannon();
@@ -243,7 +245,7 @@ export class DontYouFillItCssGui {
 
     this.liveBallUpscaleRatio = this.computeBallUpscaleRatio(DontYouFillItGame.DEFAULT_BALL_RADIUS * (this.SCALE - 2));
 
-    selectElement('#Score').style.font = this.SCALE / 12 + 'px/1 Arial';
+    selectElement('#Board #header').style.font = this.SCALE / 12 + 'px/1 Arial';
   }
 
   private isGhostEvent(evt: MouseEvent | TouchEvent) {

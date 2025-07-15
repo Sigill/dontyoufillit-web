@@ -58,11 +58,12 @@ if (query_string['debug'] !== undefined) {
 
 
 const screenContainer = selectElement('#screenContainer'),
-      startScreen = selectElement('#startScreen'),
+      startScreen = selectElement('#start-screen'),
       optionsScreen = selectElement('#optionsScreen'),
-      pauseScreen = selectElement('#pauseScreen'),
-      gameoverScreen = selectElement('#gameoverScreen'),
-      licenseScreen = selectElement('#licenseScreen');
+      pauseScreen = selectElement('#pause-screen'),
+      gameoverScreen = selectElement('#gameover-screen'),
+      licenseScreen = selectElement('#licenseScreen'),
+      startWithThreeLivesButton = selectElement<HTMLInputElement>('#checkbox-start-three-lives');
 
 const screens = new Array<HTMLElement>;
 
@@ -103,19 +104,20 @@ function popAllScreens() {
   screenContainer.style.display = 'none';
 }
 
-selectElement('#startScreenPlayButton').addEventListener('click', function (evt) {
+selectElement('#start-screen #play-button').addEventListener('click', function (evt) {
   evt.preventDefault();
-  gui.resume();
+  game.lives = startWithThreeLivesButton.checked ? 3 : 0;
+  gui.reset();
   popAllScreens();
 });
 
-selectElement('#startScreenOptionsButton').addEventListener('click', function (evt) {
+selectElement('#start-screen #options-button').addEventListener('click', function (evt) {
   evt.preventDefault();
   selectElement<HTMLInputElement>('#framerateCheckbox').checked = asBool(localStorage.getItem("debug"));
   pushScreen(optionsScreen);
 });
 
-selectElement('#startScreenLicenseButton').addEventListener('click', function (evt) {
+selectElement('#start-screen #license-button').addEventListener('click', function (evt) {
   evt.preventDefault();
   pushScreen(licenseScreen);
 });
@@ -125,21 +127,43 @@ selectElement('#optionsScreenBackButton').addEventListener('click', function (ev
   popScreen();
 });
 
-selectElement('#pauseScreenContinueButton').addEventListener('click', function (evt) {
+selectElement('#pause-screen #continue-button').addEventListener('click', function (evt) {
   evt.preventDefault();
   gui.resume();
   popScreen();
 });
 
-selectElement('#pauseScreenOptionsButton').addEventListener('click', function (evt) {
+selectElement('#pause-screen #options-button').addEventListener('click', function (evt) {
   evt.preventDefault();
   pushScreen(optionsScreen);
 });
 
-selectElement('#gameoverScreenPlayAgainButton').addEventListener('click', function (evt) {
+selectElement('#pause-screen #menu-button').addEventListener('click', function (evt) {
   evt.preventDefault();
+  popScreen();
+  pushScreen(startScreen);
+});
+
+selectElement('#retry-button').addEventListener('click', function (evt) {
+  evt.preventDefault();
+
+  game.useLife();
+  gui.resume();
+
+  popAllScreens();
+});
+
+selectElement('#play-again-button').addEventListener('click', function (evt) {
+  evt.preventDefault();
+  game.lives = startWithThreeLivesButton.checked ? 3 : 0;
   gui.reset();
   popAllScreens();
+});
+
+selectElement('#gameover-screen #menu-button').addEventListener('click', function (evt) {
+  evt.preventDefault();
+  popScreen();
+  pushScreen(startScreen);
 });
 
 selectElement('#licenseScreenBackButton').addEventListener('click', function (evt) {
@@ -160,11 +184,18 @@ gui.observable.addEventListener('gameover', function (score) {
   const highscore = parseInt(localStorage.getItem('highscore') || '0', 10);
   const newHighscore = score > highscore;
 
-  if (newHighscore) localStorage.setItem('highscore', score.toString(10));
+  if (newHighscore) {
+    localStorage.setItem('highscore', score.toString(10));
+  }
 
-  selectElement('#gameoverScreenScoreMessage').style.display = (newHighscore ? 'none' : 'inline');
-  selectElement('#gameoverScreenHighscoreMessage').style.display = (newHighscore ? 'inline' : 'none');
-  selectElement('#gameoverScreenScore').innerHTML = score.toString();
+  selectElement('#gameover-screen #score-message').style.display = (newHighscore ? 'none' : 'inline');
+  selectElement('#gameover-screen #highscore-message').style.display = (newHighscore ? 'inline' : 'none');
+  selectElement('#gameover-screen #score').innerText = score.toString();
+
+  selectElement('#gameover-screen #retry-button #remaining-lives').innerText = `${game.lives} ${game.lives > 1 ? 'lives' : 'life'}`;
+  selectElement('#gameover-screen #retry-button').parentElement!.style.display = game.canUseLife() ? 'block' : 'none';
+
+  selectElement('#gameover-screen #play-again-button').parentElement!.style.display = !game.canUseLife() ? 'block' : 'none';
 
   pushScreen(gameoverScreen);
 });
