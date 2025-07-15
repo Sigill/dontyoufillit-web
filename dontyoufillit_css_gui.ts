@@ -84,11 +84,11 @@ export class DontYouFillItCssGui {
     this.Turret.style.transform = `rotate(-${this.game.cannon.getAngle()}rad)`;
   }
 
-  private minimumBallSize = 16;
+  static readonly #minimumBallSize = 16;
 
   private computeBallUpscaleRatio(ballRadiusInPx: number) {
-    if (ballRadiusInPx < this.minimumBallSize)
-      return this.minimumBallSize / ballRadiusInPx;
+    if (ballRadiusInPx < DontYouFillItCssGui.#minimumBallSize)
+      return DontYouFillItCssGui.#minimumBallSize / ballRadiusInPx;
     else
       return undefined;
   }
@@ -97,7 +97,7 @@ export class DontYouFillItCssGui {
     let size = b.nr * (this.SCALE - 2);
 
     if (r !== undefined)
-      size = this.minimumBallSize;
+      size = DontYouFillItCssGui.#minimumBallSize;
 
     const dx = b.nx * (this.SCALE - 2) - size;
     const dy = (1 - b.ny) * (this.SCALE - 2) - size;
@@ -212,10 +212,10 @@ export class DontYouFillItCssGui {
     this.liveBallLayer.style.width = this.liveBallLayer.style.height = px(this.SCALE);
     this.staticBallLayer.style.top = this.liveBallLayer.style.top = px(this.TOP_BORDER);
 
-    let liveBallSizeInPercent = 200 * DontYouFillItGame.DEFAULT_BALL_RADIUS;
+    let liveBallDiameterInPercent = 200 * DontYouFillItGame.DEFAULT_BALL_RADIUS;
     if (this.liveBallUpscaleRatio !== undefined)
-      liveBallSizeInPercent *= this.liveBallUpscaleRatio;
-    this.LiveBall.style.width = this.LiveBall.style.height = liveBallSizeInPercent + '%';
+      liveBallDiameterInPercent *= this.liveBallUpscaleRatio;
+    this.LiveBall.style.width = this.LiveBall.style.height = liveBallDiameterInPercent + '%';
 
     this.redrawStaticBalls = true;
 
