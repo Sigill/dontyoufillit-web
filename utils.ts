@@ -29,3 +29,11 @@ export function addTouchOrClickEvent(element: string | HTMLElement, callback: (t
   e.addEventListener('click', callback);
   e.addEventListener('touchstart', callback, { passive: false });
 }
+
+export function selectElement<T extends Element = HTMLElement>(selector: string, parent: ParentNode = document): T {
+  const element = parent.querySelector<T>(selector);
+  if (element === null) {
+    throw new Error(`Could not find an element matching the '${selector}' selector.`);
+  }
+  return element;
+}

@@ -1,6 +1,7 @@
+import Stats from "stats.js";
 import { DontYouFillItGame } from "./dontyoufillit";
 import { DontYouFillItCssGui } from "./dontyoufillit_css_gui";
-import Stats from "stats.js";
+import { selectElement } from "./utils";
 
 const game = new DontYouFillItGame();
 const gui = new DontYouFillItCssGui(game, parseInt(localStorage.getItem('highscore') || '0', 10));
@@ -56,12 +57,12 @@ if (query_string['debug'] !== undefined) {
 }
 
 
-const screenContainer = document.querySelector<HTMLElement>('#screenContainer')!,
-      startScreen = document.querySelector<HTMLElement>('#startScreen')!,
-      optionsScreen = document.querySelector<HTMLElement>('#optionsScreen')!,
-      pauseScreen = document.querySelector<HTMLElement>('#pauseScreen')!,
-      gameoverScreen = document.querySelector<HTMLElement>('#gameoverScreen')!,
-      licenseScreen = document.querySelector<HTMLElement>('#licenseScreen')!;
+const screenContainer = selectElement('#screenContainer'),
+      startScreen = selectElement('#startScreen'),
+      optionsScreen = selectElement('#optionsScreen'),
+      pauseScreen = selectElement('#pauseScreen'),
+      gameoverScreen = selectElement('#gameoverScreen'),
+      licenseScreen = selectElement('#licenseScreen');
 
 const screens = new Array<HTMLElement>;
 
@@ -102,52 +103,52 @@ function popAllScreens() {
   screenContainer.style.display = 'none';
 }
 
-document.getElementById('startScreenPlayButton')!.addEventListener('click', function (evt) {
+selectElement('#startScreenPlayButton').addEventListener('click', function (evt) {
   evt.preventDefault();
   gui.resume();
   popAllScreens();
 });
 
-document.getElementById('startScreenOptionsButton')!.addEventListener('click', function (evt) {
+selectElement('#startScreenOptionsButton').addEventListener('click', function (evt) {
   evt.preventDefault();
-  document.querySelector<HTMLInputElement>('#framerateCheckbox')!.checked = asBool(localStorage.getItem("debug"));
+  selectElement<HTMLInputElement>('#framerateCheckbox').checked = asBool(localStorage.getItem("debug"));
   pushScreen(optionsScreen);
 });
 
-document.getElementById('optionsScreenBackButton')!.addEventListener('click', function (evt) {
+selectElement('#optionsScreenBackButton').addEventListener('click', function (evt) {
   evt.preventDefault();
   popScreen();
 });
 
-document.getElementById('pauseScreenContinueButton')!.addEventListener('click', function (evt) {
+selectElement('#pauseScreenContinueButton').addEventListener('click', function (evt) {
   evt.preventDefault();
   gui.resume();
   popScreen();
 });
 
-document.getElementById('pauseScreenOptionsButton')!.addEventListener('click', function (evt) {
+selectElement('#pauseScreenOptionsButton').addEventListener('click', function (evt) {
   evt.preventDefault();
   pushScreen(optionsScreen);
 });
 
-document.getElementById('gameoverScreenPlayAgainButton')!.addEventListener('click', function (evt) {
+selectElement('#gameoverScreenPlayAgainButton').addEventListener('click', function (evt) {
   evt.preventDefault();
   gui.reset();
   popAllScreens();
 });
 
-document.getElementById('startScreenLicenseButton')!.addEventListener('click', function (evt) {
+selectElement('#startScreenLicenseButton').addEventListener('click', function (evt) {
   evt.preventDefault();
   pushScreen(licenseScreen);
 });
 
-document.getElementById('licenseScreenBackButton')!.addEventListener('click', function (evt) {
+selectElement('#licenseScreenBackButton').addEventListener('click', function (evt) {
   evt.preventDefault();
   popScreen();
   licenseScreen.querySelectorAll('details').forEach(function (details) { details.open = false; });
 });
 
-document.getElementById('framerateCheckbox')!.addEventListener('change', function (this: HTMLInputElement) {
+selectElement('#framerateCheckbox').addEventListener('change', function (this: HTMLInputElement) {
   setDebugMode(asBool(this.checked));
 });
 
@@ -161,9 +162,9 @@ gui.observable.addEventListener('gameover', function (score) {
 
   if (newHighscore) localStorage.setItem('highscore', score.toString(10));
 
-  document.getElementById('gameoverScreenScoreMessage')!.style.display = (newHighscore ? 'none' : 'inline');
-  document.getElementById('gameoverScreenHighscoreMessage')!.style.display = (newHighscore ? 'inline' : 'none');
-  document.getElementById('gameoverScreenScore')!.innerHTML = score.toString();
+  selectElement('#gameoverScreenScoreMessage').style.display = (newHighscore ? 'none' : 'inline');
+  selectElement('#gameoverScreenHighscoreMessage').style.display = (newHighscore ? 'inline' : 'none');
+  selectElement('#gameoverScreenScore').innerHTML = score.toString();
 
   pushScreen(gameoverScreen);
 });

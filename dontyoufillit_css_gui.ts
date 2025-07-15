@@ -1,7 +1,7 @@
 import { Ball } from "./ball";
 import { DontYouFillItGame } from "./dontyoufillit";
 import { Observable } from "./observable";
-import { addTouchOrClickEvent, px } from "./utils";
+import { addTouchOrClickEvent, px, selectElement } from "./utils";
 
 type HTMLBallDecoration = {
   dom: HTMLDivElement;
@@ -12,7 +12,7 @@ type HTMLBall = Ball & HTMLBallDecoration;
 type DontYouFillItHTMLGame = Omit<DontYouFillItGame, 'staticBalls'> & { staticBalls: Array<HTMLBall> };
 
 function makeBallDom() {
-  const template = document.querySelector<HTMLTemplateElement>('#default-ball')!.content.cloneNode(true) as HTMLElement;
+  const template = selectElement<HTMLTemplateElement>('#default-ball').content.cloneNode(true) as DocumentFragment;
   return template.firstElementChild as HTMLDivElement;
 }
 
@@ -30,14 +30,14 @@ export class DontYouFillItCssGui {
   }>();
   highscore: number;
 
-  private readonly container = document.getElementById('Game')!;
-  private readonly board = document.getElementById('Board')!;
-  private readonly staticBallLayer = document.getElementById('StaticBallLayer')!;
-  private readonly liveBallLayer = document.getElementById('LiveBallLayer')!;
+  private readonly container = selectElement('#Game');
+  private readonly board = selectElement('#Board');
+  private readonly staticBallLayer = selectElement('#StaticBallLayer');
+  private readonly liveBallLayer = selectElement('#LiveBallLayer');
   private readonly LiveBall: HTMLElement;
-  private readonly Turret = document.getElementById('Turret')!;
-  private readonly Highscore = document.getElementById('highscore')!;
-  private readonly Score = document.getElementById('score')!;
+  private readonly Turret = selectElement('#Turret');
+  private readonly Highscore = selectElement('#highscore');
+  private readonly Score = selectElement('#score');
 
   private lastClickDate = 0;
   private gameState?: {
@@ -67,10 +67,6 @@ export class DontYouFillItCssGui {
     this.LiveBall.setAttribute('id', 'LiveBall');
     this.LiveBall.style.display = 'none';
     this.liveBallLayer.appendChild(this.LiveBall);
-
-    this.Turret = document.getElementById('Turret')!;
-    this.Highscore = document.getElementById('highscore')!;
-    this.Score = document.getElementById('score')!;
 
     window.addEventListener('resize', () => this.resizeCanvas(), false);
 
@@ -279,7 +275,7 @@ export class DontYouFillItCssGui {
 
     this.liveBallUpscaleRatio = this.computeBallUpscaleRatio(DontYouFillItGame.DEFAULT_BALL_RADIUS * (this.SCALE - 2));
 
-    document.getElementById('Score')!.style.font = this.SCALE / 12 + 'px/1 Arial';
+    selectElement('#Score').style.font = this.SCALE / 12 + 'px/1 Arial';
   }
 
   private isGhostEvent(evt: MouseEvent | TouchEvent) {
