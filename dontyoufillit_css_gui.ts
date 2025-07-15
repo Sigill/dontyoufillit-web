@@ -1,15 +1,7 @@
 import { Ball } from "./ball";
 import { DontYouFillItGame } from "./dontyoufillit";
 import { Observable } from "./observable";
-import { addTouchOrClickEvent, px, selectElement } from "./utils";
-
-type HTMLBallDecoration = {
-  dom: HTMLDivElement;
-};
-
-type HTMLBall = Ball & HTMLBallDecoration;
-
-type DontYouFillItHTMLGame = Omit<DontYouFillItGame, 'staticBalls'> & { staticBalls: Array<HTMLBall> };
+import { addTouchOrClickEvent, getOrInsert, lazyAttrAssign, px, selectElement } from "./utils";
 
 function makeBallDom() {
   const template = selectElement<HTMLTemplateElement>('#default-ball').content.cloneNode(true) as DocumentFragment;
@@ -21,7 +13,7 @@ export class DontYouFillItCssGui {
   static readonly GAME = 2;
 
   state: number;
-  game: DontYouFillItHTMLGame;
+  game: DontYouFillItGame;
   observable = new Observable<{
     beginStep: [];
     endStep: [];
@@ -40,10 +32,7 @@ export class DontYouFillItCssGui {
   private readonly Score = selectElement('#score');
 
   private lastClickDate = 0;
-  private gameState?: {
-    previousBalls: DontYouFillItHTMLGame['staticBalls'];
-    score: number;
-  } = undefined;
+  private ballsDom = new Map<Ball, HTMLDivElement>();
 
   private SCALE: number;
   private GAME_WIDTH: number;
@@ -55,12 +44,12 @@ export class DontYouFillItCssGui {
   private LEFT_BORDER: number;
   private RIGHT_BORDER: number;
 
-  private redrawUponResize = true;
+  private redrawStaticBalls = true;
   private liveBallUpscaleRatio: number | undefined = undefined;
 
   constructor(game: DontYouFillItGame, highscore: number) {
     this.state = DontYouFillItCssGui.MENU;
-    this.game = game as DontYouFillItHTMLGame;
+    this.game = game;
     this.highscore = highscore;
 
     this.LiveBall = makeBallDom();
@@ -128,69 +117,53 @@ export class DontYouFillItCssGui {
     }
   }
 
-  private decorateBall(b: Ball & Partial<HTMLBallDecoration>) {
-    if (b.dom === undefined) {
-      b.dom = makeBallDom();
-      this.staticBallLayer.appendChild(b.dom);
-    }
-  }
-
   private drawStaticBalls() {
-    if (this.gameState !== undefined) {
-      for (let i = 0; i < this.gameState.previousBalls.length; ++i) {
-        const pb = this.gameState.previousBalls[i];
-        if (pb.counter === 0) {
-          if (pb.dom !== undefined) {
-            pb.dom.remove();
-          }
-        }
+    const actualBalls = new Set(this.game.staticBalls);
+    for (const [ball, dom] of this.ballsDom.entries()) {
+      if (ball.counter === 0 || !actualBalls.has(ball)) {
+        this.ballsDom.delete(ball);
+        dom.remove();
       }
     }
 
     for (let i = 0; i < this.game.staticBalls.length; ++i) {
-      const b = this.game.staticBalls[i];
+      const ball = this.game.staticBalls[i];
 
-      const newBall = b.dom === undefined;
+      const {inserted: isNewBall, value: dom} = getOrInsert(this.ballsDom, ball, makeBallDom);
 
-      this.decorateBall(b);
+      dom.dataset.counter = ball.counter.toString();
 
-      b.dom.dataset.counter = b.counter.toString();
+      if (this.redrawStaticBalls || isNewBall) {
+        const upscaleRatio = this.computeBallUpscaleRatio(ball.nr * (this.SCALE - 2));
 
-      if (this.redrawUponResize || newBall) {
-        const upscaleRatio = this.computeBallUpscaleRatio(b.nr * (this.SCALE - 2));
+        this.transformBall(ball, dom.style, upscaleRatio);
 
-        this.transformBall(b, b.dom.style, upscaleRatio);
-
-        let ballRadiusInPercent = 200 * b.nr;
+        let ballDiameterInPercent = 200 * ball.nr;
         if (upscaleRatio !== undefined) {
-          ballRadiusInPercent *= upscaleRatio;
+          ballDiameterInPercent *= upscaleRatio;
         }
 
-        b.dom.style.width = b.dom.style.height = ballRadiusInPercent + '%';
-        b.dom.style.display = 'block';
+        dom.style.width = dom.style.height = ballDiameterInPercent + '%';
+        dom.style.display = 'block';
+      }
+
+      if (isNewBall) {
+        this.staticBallLayer.appendChild(dom);
+        // (ball as any).dom = dom; // For debug.
       }
     }
+
+    this.redrawStaticBalls = false;
   }
 
   private draw() {
     if (this.state === DontYouFillItCssGui.GAME) {
-      if ((this.gameState === undefined) || (this.gameState.score !== this.game.score)) {
-        this.Highscore.innerHTML = this.highscore.toString();
-        this.Score.innerHTML = this.game.score.toString();
-      }
+      lazyAttrAssign(this.Highscore, this.highscore.toString());
+      lazyAttrAssign(this.Score, this.game.score.toString());
 
       this.drawStaticBalls();
-
-      this.redrawUponResize = false;
-
       this.drawCannon();
-
       this.drawCurrentBall();
-
-      this.gameState = {
-        previousBalls: this.game.staticBalls.slice(),
-        score: this.game.score
-      };
     }
   }
 
@@ -211,11 +184,6 @@ export class DontYouFillItCssGui {
       this.highscore = Math.max(this.game.score, this.highscore);
 
       this.observable.dispatchEvent('gameover', this.game.score);
-
-      for (let i = 0; i < this.game.staticBalls.length; ++i) {
-        const b = this.game.staticBalls[i];
-        b.dom.remove();
-      }
     }
   }
 
@@ -249,7 +217,7 @@ export class DontYouFillItCssGui {
       liveBallSizeInPercent *= this.liveBallUpscaleRatio;
     this.LiveBall.style.width = this.LiveBall.style.height = liveBallSizeInPercent + '%';
 
-    this.redrawUponResize = true;
+    this.redrawStaticBalls = true;
 
     if (this.game.state !== DontYouFillItGame.RUNNING)
       window.requestAnimationFrame((t) => this.step(t));
@@ -287,12 +255,18 @@ export class DontYouFillItCssGui {
   resume() {
     this.game.resume();
     this.state = DontYouFillItCssGui.GAME;
+
     window.requestAnimationFrame((t) => this.step(t));
   }
 
   reset() {
-    this.gameState = undefined;
+    // Even if the cleanup loop at the start of drawStaticBalls() takes care of discarding old balls' dom,
+    // remove them all to avoid a blink where they are visible before the next step().
+    this.staticBallLayer.replaceChildren();
+
     this.game.reset();
+    this.state = DontYouFillItCssGui.GAME;
+
     window.requestAnimationFrame((t) => this.step(t));
   }
 }

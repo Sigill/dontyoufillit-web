@@ -37,3 +37,18 @@ export function selectElement<T extends Element = HTMLElement>(selector: string,
   }
   return element;
 }
+
+export function getOrInsert<T, U>(map: Map<T, U>, key: T, factory: () => U) {
+  const existingValue = map.get(key);
+  const finalValue = existingValue ?? factory();
+  if (existingValue === undefined) {
+    map.set(key, finalValue);
+  }
+  return { value: finalValue, inserted: existingValue === undefined };
+}
+
+export function lazyAttrAssign(element: HTMLElement | DOMStringMap, txt: string, attr = 'innerText') {
+  if (element[attr] !== txt) {
+    element[attr] = txt;
+  }
+}
