@@ -15,11 +15,6 @@ export function normalizeRadian(a: number) {
   return a;
 }
 
-export function now(): number {
-  // Browsers supporting high resolution timestamps will use them in requestAnimationFrame
-  return performance.now ? performance.now() : Date.now();
-}
-
 export function px(v: number) {
   return v + 'px';
 }

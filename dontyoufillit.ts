@@ -1,6 +1,6 @@
 import { Ball } from "./ball";
 import { Cannon } from "./cannon";
-import { normalizeRadian, now } from "./utils";
+import { normalizeRadian } from "./utils";
 
 export class DontYouFillItGame {
   static readonly PAUSED = 1;
@@ -16,7 +16,7 @@ export class DontYouFillItGame {
   cannon = new Cannon();
   staticBalls: Array<Ball> = [];
   currentBall: Ball | null = null;
-  lastUpdateTime = now();
+  lastUpdateTime?: number = undefined;
   score = 0;
 
   /*
@@ -24,13 +24,15 @@ export class DontYouFillItGame {
    * Position of the cannon isn't, so it will be calculated only once every frame.
    */
   update(time: number) {
+    const lastUpdateTime = this.lastUpdateTime ?? time;
+
     if (this.currentBall) {
-      let last = this.lastUpdateTime;
-      const steps = Math.floor(time - this.lastUpdateTime);
+      let loopLastUpdateTime = lastUpdateTime;
+      const steps = Math.floor(time - lastUpdateTime);
 
       for (let i = 1; i <= steps; ++i) {
-        const current = (this.lastUpdateTime * (steps - i) + time * i) / steps;
-        this.currentBall.update(last / 1000, (current - last) / 1000, this.staticBalls);
+        const loopCurrentUpdateTime = (lastUpdateTime * (steps - i) + time * i) / steps;
+        this.currentBall.update(loopLastUpdateTime / 1000, (loopCurrentUpdateTime - loopLastUpdateTime) / 1000, this.staticBalls);
 
         for (let j = this.staticBalls.length - 1; j >= 0; --j) {
           if (this.staticBalls[j].counter === 0) {
@@ -50,11 +52,11 @@ export class DontYouFillItGame {
           this.currentBall = null;
           break;
         }
-        last = current;
+        loopLastUpdateTime = loopCurrentUpdateTime;
       }
     }
 
-    this.cannon.update(this.lastUpdateTime / 1000, (time - this.lastUpdateTime) / 1000);
+    this.cannon.update(lastUpdateTime / 1000, (time - lastUpdateTime) / 1000);
 
     this.lastUpdateTime = time;
   }
@@ -64,7 +66,7 @@ export class DontYouFillItGame {
   }
 
   resume() {
-    this.lastUpdateTime = performance.now ? performance.now() : Date.now();
+    this.lastUpdateTime = undefined;
     this.state = DontYouFillItGame.RUNNING;
   }
 
