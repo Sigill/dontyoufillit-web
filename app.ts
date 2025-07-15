@@ -3,8 +3,8 @@ import { DontYouFillItGame } from "./dontyoufillit";
 import { DontYouFillItCssGui } from "./dontyoufillit_css_gui";
 import { selectElement } from "./utils";
 
-const game = new DontYouFillItGame();
-const gui = new DontYouFillItCssGui(game, parseInt(localStorage.getItem('highscore') || '0', 10));
+const game = (window as any).game = new DontYouFillItGame();
+const gui = (window as any).ui = new DontYouFillItCssGui(game, parseInt(localStorage.getItem('highscore') || '0', 10));
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms
@@ -115,6 +115,11 @@ selectElement('#startScreenOptionsButton').addEventListener('click', function (e
   pushScreen(optionsScreen);
 });
 
+selectElement('#startScreenLicenseButton').addEventListener('click', function (evt) {
+  evt.preventDefault();
+  pushScreen(licenseScreen);
+});
+
 selectElement('#optionsScreenBackButton').addEventListener('click', function (evt) {
   evt.preventDefault();
   popScreen();
@@ -135,11 +140,6 @@ selectElement('#gameoverScreenPlayAgainButton').addEventListener('click', functi
   evt.preventDefault();
   gui.reset();
   popAllScreens();
-});
-
-selectElement('#startScreenLicenseButton').addEventListener('click', function (evt) {
-  evt.preventDefault();
-  pushScreen(licenseScreen);
 });
 
 selectElement('#licenseScreenBackButton').addEventListener('click', function (evt) {
