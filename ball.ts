@@ -2,14 +2,16 @@ import { RK41DObject } from "./rk4-integrator.js";
 import { normalizeRadian, vectorLength } from "./utils.js";
 
 export class Ball extends RK41DObject {
+  counter: number;
   nr: number;
   nx: number;
   ny: number;
   direction: number;
-  counter: number;
 
   constructor(r: number, x: number, y: number, a: number) {
     super();
+
+    this.counter = 3;
 
     this.nr = r; // Normalized radius and coordinates
     this.nx = x;
@@ -18,8 +20,6 @@ export class Ball extends RK41DObject {
     this.direction = a;
     this.state.u = 0;
     this.state.s = 1;
-
-    this.counter = 3;
   }
 
   override acceleration() {
