@@ -152,7 +152,18 @@ www/service-worker.js: service-worker.js
 www/manifest.json: manifest.json
 	cp $< $@
 
-www/app.css www/app.js: app.css ball.ts cannon.ts observable.ts rk4-integrator.ts utils.ts dontyoufillit.ts dontyoufillit_css_gui.ts app.ts
+ESBUILD_SOURCE_FILES = \
+	app.css \
+	app.ts \
+	ball-engine-rk4.ts \
+	ball-engine.ts \
+	ball.ts \
+	cannon.ts \
+	constants.ts \
+	css-board.ts \
+	game-handler.ts
+
+www/app.css www/app.js: $(ESBUILD_SOURCE_FILES)
 	npx tsx esbuild.ts
 
 www/.htaccess: .htaccess

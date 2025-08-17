@@ -124,10 +124,6 @@ dontyoufillit-css-board {
 		border-style: solid solid dashed;
 	}
 
-	#LiveBall {
-		will-change: transform;
-	}
-
 	.Cannon {
 		position: absolute;
 		background-color: transparent;
@@ -172,8 +168,6 @@ dontyoufillit-css-board {
 		left: 50%;
 		transform-origin: left 50%;
 		-webkit-transform-origin: left 50%;
-		will-change: transform;
-		/*transform: rotate(-45deg);*/
 	}
 
 	.ball {
@@ -183,7 +177,7 @@ dontyoufillit-css-board {
 
 	.ball .disk {
 		width: 100%;
-		height:0;
+		height: 0;
 		padding-bottom: 100%;
 		-moz-border-radius: 50%;
 		-webkit-border-radius: 50%;

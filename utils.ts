@@ -47,3 +47,11 @@ export function lazyAttrAssign(element: HTMLElement | DOMStringMap, txt: string,
     element[attr] = txt;
   }
 }
+
+async function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export function asBool(v: boolean | string | null) {
+  return v === true || v === 'true';
+}

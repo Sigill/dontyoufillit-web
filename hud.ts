@@ -1,6 +1,10 @@
-import { addTouchOrClickEvent, selectElement } from "./utils";
+import { addTouchOrClickEvent, lazyAttrAssign, selectElement } from "./utils";
 
 export class HUD extends HTMLElement {
+  private readonly highscoreSpan: HTMLSpanElement;
+  private readonly scoreSpan: HTMLSpanElement;
+  private readonly livesSpan: HTMLSpanElement;
+
   onPause?: (ev: MouseEvent | TouchEvent) => void;
 
   constructor() {
@@ -18,6 +22,17 @@ export class HUD extends HTMLElement {
       this.querySelector<HTMLDivElement>('.pause')!,
       ev => this.onPause?.(ev)
     );
+
+
+    this.highscoreSpan = selectElement('.highscore', this);
+    this.scoreSpan = selectElement('.score', this);
+    this.livesSpan = selectElement('.lives', this);
+  }
+
+  render({score, highscore, lives}: { score: number; highscore: number; lives: number; }) {
+    lazyAttrAssign(this.highscoreSpan, highscore.toString());
+    lazyAttrAssign(this.scoreSpan, score.toString());
+    lazyAttrAssign(this.livesSpan.dataset, lives.toString(), 'counter');
   }
 }
 

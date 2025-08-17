@@ -6,7 +6,25 @@ export class BallEngineRK4 extends BallEngine {
   staticBalls: Array<StaticBall> = [];
   currentBall: Ball | null = null;
 
+  snapshot = new Array<[StaticBall, StaticBall]>();
+
+  takeSnapshot(): void {
+    this.snapshot = this.staticBalls.map<[StaticBall, StaticBall]>(b => [b, structuredClone(b)]);
+  }
+
+  restoreSnapshot() {
+    this.staticBalls = this.snapshot.map(([ball, snapshot]) => {
+      ball.counter = snapshot.counter;
+      ball.nr = snapshot.nr;
+      ball.nx = snapshot.nx;
+      ball.ny = snapshot.ny;
+      return ball;
+    });
+  }
+
   fire({nr, angle, nx, ny}: { nr: number; angle: number; nx: number; ny: number; }) {
+    this.takeSnapshot();
+
     this.currentBall = new Ball(nr, nx, ny, angle);
   }
 
@@ -14,20 +32,18 @@ export class BallEngineRK4 extends BallEngine {
    * Position of the current ball is important, so it will be calculated 1000 times per second.
    * Position of the cannon isn't, so it will be calculated only once every frame.
    */
-  update(lastUpdateTime: number | undefined, t1: number) {
-    lastUpdateTime ??= t1;
-
+  update(t1: number, t0: number): { score: number; gameover: boolean; } {
     const updateState = {
       score: 0,
       gameover: false,
     };
 
     if (this.currentBall) {
-      let loopLastUpdateTime = lastUpdateTime;
-      const steps = Math.floor(t1 - lastUpdateTime);
+      let loopLastUpdateTime = t0;
+      const steps = Math.floor(t1 - t0);
 
       for (let i = 1; i <= steps; ++i) {
-        const loopCurrentUpdateTime = (lastUpdateTime * (steps - i) + t1 * i) / steps;
+        const loopCurrentUpdateTime = (t0 * (steps - i) + t1 * i) / steps;
         this.currentBall.update(loopLastUpdateTime / 1000, (loopCurrentUpdateTime - loopLastUpdateTime) / 1000, this.staticBalls);
 
         for (let j = this.staticBalls.length - 1; j >= 0; --j) {
@@ -62,20 +78,7 @@ export class BallEngineRK4 extends BallEngine {
       }
     }
 
-    // this.cannon.update(lastUpdateTime / 1000, (time - lastUpdateTime) / 1000);
-
     return updateState;
-  }
-
-  restoreSnapshot(snapshot: Array<[StaticBall, StaticBall]>) {
-    this.staticBalls = snapshot.map(([ball, snapshot]) => {
-      ball.counter = snapshot.counter;
-      ball.nr = snapshot.nr;
-      ball.nx = snapshot.nx;
-      ball.ny = snapshot.ny;
-      return ball;
-    });
-
   }
 
   reset() {

@@ -59,8 +59,8 @@
 				<p class="title">Options</p>
 				<table class="centered">
 					<tr>
-						<td><label class="option" for="framerateCheckbox">Show framerate</label></td>
-						<td><label class="switch"><input type="checkbox" id="framerateCheckbox"><span class="slider"></span></label></td>
+						<td><label class="option" for="showFramerateCheckbox">Show framerate</label></td>
+						<td><label class="switch"><input type="checkbox" id="showFramerateCheckbox"><span class="slider"></span></label></td>
 					</tr>
 				</table>
 				<p class="button"><span id="optionsScreenBackButton">Back</span></p>
@@ -109,41 +109,42 @@
 		</details>
 		<p class="button"><span id="licenseScreenBackButton">Back</span></p>
 	</div>
-
-	<template id="default-ball">
-		<div class="ball" data-counter="3">
-			<div class="disk"></div><div class="num"></div><div class="bar bar-1"></div><div class="bar bar-2"></div>
-		</div>
-	</template>
-
-	<template id="hud-template">
-		<div class="left-col">
-			<div class="label">Highscore</div><div class="value">2</div>
-			<div class="label">Score</div><div class="value">1</div>
-		</div>
-
-		<div class="right-col">
-			<span class="lives" data-counter="2"></span>
-
-			<div class="pause">
-				<div class="pause-bar"></div>
-				<div class="pause-bar"></div>
-			</div>
-		</div>
-	</template>
-
-	<template id="css-board-template">
-		<div id="StaticBallLayer"></div>
-		<div class="Cannon">
-			<div class="In">
-				<div class="Base"></div>
-				<div class="Dome"></div>
-				<div id="Turret" class="Turret"></div>
-			</div>
-		</div>
-		<div id="LiveBallLayer"></div>
-	</template>
 </div>
+
+<template id="default-ball">
+	<div class="ball" data-counter="3">
+		<div class="disk"></div><div class="num"></div><div class="bar bar-1"></div><div class="bar bar-2"></div>
+	</div>
+</template>
+
+<template id="hud-template">
+	<div class="left-col">
+		<div class="label">Highscore</div><div class="value highscore"></div>
+		<div class="label">Score</div><div class="value score"></div>
+	</div>
+
+	<div class="right-col">
+		<span class="lives"></span>
+
+		<div class="pause">
+			<div class="pause-bar"></div>
+			<div class="pause-bar"></div>
+		</div>
+	</div>
+</template>
+
+<template id="css-board-template">
+	<div id="StaticBallLayer"></div>
+	<div class="Cannon">
+		<div class="In">
+			<div class="Base"></div>
+			<div class="Dome"></div>
+			<div id="Turret" class="Turret"></div>
+		</div>
+	</div>
+	<div id="LiveBallLayer"></div>
+</template>
+
 <script>
 	const container = document.querySelector('.box');
 	const resizeObserver = new ResizeObserver(() => {
@@ -152,6 +153,8 @@
 	});
 	resizeObserver.observe(container);
 </script>
+
 <script type="module" src="app.js"></script>
+
 </body>
 </html>
