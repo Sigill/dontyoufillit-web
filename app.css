@@ -11,228 +11,232 @@
 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
-body, html {
-	width: 100%;
+html, body {
 	height: 100%;
-	overflow: auto;
-	background-color: black;
+}
+
+body {
+	background: black;
+	color: white;
 	font-family: Arial, Helvetica, sans-serif;
+	display: grid;
+	place-items: center;
 }
 
-#Game {
-	/* Things will otherwise overflow and create scrollbars during resize */
-	overflow: hidden;
-}
-
-#Board {
-	position: absolute;
-	/* Balls will otherwise overflow and create scrollbars */
-	overflow: hidden;
-}
-
-#Board #header {
-	#Score {
-		position: absolute;
-		color: white;
-		top: 0;
-		left: 0;
-		height: 12.5%;
-		width: 14ex;
-
-		.L1 {
-			bottom: 0.9em;
-		}
-
-		.L2 {
-			bottom: 0.1em;
-		}
-
-		.C1 {
-			left: 0.2ex;
-		}
-
-		.C2 {
-			left: 9.5ex;
-		}
-
-		span {
-			position: absolute;
-			display: block;
-			height: 1em;
-		}
-	}
-
-	#lives {
-		position: absolute;
-		color: white;
-		top: 0;
-		right: 16.666666667%;
-		height: 12.5%;
-		text-align: end;
-
-		&[data-counter="3"]:before {
-			content: "♥♥♥";
-		}
-		&[data-counter="2"]:before {
-			content: "♥♥";
-		}
-		&[data-counter="1"]:before {
-			content: "♥";
-		}
-	}
-}
-
-.PauseButton {
-	position: absolute;
-	background-color: transparent;
-	width: 16.666666667%;
-	height: 12.5%;
-	right: 0;
-	top: 0;
-}
-
-.PauseButton > div {
-	position: absolute;
-	width: 30%;
-	height: 80%;
-	top: 10%;
-	background: white;
-}
-
-.PauseButton .P1 {
-	left: 10%;
-}
-
-.PauseButton .P2 {
-	left: 60%;
-}
-
-#StaticBallLayer, #LiveBallLayer {
+.box {
+	aspect-ratio: 3 / 4;
+	width: min(100vw, calc(100vh * 3 / 4));
+	max-width: 100vw;
+	max-height: 100vh;
 	box-sizing: border-box;
-	position: absolute;
+
+	display: grid;
+	grid-template-rows: 1fr 7fr;
+
+	overflow: hidden;
+
+	.hud, .game {
+		overflow: hidden;
+	}
 }
 
-#StaticBallLayer {
-	border: 1px solid black;
+
+dontyoufillit-hud {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	justify-content: space-between;
+
+	background: #334155;
+	overflow: hidden;
+
+	.left-col {
+		display: grid;
+		grid-template-columns: auto auto;
+		grid-template-rows: min-content;
+		gap: 0 1ex;
+		align-items: baseline;
+		justify-content: start;
+
+		line-height: 80%;
+		padding-top: 0.15em;
+	}
+
+	.right-col {
+		display: grid;
+		grid-template-columns: auto auto;
+
+		.lives {
+			&[data-counter="3"]:before {
+				content: "♥♥♥";
+			}
+			&[data-counter="2"]:before {
+				content: "♥♥";
+			}
+			&[data-counter="1"]:before {
+				content: "♥";
+			}
+		}
+
+		/*
+			* Header is 2em tall.
+			* Pause bar is 80% tall, 30% wide.
+			*/
+		.pause {
+			display: flex;
+			gap: 0.4em;
+			justify-content: center;
+			align-items: center;
+			padding: 0.2em;
+
+			.pause-bar {
+				background: white;
+				width: 0.6em;
+				height: 1.6em;
+			}
+		}
+	}
 }
 
-#LiveBallLayer {
-	border-width: 1px;
-	border-color: white;
-	border-style: solid solid dotted;
-}
-
-#LiveBall {
-	will-change: transform;
-}
-
-.Cannon {
-	position: absolute;
-	background-color: transparent;
-	width: 10%;
-	height: 7.5%;
-	left: 50%;
-	bottom: 0;
-}
-
-.Cannon .In {
-	position: absolute;
-	left: -50%;
+dontyoufillit-css-board {
+	display: block;
 	width: 100%;
 	height: 100%;
+
+	background: #0f172a;
+	overflow: hidden;
+
+	position: relative;
+
+	#StaticBallLayer, #LiveBallLayer {
+		box-sizing: border-box;
+		position: absolute;
+		width: 100%;
+		aspect-ratio: 1 / 1;
+	}
+
+	#StaticBallLayer {
+		border: 1px solid black;
+	}
+
+	#LiveBallLayer {
+		border-width: 1px;
+		border-color: white;
+		border-style: solid solid dashed;
+	}
+
+	#LiveBall {
+		will-change: transform;
+	}
+
+	.Cannon {
+		position: absolute;
+		background-color: transparent;
+		width: 10%;
+		height: 7.5%;
+		left: 50%;
+		bottom: 0;
+	}
+
+	.Cannon .In {
+		position: absolute;
+		left: -50%;
+		width: 100%;
+		height: 100%;
+	}
+
+	.Cannon .Base {
+		position: absolute;
+		width: 100%;
+		height: 66.66666667%;
+		bottom: 0;
+		background: white;
+	}
+
+	.Cannon .Dome {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		-moz-border-radius: 50%;
+		-webkit-border-radius: 50%;
+		border-radius: 50%;
+		background: white;
+		top: -16.6666667%;
+	}
+
+	.Cannon .Turret {
+		position: absolute;
+		width: 66.666666667%;
+		height: 55.5555556%;
+		background: white;
+		top: 5.55555556%;
+		left: 50%;
+		transform-origin: left 50%;
+		-webkit-transform-origin: left 50%;
+		will-change: transform;
+		/*transform: rotate(-45deg);*/
+	}
+
+	.ball {
+		position: absolute;
+		background-color: transparent;
+	}
+
+	.ball .disk {
+		width: 100%;
+		height:0;
+		padding-bottom: 100%;
+		-moz-border-radius: 50%;
+		-webkit-border-radius: 50%;
+		border-radius: 50%;
+		background: white;
+	}
+
+	.ball .num {
+		position: absolute;
+		background-color: black;
+		height: 70%;
+	}
+
+	.ball .bar {
+		position: absolute;
+		background-color: white;
+		/* Should be 30%, but this might create stitching issues */
+		width: 35%;
+		height: 7.5%;
+	}
+
+	.ball[data-counter="1"] .num {
+		width: 20%;
+		left: 40%;
+		top: 15%;
+	}
+
+	.ball[data-counter="1"] .bar {
+		display: none;
+	}
+
+	.ball[data-counter="2"] .num, .ball[data-counter="3"] .num {
+		width: 50%;
+		left: 25%;
+		top: 15%;
+	}
+
+	.ball[data-counter="2"] .bar-1, .ball[data-counter="3"] .bar-1 {
+		left: 20%;
+		top: 35%;
+	}
+
+	.ball[data-counter="2"] .bar-2 {
+		left: 45%;
+		top: 57.5%;
+	}
+
+	.ball[data-counter="3"] .bar-2 {
+		left: 20%;
+		top: 57.5%;
+	}
 }
 
-.Cannon .Base {
-	position: absolute;
-	width: 100%;
-	height: 66.66666667%;
-	bottom: 0;
-	background: white;
-}
-
-.Cannon .Dome {
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	-moz-border-radius: 50%;
-	-webkit-border-radius: 50%;
-	border-radius: 50%;
-	background: white;
-	top: -16.6666667%;
-}
-
-.Cannon .Turret {
-	position: absolute;
-	width: 66.666666667%;
-	height: 55.5555556%;
-	background: white;
-	top: 5.55555556%;
-	left: 50%;
-	transform-origin: left 50%;
-	-webkit-transform-origin: left 50%;
-	will-change: transform;
-	/*transform: rotate(-45deg);*/
-}
-
-.ball {
-	position: absolute;
-	background-color: transparent;
-}
-
-.ball .disk {
-	width: 100%;
-	height:0;
-	padding-bottom: 100%;
-	-moz-border-radius: 50%;
-	-webkit-border-radius: 50%;
-	border-radius: 50%;
-	background: white;
-}
-
-.ball .num {
-	position: absolute;
-	background-color: black;
-	height: 70%;
-}
-
-.ball .bar {
-	position: absolute;
-	background-color: white;
-	/* Should be 30%, but this might create stitching issues */
-	width: 35%;
-	height: 7.5%;
-}
-
-.ball[data-counter="1"] .num {
-	width: 20%;
-	left: 40%;
-	top: 15%;
-}
-
-.ball[data-counter="1"] .bar {
-	display: none;
-}
-
-.ball[data-counter="2"] .num, .ball[data-counter="3"] .num {
-	width: 50%;
-	left: 25%;
-	top: 15%;
-}
-
-.ball[data-counter="2"] .bar-1, .ball[data-counter="3"] .bar-1 {
-	left: 20%;
-	top: 35%;
-}
-
-.ball[data-counter="2"] .bar-2 {
-	left: 45%;
-	top: 57.5%;
-}
-
-.ball[data-counter="3"] .bar-2 {
-	left: 20%;
-	top: 57.5%;
-}
 
 #screenContainer {
 	display: none;

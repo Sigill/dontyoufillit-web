@@ -33,7 +33,7 @@ export class Ball extends RK41DObject {
     return -0.4;
   }
 
-  update(t: number, dt: number, staticBalls: Array<Ball>) {
+  update(t: number, dt: number, staticBalls: Array<StaticBall>) {
     const previousStateU = this.state.u;
 
     this.integrate(t, dt);
@@ -86,30 +86,6 @@ export class Ball extends RK41DObject {
     }
   }
 
-  grow(staticBalls: Array<Ball>) {
-    let minRadius = Number.MAX_VALUE, available, o;
-
-    for (let i = 0; i < staticBalls.length; ++i) {
-      o = staticBalls[i];
-      available = vectorLength(this.nx - o.nx, this.ny - o.ny) - o.nr;
-      if (minRadius > available) minRadius = available;
-    }
-
-    available = this.nx;
-    if (minRadius > available) minRadius = available;
-
-    available = 1 - this.nx;
-    if (minRadius > available) minRadius = available;
-
-    available = Math.abs(this.ny);
-    if (minRadius > available) minRadius = available;
-
-    available = Math.abs(1 - this.ny);
-    if (minRadius > available) minRadius = available;
-
-    this.nr = Math.abs(minRadius);
-  }
-
   staticSnapshot(): StaticBall {
     return {
       counter: this.counter,
@@ -118,4 +94,31 @@ export class Ball extends RK41DObject {
       ny: this.ny,
     };
   }
+}
+
+export function computeExpandedRadius(
+  {nx, ny}: { nx: number; ny: number; },
+  staticBalls: Array<{ nr: number; nx: number; ny: number; }>
+) {
+  let minRadius = Number.MAX_VALUE, available: number, o: { nr: number; nx: number; ny: number; };
+
+    for (let i = 0; i < staticBalls.length; ++i) {
+      o = staticBalls[i];
+      available = vectorLength(nx - o.nx, ny - o.ny) - o.nr;
+      if (minRadius > available) minRadius = available;
+    }
+
+    available = nx;
+    if (minRadius > available) minRadius = available;
+
+    available = 1 - nx;
+    if (minRadius > available) minRadius = available;
+
+    available = Math.abs(ny);
+    if (minRadius > available) minRadius = available;
+
+    available = Math.abs(1 - ny);
+    if (minRadius > available) minRadius = available;
+
+    return Math.abs(minRadius);
 }

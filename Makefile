@@ -152,12 +152,8 @@ www/service-worker.js: service-worker.js
 www/manifest.json: manifest.json
 	cp $< $@
 
-www/app.js: ball.ts cannon.ts observable.ts rk4-integrator.ts utils.ts dontyoufillit.ts dontyoufillit_css_gui.ts app.ts
-	npm run build-js
-
-www/app.css: app.css
-	npm run build-css
-
+www/app.css www/app.js: app.css ball.ts cannon.ts observable.ts rk4-integrator.ts utils.ts dontyoufillit.ts dontyoufillit_css_gui.ts app.ts
+	npx tsx esbuild.ts
 
 www/.htaccess: .htaccess
 	cp .htaccess www/

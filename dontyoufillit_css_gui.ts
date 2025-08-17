@@ -1,12 +1,8 @@
-import { Ball } from "./ball";
+import { Ball, StaticBall } from "./ball";
 import { DontYouFillItGame } from "./dontyoufillit";
 import { Observable } from "./observable";
+import { makeBallDom } from "./renderer";
 import { addTouchOrClickEvent, getOrInsert, lazyAttrAssign, px, selectElement } from "./utils";
-
-function makeBallDom() {
-  const template = selectElement<HTMLTemplateElement>('#default-ball').content.cloneNode(true) as DocumentFragment;
-  return template.firstElementChild as HTMLDivElement;
-}
 
 export class DontYouFillItCssGui {
   static readonly MENU = 1;
@@ -71,6 +67,7 @@ export class DontYouFillItCssGui {
       evt.preventDefault();
       if (this.isGhostEvent(evt)) return;
       if ((this.game.currentBall === null) && (this.game.state === DontYouFillItGame.RUNNING)) {
+        // TODO Get updated cannon angle.
         this.game.fire();
       }
     });
@@ -94,7 +91,7 @@ export class DontYouFillItCssGui {
       return undefined;
   }
 
-  private transformBall(b: Ball, s: CSSStyleDeclaration, r: number | undefined) {
+  private transformBall(b: StaticBall, s: CSSStyleDeclaration, r: number | undefined) {
     let size = b.nr * (this.SCALE - 2);
 
     if (r !== undefined)

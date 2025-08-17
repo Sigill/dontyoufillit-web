@@ -30,35 +30,11 @@
 <!-- END WEB -->
 </head>
 <body>
-<div id="Game" class="fullscreen">
-	<div id="Board">
-		<div id="header">
-			<div id="Score">
-				<span class="L1">Highscore</span>
-				<span id="highscore" class="L1 C2"></span>
-				<span class="L2">Score</span>
-				<span id="score" class="L2 C2"></span>
-			</div>
-
-			<span id="lives">
-			</span>
-
-			<div id="PauseButton" class="PauseButton">
-				<div class="P1"></div>
-				<div class="P2"></div>
-			</div>
-		</div>
-		<div id="StaticBallLayer"></div>
-		<div class="Cannon">
-			<div class="In">
-				<div class="Base"></div>
-				<div class="Dome"></div>
-				<div id="Turret" class="Turret"></div>
-			</div>
-		</div>
-		<div id="LiveBallLayer"></div>
-	</div>
+<div class="box">
+	<div class="hud"></div>
+	<div class="game"></div>
 </div>
+
 <div id="screenContainer" class="fullscreen">
 	<div id="start-screen" class="fullscreen screen">
 		<div class="fullscreen vcentered">
@@ -139,7 +115,43 @@
 			<div class="disk"></div><div class="num"></div><div class="bar bar-1"></div><div class="bar bar-2"></div>
 		</div>
 	</template>
+
+	<template id="hud-template">
+		<div class="left-col">
+			<div class="label">Highscore</div><div class="value">2</div>
+			<div class="label">Score</div><div class="value">1</div>
+		</div>
+
+		<div class="right-col">
+			<span class="lives" data-counter="2"></span>
+
+			<div class="pause">
+				<div class="pause-bar"></div>
+				<div class="pause-bar"></div>
+			</div>
+		</div>
+	</template>
+
+	<template id="css-board-template">
+		<div id="StaticBallLayer"></div>
+		<div class="Cannon">
+			<div class="In">
+				<div class="Base"></div>
+				<div class="Dome"></div>
+				<div id="Turret" class="Turret"></div>
+			</div>
+		</div>
+		<div id="LiveBallLayer"></div>
+	</template>
 </div>
+<script>
+	const container = document.querySelector('.box');
+	const resizeObserver = new ResizeObserver(() => {
+		const width = container.clientWidth;
+		container.style.fontSize = width / 12 + 'px'
+	});
+	resizeObserver.observe(container);
+</script>
 <script type="module" src="app.js"></script>
 </body>
 </html>

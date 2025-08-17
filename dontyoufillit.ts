@@ -1,6 +1,6 @@
-import { Ball, StaticBall } from "./ball";
+import { computeExpandedRadius, StaticBall } from "./ball";
 import { Cannon } from "./cannon";
-import { normalizeRadian } from "./utils";
+import { BallEngineRK4 } from "./ball-engine-rk4";
 
 export class DontYouFillItGame {
   static readonly PAUSED = 1;
@@ -14,13 +14,21 @@ export class DontYouFillItGame {
 
   state = DontYouFillItGame.PAUSED;
   cannon = new Cannon();
-  staticBalls: Array<Ball> = [];
-  currentBall: Ball | null = null;
   lastUpdateTime?: number = undefined;
   score = 0;
   lives = 0;
 
-  snapshot = { score: 0, staticBalls: new Array<[Ball, StaticBall]>()};
+  snapshot = { score: 0, staticBalls: new Array<[StaticBall, StaticBall]>() };
+
+  engine = new BallEngineRK4();
+
+  get currentBall() {
+    return this.engine.currentBall;
+  }
+
+  get staticBalls() {
+    return this.engine.staticBalls;
+  }
 
   /*
    * Position of the current ball is important, so it will be calculated 1000 times per second.
@@ -28,37 +36,16 @@ export class DontYouFillItGame {
    */
   update(time: number) {
     const lastUpdateTime = this.lastUpdateTime ?? time;
+    const updatestate = this.engine.update(lastUpdateTime ?? time, time);
 
-    if (this.currentBall) {
-      let loopLastUpdateTime = lastUpdateTime;
-      const steps = Math.floor(time - lastUpdateTime);
+    if (this.currentBall !== null && this.currentBall.state.s === 0) {
+      const expandedRadius = computeExpandedRadius(this.currentBall, this.staticBalls);
 
-      for (let i = 1; i <= steps && this.state === DontYouFillItGame.RUNNING; ++i) {
-        const loopCurrentUpdateTime = (lastUpdateTime * (steps - i) + time * i) / steps;
-        this.currentBall.update(loopLastUpdateTime / 1000, (loopCurrentUpdateTime - loopLastUpdateTime) / 1000, this.staticBalls);
+    }
 
-        for (let j = this.staticBalls.length - 1; j >= 0; --j) {
-          if (this.staticBalls[j].counter === 0) {
-            ++this.score;
-            this.staticBalls.splice(j, 1);
-          }
-        }
-
-        if (this.currentBall.ny < this.currentBall.nr && normalizeRadian(this.currentBall.direction) > Math.PI) {
-          this.currentBall.state.s = 0;
-          this.state = DontYouFillItGame.GAMEOVER;
-          this.lives -= 1;
-
-        } else if (this.currentBall.state.s < 0.001) {
-          if (this.currentBall.ny >= 0) {
-            this.currentBall.grow(this.staticBalls);
-            this.staticBalls.push(this.currentBall);
-          }
-          this.currentBall = null;
-          break;
-        }
-        loopLastUpdateTime = loopCurrentUpdateTime;
-      }
+    this.score += updatestate.score;
+    if (updatestate.gameover) {
+      this.state = DontYouFillItGame.GAMEOVER;
     }
 
     this.cannon.update(lastUpdateTime / 1000, (time - lastUpdateTime) / 1000);
@@ -76,8 +63,7 @@ export class DontYouFillItGame {
   }
 
   reset() {
-    this.currentBall = null;
-    this.staticBalls = [];
+    this.engine.reset();
     this.cannon.state.u = 0;
     this.score = 0;
     this.resume();
@@ -86,28 +72,22 @@ export class DontYouFillItGame {
   fire() {
     this.takeSnapshot();
 
-    this.currentBall = new Ball(
-      DontYouFillItGame.DEFAULT_BALL_RADIUS,
-      0.5 + Math.cos(this.cannon.getAngle()) * DontYouFillItGame.CANNON_LENGTH,
-      DontYouFillItGame.CANNON_Y_POSITION + DontYouFillItGame.CANNON_BASE_HEIGHT + Math.sin(this.cannon.getAngle()) * DontYouFillItGame.CANNON_LENGTH,
-      this.cannon.getAngle()
-    );
+    this.engine.fire({
+      nr: DontYouFillItGame.DEFAULT_BALL_RADIUS,
+      angle: this.cannon.getAngle(),
+      nx: 0.5 + Math.cos(this.cannon.getAngle()) * DontYouFillItGame.CANNON_LENGTH,
+      ny: DontYouFillItGame.CANNON_Y_POSITION + DontYouFillItGame.CANNON_BASE_HEIGHT + Math.sin(this.cannon.getAngle()) * DontYouFillItGame.CANNON_LENGTH,
+    });
   }
 
   private takeSnapshot() {
     this.snapshot.score = this.score;
-    this.snapshot.staticBalls = this.staticBalls.map<[Ball, StaticBall]>(b => [b, b.staticSnapshot()]);
+    this.snapshot.staticBalls = this.staticBalls.map<[StaticBall, StaticBall]>(b => [b, structuredClone(b)]);
   }
 
   restoreSnapshot() {
     this.score = this.snapshot.score;
-    this.staticBalls = this.snapshot.staticBalls.map(([ball, snapshot]) => {
-      ball.counter = snapshot.counter;
-      ball.nr = snapshot.nr;
-      ball.nx = snapshot.nx;
-      ball.ny = snapshot.ny;
-      return ball;
-    });
+    this.engine.restoreSnapshot(this.snapshot.staticBalls);
   }
 
   canUseLife() {
@@ -123,6 +103,5 @@ export class DontYouFillItGame {
 
     this.lastUpdateTime = performance.now ? performance.now() : Date.now();
     this.state = DontYouFillItGame.RUNNING;
-    this.currentBall = null;
   }
 }

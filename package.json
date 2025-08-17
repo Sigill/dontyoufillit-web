@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "DontYouFillIt is a Breakout-style game mixed with snooker.",
   "private": true,
+  "type": "module",
   "scripts": {
-    "build-js": "npx esbuild --bundle --outfile=www/app.js --sourcemap app.ts",
-    "build-css": "npx esbuild --minify --outfile=www/app.css --sourcemap app.css",
-    "build-watch": "npm run build-js -- --watch",
-    "build": "make"
+    "build-esbuild": "npx tsx esbuild.ts",
+    "build": "make",
+    "dev": "make && npx tsx --watch esbuild.ts --watch --serve"
   },
   "repository": {
     "type": "git",
@@ -17,8 +17,12 @@
   "license": "MIT",
   "devDependencies": {
     "@eslint/js": "^9.30.0",
+    "@types/app-root-dir": "^0.1.4",
     "@types/eslint__js": "^8.42.3",
+    "@types/node": "^24.3.0",
     "@types/stats.js": "^0.17.4",
+    "app-root-dir": "^1.0.2",
+    "commander": "^14.0.0",
     "esbuild": "^0.25.5",
     "eslint": "^9.30.0",
     "stats.js": "^0.17.0",
