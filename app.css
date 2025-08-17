@@ -30,6 +30,8 @@ body {
   max-height: 100dvh;
   box-sizing: border-box;
 
+  font-size: calc(min(100dvw, calc(100dvh * 3 / 4)) / 12);
+
   display: grid;
   grid-template-rows: 1fr 7fr;
 

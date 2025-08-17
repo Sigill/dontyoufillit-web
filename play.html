@@ -144,16 +144,6 @@
     </div>
     <div id="LiveBallLayer"></div>
   </template>
-
-  <script>
-    const container = document.querySelector('.box');
-    const resizeObserver = new ResizeObserver(() => {
-      const width = container.clientWidth;
-      container.style.fontSize = width / 12 + 'px'
-    });
-    resizeObserver.observe(container);
-  </script>
-
   <script type="module" src="app.js"></script>
 </body>
 </html>
