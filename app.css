@@ -25,9 +25,9 @@ body {
 
 .box {
 	aspect-ratio: 3 / 4;
-	width: min(100vw, calc(100vh * 3 / 4));
-	max-width: 100vw;
-	max-height: 100vh;
+	width: min(100dvw, calc(100dvh * 3 / 4));
+	max-width: 100dvw;
+	max-height: 100dvh;
 	box-sizing: border-box;
 
 	display: grid;
