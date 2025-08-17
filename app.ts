@@ -77,7 +77,7 @@ game.observable.addEventListener('endStep', () => {
   }
 });
 
-addTouchOrClickEvent(selectElement<HTMLDivElement>('.box'), (evt) => {
+addTouchOrClickEvent(selectElement<HTMLElement>('.fullscreen-container'), (evt) => {
   evt.preventDefault();
   evt.stopPropagation();
 
