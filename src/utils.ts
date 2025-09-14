@@ -42,9 +42,16 @@ export function getOrInsert<T, U>(map: Map<T, U>, key: T, factory: () => U) {
   return { value: finalValue, inserted: existingValue === undefined };
 }
 
-export function lazyAttrAssign(element: HTMLElement | DOMStringMap, txt: string, attr = 'innerText') {
-  if (element[attr] !== txt) {
-    element[attr] = txt;
+export function lazyAssign(element: DOMStringMap, value: string, key: keyof DOMStringMap): void {
+  if (element[key] !== value) {
+    element[key] = value;
+  }
+}
+
+// Can't figure-out how to specify the types to have a single lazyAssign function.
+export function lazySetInnerText(element: HTMLElement, value: string): void {
+  if (element.innerText !== value) {
+    element.innerText = value;
   }
 }
 

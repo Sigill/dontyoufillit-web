@@ -1,8 +1,8 @@
 import { StaticBall } from "./ball";
 
 export abstract class BallEngine {
-  staticBalls: Array<StaticBall>;
-  currentBall: StaticBall | null;
+  abstract staticBalls: Array<StaticBall>;
+  abstract currentBall: StaticBall | null;
 
   abstract takeSnapshot(): void;
   abstract restoreSnapshot(): void;

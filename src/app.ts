@@ -47,15 +47,10 @@ function showFps(enabled: boolean) {
   stats.dom.style.display = enabled ? 'block' : 'none';
 }
 
-const query_string = {};
-window.location.search.substring(1).split('&').forEach(function (e) {
-  const pair = e.split('=', 2);
-  query_string[pair[0]] = (pair.length === 2) ? pair[1] : true;
-});
+const queryParams = new URLSearchParams(window.location.search);
 
-
-if (query_string['show-fps'] !== undefined) {
-  showFps(asBool(query_string['show-fps']));
+if (queryParams.get('show-fps') !== undefined) {
+  showFps(asBool(queryParams.get('show-fps')));
 } else if (localStorage.getItem('show-fps') !== null) {
   showFps(asBool(localStorage.getItem('show-fps')));
 } else {

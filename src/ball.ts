@@ -1,5 +1,6 @@
-import { RK41DObject } from "./rk4-integrator.js";
-import { normalizeRadian, vectorLength } from "./utils.js";
+import { RK41DObject } from "./rk4-integrator";
+import { normalizeRadian, vectorLength } from "./utils";
+import * as Constants from "./constants";
 
 export interface StaticBall {
   counter: number;
@@ -30,7 +31,7 @@ export class Ball extends RK41DObject {
   }
 
   override acceleration() {
-    return -0.4;
+    return Constants.DEFAULT_BALL_ACCELERATION;
   }
 
   update(t: number, dt: number, staticBalls: Array<StaticBall>) {

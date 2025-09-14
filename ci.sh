@@ -16,6 +16,7 @@ mkdir -p /cache/node_modules
 rsync -a /cache/node_modules/ /src/node_modules/
 npm i --prefer-offline --no-audit --progress=false
 rsync -a /src/node_modules/ /cache/node_modules/
+npx tsc
 make
 tree dist/
 " && echo SUCCESS || echo FAILURE

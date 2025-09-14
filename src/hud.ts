@@ -1,4 +1,9 @@
-import { addTouchOrClickEvent, lazyAttrAssign, selectElement } from "./utils";
+import {
+  addTouchOrClickEvent,
+  lazySetInnerText,
+  lazyAssign,
+  selectElement,
+} from "./utils";
 
 export class HUD extends HTMLElement {
   private readonly highscoreSpan: HTMLSpanElement;
@@ -30,9 +35,9 @@ export class HUD extends HTMLElement {
   }
 
   render({score, highscore, lives}: { score: number; highscore: number; lives: number; }) {
-    lazyAttrAssign(this.highscoreSpan, highscore.toString());
-    lazyAttrAssign(this.scoreSpan, score.toString());
-    lazyAttrAssign(this.livesSpan.dataset, lives.toString(), 'counter');
+    lazySetInnerText(this.highscoreSpan, highscore.toString());
+    lazySetInnerText(this.scoreSpan, score.toString());
+    lazyAssign(this.livesSpan.dataset, lives.toString(), 'counter');
   }
 }
 
