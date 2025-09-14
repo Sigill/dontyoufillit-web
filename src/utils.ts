@@ -62,3 +62,49 @@ export async function sleep(ms: number): Promise<void> {
 export function asBool(v: boolean | string | null) {
   return v === true || v === 'true';
 }
+
+export function directionalArrow(vx: number, vy: number) {
+  if (vx > 0) {
+    if (vy > 0) {
+      return "↗";
+    } else if (vy < 0) {
+      return "↘";
+    } else {
+      return "→";
+    }
+  } else if (vx < 0) {
+    if (vy > 0) {
+      return "↖";
+    } else if (vy < 0) {
+      return "↙";
+    } else {
+      return "←";
+    }
+  } else {
+    if (vy > 0) {
+      return '↑';
+    } else if (vy < 0) {
+      return "↓";
+    } else {
+      return "∅";
+    }
+  }
+}
+
+export function solveQuadratic(a: number, b: number, c: number, epsilon = 0) {
+  const delta = b ** 2 - 4 * a * c;
+  if (delta < -epsilon) return [];
+  if (delta > epsilon) return [
+    (-b + Math.sqrt(delta)) / (2 * a),
+    (-b - Math.sqrt(delta)) / (2 * a),
+  ];
+  return [-b / (2 * a)];
+}
+
+export function toDeg(rad: number) {
+  return rad * 180 / Math.PI;
+}
+
+export function ppAngle(a: number) {
+  return `${a.toFixed(2)}rad/${toDeg(a).toFixed(1)}°`;
+}

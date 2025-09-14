@@ -33,6 +33,12 @@ export default tseslint.config(
       "no-template-curly-in-string": ["error"],
       "multiline-ternary": ["error", "always-multiline"],
       "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-expressions": [
+        "error",
+        {
+          "allowShortCircuit": true, // Allows verbose && console.log().
+        }
+      ]
     },
   }
 );

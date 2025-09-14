@@ -38,6 +38,7 @@ program.action(async ({ watch, serve, liveReload }: { watch: boolean; serve: boo
     entryPoints: [
       { in: 'src/app.ts', out: 'www/app' },
       { in: 'src/app.css', out: 'www/app' },
+      { in: 'dev/wall-collision.ts', out: 'dev/wall-collision' },
     ],
     loader: {
       '.html': 'text'
