@@ -21,7 +21,7 @@ const logRebuildPlugin: esbuild.Plugin = {
   },
 }
 
-const wwwDir = path.join(root, 'www');
+const distdir = path.join(root, 'dist');
 
 const program = new Command();
 program.option('--watch', 'Rebuild upon change', false);
@@ -33,11 +33,11 @@ program.action(async ({ watch, serve, liveReload }: { watch: boolean; serve: boo
     target: 'esnext',
     format: 'esm',
     bundle: true,
-    minify: true,
-    outdir: wwwDir,
+    minify: false,
+    outdir: distdir,
     entryPoints: [
-      'app.ts',
-      'app.css',
+      { in: 'src/app.ts', out: 'www/app' },
+      { in: 'src/app.css', out: 'www/app' },
     ],
     loader: {
       '.html': 'text'
