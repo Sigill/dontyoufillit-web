@@ -98,10 +98,10 @@ export class GameHandler {
     this.#takeSnapshot();
 
     this.#ballEngine.fire({
-      nr: Constants.DEFAULT_BALL_RADIUS,
+      radius: Constants.DEFAULT_BALL_RADIUS,
       angle: this.#cannon.getAngle(),
-      nx: 0.5 + Math.cos(this.#cannon.getAngle()) * Constants.CANNON_LENGTH,
-      ny: Constants.CANNON_Y_POSITION + Constants.CANNON_BASE_HEIGHT + Math.sin(this.#cannon.getAngle()) * Constants.CANNON_LENGTH,
+      x: 0.5 + Math.cos(this.#cannon.getAngle()) * Constants.CANNON_LENGTH,
+      y: Constants.CANNON_Y_POSITION + Constants.CANNON_BASE_HEIGHT + Math.sin(this.#cannon.getAngle()) * Constants.CANNON_LENGTH,
     });
   }
 

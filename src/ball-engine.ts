@@ -7,7 +7,7 @@ export abstract class BallEngine {
   abstract takeSnapshot(): void;
   abstract restoreSnapshot(): void;
 
-  abstract fire(ball: { nr: number; angle: number; nx: number; ny: number; }): void;
+  abstract fire(ball: { radius: number; angle: number; x: number; y: number; }): void;
 
   abstract update(t1: number, t0: number): { score: number; gameover: boolean; };
 

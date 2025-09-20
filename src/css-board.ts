@@ -64,7 +64,7 @@ export class CssBoard extends HTMLElement {
       dom.dataset.counter = ball.counter.toString();
 
       if (isNewBall) {
-        dom.style.width = dom.style.height = 200 * ball.nr + '%';
+        dom.style.width = dom.style.height = 200 * ball.radius + '%';
         dom.style.display = 'block';
 
         this.transformBall(ball, dom);
@@ -78,8 +78,8 @@ export class CssBoard extends HTMLElement {
   }
 
   private transformBall(b: StaticBall, dom: HTMLDivElement) {
-    dom.style.left = (b.nx - b.nr) * 100 + '%';
-    dom.style.bottom = (b.ny - b.nr) * 100 + '%';
+    dom.style.left = (b.x - b.radius) * 100 + '%';
+    dom.style.bottom = (b.y - b.radius) * 100 + '%';
   }
 
   private drawCurrentBall(game: BallEngine) {

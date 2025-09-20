@@ -4,28 +4,28 @@ import * as Constants from "./constants";
 
 export interface StaticBall {
   counter: number;
-  nr: number;
-  nx: number;
-  ny: number;
+  radius: number;
+  x: number;
+  y: number;
 }
 
 export class Ball extends RK41DObject {
   counter: number;
-  nr: number;
-  nx: number;
-  ny: number;
+  radius: number;
+  x: number;
+  y: number;
   direction: number;
 
-  constructor(r: number, x: number, y: number, a: number) {
+  constructor(radius: number, x: number, y: number, angle: number) {
     super();
 
     this.counter = 3;
 
-    this.nr = r; // Normalized radius and coordinates
-    this.nx = x;
-    this.ny = y;
+    this.radius = radius;
+    this.x = x;
+    this.y = y;
 
-    this.direction = a;
+    this.direction = angle;
     this.state.u = 0;
     this.state.s = 1;
   }
@@ -40,39 +40,39 @@ export class Ball extends RK41DObject {
     this.integrate(t, dt);
 
     const d = this.state.u - previousStateU;
-    this.nx += d * Math.cos(this.direction);
-    this.ny += d * Math.sin(this.direction);
+    this.x += d * Math.cos(this.direction);
+    this.y += d * Math.sin(this.direction);
 
     this.bounce(staticBalls);
   }
 
   private bounce(staticBalls: Array<StaticBall>) {
-    if (this.nx > 1 - this.nr) {
-      this.nx = 1 - this.nr;
+    if (this.x > 1 - this.radius) {
+      this.x = 1 - this.radius;
       this.direction = normalizeRadian(Math.PI - this.direction);
-    } else if (this.nx < this.nr) {
-      this.nx = this.nr;
+    } else if (this.x < this.radius) {
+      this.x = this.radius;
       this.direction = normalizeRadian(Math.PI - this.direction);
     }
 
-    if (this.ny > 1 - this.nr) {
-      this.ny = 1 - this.nr;
+    if (this.y > 1 - this.radius) {
+      this.y = 1 - this.radius;
       this.direction = normalizeRadian(-this.direction);
     }
 
     for (let i = 0; i < staticBalls.length; ++i) {
       const o = staticBalls[i];
 
-      const normalX = this.nx - o.nx;
-      const normalY = this.ny - o.ny;
+      const normalX = this.x - o.x;
+      const normalY = this.y - o.y;
       const dist = vectorLength(normalX, normalY);
 
-      if (dist <= o.nr + this.nr) {
+      if (dist <= o.radius + this.radius) {
         --o.counter;
 
         // Move it back to prevent clipping
-        this.nx = o.nx + normalX * (this.nr + o.nr) / dist;
-        this.ny = o.ny + normalY * (this.nr + o.nr) / dist;
+        this.x = o.x + normalX * (this.radius + o.radius) / dist;
+        this.y = o.y + normalY * (this.radius + o.radius) / dist;
 
         // http://en.wikipedia.org/wiki/Elastic_collision#Two-Dimensional_Collision_With_Two_Moving_Objects
         // Assuming no speed and an infinite mass for the second ball.
@@ -90,35 +90,35 @@ export class Ball extends RK41DObject {
   staticSnapshot(): StaticBall {
     return {
       counter: this.counter,
-      nr: this.nr,
-      nx: this.nx,
-      ny: this.ny,
+      radius: this.radius,
+      x: this.x,
+      y: this.y,
     };
   }
 }
 
 export function computeExpandedRadius(
-  {nx, ny}: { nx: number; ny: number; },
-  staticBalls: Array<{ nr: number; nx: number; ny: number; }>
+  {x, y}: { x: number; y: number; },
+  staticBalls: Array<{ radius: number; x: number; y: number; }>
 ) {
-  let minRadius = Number.MAX_VALUE, available: number, o: { nr: number; nx: number; ny: number; };
+  let minRadius = Number.MAX_VALUE, available: number, o: { radius: number; x: number; y: number; };
 
   for (let i = 0; i < staticBalls.length; ++i) {
     o = staticBalls[i];
-    available = vectorLength(nx - o.nx, ny - o.ny) - o.nr;
+    available = vectorLength(x - o.x, y - o.y) - o.radius;
     if (minRadius > available) minRadius = available;
   }
 
-  available = nx;
+  available = x;
   if (minRadius > available) minRadius = available;
 
-  available = 1 - nx;
+  available = 1 - x;
   if (minRadius > available) minRadius = available;
 
-  available = Math.abs(ny);
+  available = Math.abs(y);
   if (minRadius > available) minRadius = available;
 
-  available = Math.abs(1 - ny);
+  available = Math.abs(1 - y);
   if (minRadius > available) minRadius = available;
 
   return Math.abs(minRadius);

@@ -15,17 +15,17 @@ export class BallEngineRK4 extends BallEngine {
   restoreSnapshot() {
     this.staticBalls = this.snapshot.map(([ball, snapshot]) => {
       ball.counter = snapshot.counter;
-      ball.nr = snapshot.nr;
-      ball.nx = snapshot.nx;
-      ball.ny = snapshot.ny;
+      ball.radius = snapshot.radius;
+      ball.x = snapshot.x;
+      ball.y = snapshot.y;
       return ball;
     });
   }
 
-  fire({nr, angle, nx, ny}: { nr: number; angle: number; nx: number; ny: number; }) {
+  fire({radius: radius, angle, x, y}: { radius: number; angle: number; x: number; y: number; }) {
     this.takeSnapshot();
 
-    this.currentBall = new Ball(nr, nx, ny, angle);
+    this.currentBall = new Ball(radius, x, y, angle);
   }
 
   /*
@@ -53,7 +53,7 @@ export class BallEngineRK4 extends BallEngine {
           }
         }
 
-        if (this.currentBall.ny < this.currentBall.nr && normalizeRadian(this.currentBall.direction) > Math.PI) {
+        if (this.currentBall.y < this.currentBall.radius && normalizeRadian(this.currentBall.direction) > Math.PI) {
           this.currentBall.state.s = 0;
           updateState.gameover = true;
           this.currentBall = null;
@@ -61,14 +61,14 @@ export class BallEngineRK4 extends BallEngine {
         }
 
         if (this.currentBall.state.s < 0.001) {
-          if (this.currentBall.ny >= 0) {
+          if (this.currentBall.y >= 0) {
             this.currentBall.state.s = 0;
             const expandedRadius = computeExpandedRadius(this.currentBall, this.staticBalls);
             this.staticBalls.push({
               counter: 3,
-              nr: expandedRadius,
-              nx: this.currentBall.nx,
-              ny: this.currentBall.ny,
+              radius: expandedRadius,
+              x: this.currentBall.x,
+              y: this.currentBall.y,
             });
           }
           this.currentBall = null;
