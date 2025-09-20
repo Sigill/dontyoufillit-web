@@ -11,7 +11,7 @@ export function makeBallDom() {
 }
 
 export class CssBoard extends HTMLElement {
-  private ballsDom = new Map<Ball, HTMLDivElement>();
+  private ballsDom = new Map<StaticBall, HTMLDivElement>();
 
   private staticBallLayer: HTMLElement;
   private liveBallLayer: HTMLElement;
@@ -77,7 +77,7 @@ export class CssBoard extends HTMLElement {
     }
   }
 
-  private transformBall(b: StaticBall, dom: HTMLDivElement) {
+  private transformBall(b: Omit<StaticBall, 'counter'>, dom: HTMLDivElement) {
     dom.style.left = (b.x - b.radius) * 100 + '%';
     dom.style.bottom = (b.y - b.radius) * 100 + '%';
   }

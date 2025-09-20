@@ -10,7 +10,6 @@ export interface StaticBall {
 }
 
 export class Ball extends RK41DObject {
-  counter: number;
   radius: number;
   x: number;
   y: number;
@@ -18,8 +17,6 @@ export class Ball extends RK41DObject {
 
   constructor(radius: number, x: number, y: number, angle: number) {
     super();
-
-    this.counter = 3;
 
     this.radius = radius;
     this.x = x;
@@ -85,15 +82,6 @@ export class Ball extends RK41DObject {
         this.direction = Math.atan2(velocityY, velocityX);
       }
     }
-  }
-
-  staticSnapshot(): StaticBall {
-    return {
-      counter: this.counter,
-      radius: this.radius,
-      x: this.x,
-      y: this.y,
-    };
   }
 }
 

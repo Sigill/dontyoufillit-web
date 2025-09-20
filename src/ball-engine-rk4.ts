@@ -1,36 +1,16 @@
-import { Ball, computeExpandedRadius, StaticBall } from "./ball";
+import { Ball, computeExpandedRadius } from "./ball";
 import { BallEngine } from "./ball-engine";
 import { normalizeRadian } from "./utils";
 
 export class BallEngineRK4 extends BallEngine {
-  staticBalls: Array<StaticBall> = [];
   currentBall: Ball | null = null;
 
-  snapshot = new Array<[StaticBall, StaticBall]>();
-
-  takeSnapshot(): void {
-    this.snapshot = this.staticBalls.map<[StaticBall, StaticBall]>(b => [b, structuredClone(b)]);
-  }
-
-  restoreSnapshot() {
-    this.staticBalls = this.snapshot.map(([ball, snapshot]) => {
-      ball.counter = snapshot.counter;
-      ball.radius = snapshot.radius;
-      ball.x = snapshot.x;
-      ball.y = snapshot.y;
-      return ball;
-    });
-  }
-
-  fire({radius: radius, angle, x, y}: { radius: number; angle: number; x: number; y: number; }) {
-    this.takeSnapshot();
-
+  override internalFire({radius: radius, angle, x, y}: { radius: number; angle: number; x: number; y: number; }) {
     this.currentBall = new Ball(radius, x, y, angle);
   }
 
   /*
    * Position of the current ball is important, so it will be calculated 1000 times per second.
-   * Position of the cannon isn't, so it will be calculated only once every frame.
    */
   update(t1: number, t0: number): { score: number; gameover: boolean; } {
     const updateState = {
@@ -81,8 +61,7 @@ export class BallEngineRK4 extends BallEngine {
     return updateState;
   }
 
-  reset() {
+  override internalReset() {
     this.currentBall = null;
-    this.staticBalls = [];
   }
 }
