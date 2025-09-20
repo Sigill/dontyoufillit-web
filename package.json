@@ -7,7 +7,8 @@
   "scripts": {
     "build-esbuild": "npx tsx esbuild.ts",
     "build": "make",
-    "dev": "make && npx tsx --watch esbuild.ts --watch --serve"
+    "dev": "make && npx tsx --watch esbuild.ts --watch --serve",
+    "lint": "eslint src/"
   },
   "repository": {
     "type": "git",

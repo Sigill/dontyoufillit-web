@@ -103,23 +103,23 @@ export function computeExpandedRadius(
 ) {
   let minRadius = Number.MAX_VALUE, available: number, o: { nr: number; nx: number; ny: number; };
 
-    for (let i = 0; i < staticBalls.length; ++i) {
-      o = staticBalls[i];
-      available = vectorLength(nx - o.nx, ny - o.ny) - o.nr;
-      if (minRadius > available) minRadius = available;
-    }
-
-    available = nx;
+  for (let i = 0; i < staticBalls.length; ++i) {
+    o = staticBalls[i];
+    available = vectorLength(nx - o.nx, ny - o.ny) - o.nr;
     if (minRadius > available) minRadius = available;
+  }
 
-    available = 1 - nx;
-    if (minRadius > available) minRadius = available;
+  available = nx;
+  if (minRadius > available) minRadius = available;
 
-    available = Math.abs(ny);
-    if (minRadius > available) minRadius = available;
+  available = 1 - nx;
+  if (minRadius > available) minRadius = available;
 
-    available = Math.abs(1 - ny);
-    if (minRadius > available) minRadius = available;
+  available = Math.abs(ny);
+  if (minRadius > available) minRadius = available;
 
-    return Math.abs(minRadius);
+  available = Math.abs(1 - ny);
+  if (minRadius > available) minRadius = available;
+
+  return Math.abs(minRadius);
 }

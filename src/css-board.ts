@@ -1,7 +1,7 @@
 import { Ball, StaticBall } from "./ball";
 import { BallEngine } from "./ball-engine";
 import { Cannon } from "./cannon";
-import { getOrInsert, px, selectElement } from "./utils";
+import { getOrInsert, selectElement } from "./utils";
 import * as Constants from './constants';
 
 

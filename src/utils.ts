@@ -55,7 +55,7 @@ export function lazySetInnerText(element: HTMLElement, value: string): void {
   }
 }
 
-async function sleep(ms: number): Promise<void> {
+export async function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
