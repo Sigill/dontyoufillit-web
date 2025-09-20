@@ -27,7 +27,7 @@ export class Ball extends RK41DObject {
 
     this.direction = angle;
     this.state.u = 0;
-    this.state.v = 1;
+    this.state.v = Constants.DEFAULT_BALL_VELOCITY;
   }
 
   override acceleration() {
