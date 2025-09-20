@@ -4,7 +4,7 @@ export class Cannon extends RK41DObject {
   constructor() {
     super();
     this.state.u = 0;
-    this.state.s = Math.PI / 3;
+    this.state.v = Math.PI / 3;
   }
 
   override acceleration(): number {
@@ -20,7 +20,7 @@ export class Cannon extends RK41DObject {
 
     if (Math.abs(this.state.u) >= Math.PI / 2) {
       this.state.u = ((Math.PI / 2) - Math.abs(Math.PI / 2 - Math.abs(this.state.u))) * Math.sign(this.state.u);
-      this.state.s *= -1;
+      this.state.v *= -1;
     }
   }
 }

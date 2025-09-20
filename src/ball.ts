@@ -27,7 +27,7 @@ export class Ball extends RK41DObject {
 
     this.direction = angle;
     this.state.u = 0;
-    this.state.s = 1;
+    this.state.v = 1;
   }
 
   override acceleration() {
@@ -76,10 +76,10 @@ export class Ball extends RK41DObject {
 
         // http://en.wikipedia.org/wiki/Elastic_collision#Two-Dimensional_Collision_With_Two_Moving_Objects
         // Assuming no speed and an infinite mass for the second ball.
-        const phi = Math.atan2(normalY, normalX), theta = this.direction, speed = this.state.s;
+        const phi = Math.atan2(normalY, normalX), theta = this.direction, velocity = this.state.v;
 
-        const velocityX = -speed * Math.cos(theta - phi) * Math.cos(phi) + speed * Math.sin(theta - phi) * Math.cos(phi + Math.PI / 2);
-        const velocityY = -speed * Math.cos(theta - phi) * Math.sin(phi) + speed * Math.sin(theta - phi) * Math.sin(phi + Math.PI / 2);
+        const velocityX = -velocity * Math.cos(theta - phi) * Math.cos(phi) + velocity * Math.sin(theta - phi) * Math.cos(phi + Math.PI / 2);
+        const velocityY = -velocity * Math.cos(theta - phi) * Math.sin(phi) + velocity * Math.sin(theta - phi) * Math.sin(phi + Math.PI / 2);
 
         // Linear speed doesn't change, only the direction.
         this.direction = Math.atan2(velocityY, velocityX);

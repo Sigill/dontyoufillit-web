@@ -1,15 +1,15 @@
 export interface RK41DObject_State {
   u: number;
-  s: number;
+  v: number;
 }
 
 export interface RK41DObject_Derivative {
   du: number;
-  ds: number;
+  dv: number;
 }
 
 export abstract class RK41DObject {
-  state: RK41DObject_State = { u: 0, s: 0 };
+  state: RK41DObject_State = { u: 0, v: 0 };
 
   abstract acceleration(state: RK41DObject_State, t: number): number;
 
@@ -21,25 +21,25 @@ export abstract class RK41DObject {
   ): RK41DObject_Derivative {
     const state: RK41DObject_State = {
       u: initialState.u + derivative.du * dt,
-      s: initialState.s + derivative.ds * dt,
+      v: initialState.v + derivative.dv * dt,
     };
 
     return {
-      du: state.s,
-      ds: this.acceleration(state, t + dt),
+      du: state.v,
+      dv: this.acceleration(state, t + dt),
     };
   }
 
   integrate(t: number, dt: number): void {
-    const a = this.evaluate(this.state, t, 0, {du: 0, ds: 0});
+    const a = this.evaluate(this.state, t, 0, {du: 0, dv: 0});
     const b = this.evaluate(this.state, t, dt * 0.5, a);
     const c = this.evaluate(this.state, t, dt * 0.5, b);
     const d = this.evaluate(this.state, t, dt, c);
 
-    const dxdt = 1 / 6 * (a.du + 2 * (b.du + c.du) + d.du);
-    const dvdt = 1 / 6 * (a.ds + 2 * (b.ds + c.ds) + d.ds);
+    const dudt = 1 / 6 * (a.du + 2 * (b.du + c.du) + d.du);
+    const dvdt = 1 / 6 * (a.dv + 2 * (b.dv + c.dv) + d.dv);
 
-    this.state.u = this.state.u + dxdt * dt;
-    this.state.s = this.state.s + dvdt * dt;
+    this.state.u = this.state.u + dudt * dt;
+    this.state.v = this.state.v + dvdt * dt;
   }
 }

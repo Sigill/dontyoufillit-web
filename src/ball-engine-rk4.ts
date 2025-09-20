@@ -54,15 +54,15 @@ export class BallEngineRK4 extends BallEngine {
         }
 
         if (this.currentBall.y < this.currentBall.radius && normalizeRadian(this.currentBall.direction) > Math.PI) {
-          this.currentBall.state.s = 0;
+          this.currentBall.state.v = 0;
           updateState.gameover = true;
           this.currentBall = null;
           break;
         }
 
-        if (this.currentBall.state.s < 0.001) {
+        if (this.currentBall.state.v < 0.001) {
           if (this.currentBall.y >= 0) {
-            this.currentBall.state.s = 0;
+            this.currentBall.state.v = 0;
             const expandedRadius = computeExpandedRadius(this.currentBall, this.staticBalls);
             this.staticBalls.push({
               counter: 3,
