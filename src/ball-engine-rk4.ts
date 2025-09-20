@@ -40,11 +40,11 @@ export class BallEngineRK4 extends BallEngine {
 
     if (this.currentBall) {
       let loopLastUpdateTime = t0;
-      const steps = Math.floor(t1 - t0);
+      const steps = Math.floor((t1 - t0) * 1000);
 
       for (let i = 1; i <= steps; ++i) {
         const loopCurrentUpdateTime = (t0 * (steps - i) + t1 * i) / steps;
-        this.currentBall.update(loopLastUpdateTime / 1000, (loopCurrentUpdateTime - loopLastUpdateTime) / 1000, this.staticBalls);
+        this.currentBall.update(loopLastUpdateTime, (loopCurrentUpdateTime - loopLastUpdateTime), this.staticBalls);
 
         for (let j = this.staticBalls.length - 1; j >= 0; --j) {
           if (this.staticBalls[j].counter === 0) {

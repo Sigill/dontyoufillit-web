@@ -47,7 +47,7 @@ export class GameHandler {
   #update(t: number) {
     const lastUpdateTime = this.#lastUpdateTime ?? t;
 
-    this.#cannon.update(lastUpdateTime / 1000, (t - lastUpdateTime) / 1000);
+    this.#cannon.update(lastUpdateTime, t - lastUpdateTime);
     const updatestate = this.#ballEngine.update(t, lastUpdateTime);
 
     this.score += updatestate.score;
@@ -65,7 +65,7 @@ export class GameHandler {
   step(t: number) {
     this.observable.dispatchEvent('beginStep');
 
-    this.#update(t);
+    this.#update(t / 1000);
 
     this.observable.dispatchEvent('endStep');
 
