@@ -10,19 +10,19 @@ export abstract class BallEngineTemporalDiscretization extends BallEngine {
   /*
    * Position of the current ball is important, so it will be calculated 1000 times per second.
    */
-  override update(t1: number, t0: number): { score: number; gameover: boolean; } {
+  override update(frameTime: number, lastFrameTime: number): { score: number; gameover: boolean; } {
     const updateState = {
       score: 0,
       gameover: false,
     };
 
     if (this.currentBall) {
-      let loopLastUpdateTime = t0;
-      const steps = Math.floor((t1 - t0) * 1000);
+      let loopLastUpdateTime = lastFrameTime;
+      const steps = Math.floor((frameTime - lastFrameTime) * 1000);
 
       for (let i = 1; i <= steps; ++i) {
-        const loopCurrentUpdateTime = (t0 * (steps - i) + t1 * i) / steps;
-        this.currentBall.update(loopLastUpdateTime, (loopCurrentUpdateTime - loopLastUpdateTime), this.staticBalls);
+        const loopCurrentUpdateTime = (lastFrameTime * (steps - i) + frameTime * i) / steps;
+        this.currentBall.update(loopCurrentUpdateTime, loopLastUpdateTime, this.staticBalls);
 
         for (let j = this.staticBalls.length - 1; j >= 0; --j) {
           if (this.staticBalls[j].counter === 0) {

@@ -34,8 +34,8 @@ const screenContainer = selectElement('#screenContainer'),
 
 const cannon = new Cannon();
 // const ballEngine = new BallEngineRK4();
-const ballEngine = new BallEngineMotionEquationDelta();
-// const ballEngine = new BallEngineMotionEquationAbsolute();
+// const ballEngine = new BallEngineMotionEquationDelta();
+const ballEngine = new BallEngineMotionEquationAbsolute();
 const game = new GameHandler({cannon, ballEngine});
 game.highscore = readStoredHighscore();
 

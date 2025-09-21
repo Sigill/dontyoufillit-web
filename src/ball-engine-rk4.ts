@@ -23,10 +23,10 @@ class BouncingBallRK4 extends BouncingBall {
     this.#integrator.v = 0;
   }
 
-  override internalUpdate(t: number, dt: number) {
+  override internalUpdate(frameTime: number, lastFrameTime: number) {
     const previousStateU = this.#integrator.u;
 
-    this.#integrator.integrate(t, dt);
+    this.#integrator.integrate(lastFrameTime, frameTime - lastFrameTime);
 
     const deltaU = this.#integrator.u - previousStateU;
     this.x += deltaU * Math.cos(this.direction);

@@ -31,7 +31,7 @@ export abstract class BallEngine {
 
   abstract internalFire(ball: { radius: number; angle: number; x: number; y: number; }): void;
 
-  abstract update(t1: number, t0: number): { score: number; gameover: boolean; };
+  abstract update(frameTime: number, lastFrameTime: number): { score: number; gameover: boolean; };
 
   reset() {
     this.staticBalls = [];

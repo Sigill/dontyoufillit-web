@@ -20,13 +20,13 @@ export abstract class BouncingBall {
 
   abstract stop(): void;
 
-  update(t: number, dt: number, staticBalls: Array<StaticBall>) {
-    this.internalUpdate(t, dt);
+  update(frameTime: number, lastFrameTime: number, staticBalls: Array<StaticBall>) {
+    this.internalUpdate(frameTime, lastFrameTime);
 
     this.bounce(staticBalls);
   }
 
-  abstract internalUpdate(t: number, dt: number): void;
+  abstract internalUpdate(frameTime: number, lastFrameTime: number): void;
 
   private bounce(staticBalls: Array<StaticBall>) {
     if (this.x > 1 - this.radius) {

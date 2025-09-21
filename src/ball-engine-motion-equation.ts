@@ -14,9 +14,10 @@ class BouncingBallMotionEquationDelta extends BouncingBall {
     this.#v = 0;
   }
 
-  override internalUpdate(t: number, dt: number) {
-    const deltaU = this.#v * dt + 1/2 * Constants.DEFAULT_BALL_ACCELERATION * dt**2;
-    this.#v += Constants.DEFAULT_BALL_ACCELERATION * dt;
+  override internalUpdate(frameTime: number, lastFrameTime: number) {
+    const deltaT = frameTime - lastFrameTime;
+    const deltaU = this.#v * deltaT + 1/2 * Constants.DEFAULT_BALL_ACCELERATION * deltaT**2;
+    this.#v += Constants.DEFAULT_BALL_ACCELERATION * deltaT;
 
     this.x += deltaU * Math.cos(this.direction);
     this.y += deltaU * Math.sin(this.direction);
@@ -47,12 +48,15 @@ class BouncingBallMotionEquationAbsolute extends BouncingBall {
     this.#v = 0;
   }
 
-  override internalUpdate(t: number, dt: number) {
-    this.#firedAt ??= t;
+  override internalUpdate(frameTime: number) {
+    this.#firedAt ??= frameTime;
 
     const prevU = this.#u;
-    this.#u = Constants.DEFAULT_BALL_VELOCITY * (t + dt - this.#firedAt) + 1/2 * Constants.DEFAULT_BALL_ACCELERATION * (t + dt - this.#firedAt)**2;
-    this.#v = Constants.DEFAULT_BALL_VELOCITY + Constants.DEFAULT_BALL_ACCELERATION * (t + dt - this.#firedAt);
+
+    const ballTime = frameTime - this.#firedAt;
+    // Does this reduce rounding error accumulation compared to the delta-based implementation?
+    this.#u = Constants.DEFAULT_BALL_VELOCITY * ballTime + 1/2 * Constants.DEFAULT_BALL_ACCELERATION * ballTime**2;
+    this.#v = Constants.DEFAULT_BALL_VELOCITY + Constants.DEFAULT_BALL_ACCELERATION * ballTime;
 
     const deltaU = this.#u - prevU;
 
