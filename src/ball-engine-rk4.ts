@@ -1,64 +1,42 @@
-import { Ball, computeExpandedRadius } from "./ball";
-import { BallEngine } from "./ball-engine";
-import { normalizeRadian } from "./utils";
+import { BallEngineTemporalDiscretization } from "./ball-engine-temporal-discretization";
+import { BouncingBall } from "./bouncing-ball";
+import * as Constants from "./constants";
+import { RK41DObject } from "./rk4-integrator";
 
-export class BallEngineRK4 extends BallEngine {
-  currentBall: Ball | null = null;
 
-  override internalFire({radius: radius, angle, x, y}: { radius: number; angle: number; x: number; y: number; }) {
-    this.currentBall = new Ball(radius, x, y, angle);
-  }
-
-  /*
-   * Position of the current ball is important, so it will be calculated 1000 times per second.
-   */
-  update(t1: number, t0: number): { score: number; gameover: boolean; } {
-    const updateState = {
-      score: 0,
-      gameover: false,
-    };
-
-    if (this.currentBall) {
-      let loopLastUpdateTime = t0;
-      const steps = Math.floor((t1 - t0) * 1000);
-
-      for (let i = 1; i <= steps; ++i) {
-        const loopCurrentUpdateTime = (t0 * (steps - i) + t1 * i) / steps;
-        this.currentBall.update(loopLastUpdateTime, (loopCurrentUpdateTime - loopLastUpdateTime), this.staticBalls);
-
-        for (let j = this.staticBalls.length - 1; j >= 0; --j) {
-          if (this.staticBalls[j].counter === 0) {
-            ++updateState.score;
-            this.staticBalls.splice(j, 1);
-          }
-        }
-
-        if (this.currentBall.y < this.currentBall.radius && normalizeRadian(this.currentBall.direction) > Math.PI) {
-          this.currentBall.state.v = 0;
-          updateState.gameover = true;
-          this.currentBall = null;
-          break;
-        }
-
-        if (this.currentBall.state.v < 0.001) {
-          if (this.currentBall.y >= 0) {
-            this.currentBall.state.v = 0;
-            const expandedRadius = computeExpandedRadius(this.currentBall, this.staticBalls);
-            this.staticBalls.push({
-              counter: 3,
-              radius: expandedRadius,
-              x: this.currentBall.x,
-              y: this.currentBall.y,
-            });
-          }
-          this.currentBall = null;
-          break;
-        }
-        loopLastUpdateTime = loopCurrentUpdateTime;
-      }
+class BouncingBallRK4 extends BouncingBall {
+  #integrator = new class extends RK41DObject {
+    constructor() {
+      super(0, Constants.DEFAULT_BALL_VELOCITY);
     }
 
-    return updateState;
+    override acceleration(): number {
+      return Constants.DEFAULT_BALL_ACCELERATION;
+    }
+  };
+
+  get velocity(): number {
+    return this.#integrator.v;
+  }
+
+  override stop() {
+    this.#integrator.v = 0;
+  }
+
+  override internalUpdate(t: number, dt: number) {
+    const previousStateU = this.#integrator.u;
+
+    this.#integrator.integrate(t, dt);
+
+    const deltaU = this.#integrator.u - previousStateU;
+    this.x += deltaU * Math.cos(this.direction);
+    this.y += deltaU * Math.sin(this.direction);
+  }
+}
+
+export class BallEngineRK4 extends BallEngineTemporalDiscretization {
+  override internalFire({radius: radius, angle, x, y}: { radius: number; angle: number; x: number; y: number; }) {
+    this.currentBall = new BouncingBallRK4(radius, x, y, angle);
   }
 
   override internalReset() {

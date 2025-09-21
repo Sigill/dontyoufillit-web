@@ -153,7 +153,7 @@ ESBUILD_SOURCE_FILES = \
 	src/app.ts \
 	src/ball-engine-rk4.ts \
 	src/ball-engine.ts \
-	src/ball.ts \
+	src/bouncing-ball.ts \
 	src/cannon.ts \
 	src/constants.ts \
 	src/css-board.ts \

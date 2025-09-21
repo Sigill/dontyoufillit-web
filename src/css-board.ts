@@ -1,4 +1,4 @@
-import { Ball, StaticBall } from "./ball";
+import { StaticBall } from "./static-ball";
 import { BallEngine } from "./ball-engine";
 import { Cannon } from "./cannon";
 import { getOrInsert, selectElement } from "./utils";

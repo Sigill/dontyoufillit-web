@@ -1,4 +1,4 @@
-import { StaticBall } from "./ball";
+import { StaticBall } from "./static-ball";
 
 export abstract class BallEngine {
   staticBalls: Array<StaticBall>;

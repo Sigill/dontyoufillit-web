@@ -89,7 +89,7 @@ export class GameHandler {
 
   reset() {
     this.#ballEngine.reset();
-    this.#cannon.state.u = 0;
+    this.#cannon.reset();
     this.score = 0;
     this.resume();
   }

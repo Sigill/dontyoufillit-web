@@ -1,26 +1,30 @@
-import { RK41DObject } from "./rk4-integrator.js";
+import { RK41DObject } from "./rk4-integrator";
 
-export class Cannon extends RK41DObject {
-  constructor() {
-    super();
-    this.state.u = 0;
-    this.state.v = Math.PI / 3;
-  }
+export class Cannon {
+  #integrator = new class extends RK41DObject {
+    constructor() {
+      super(0, Math.PI / 3);
+    }
 
-  override acceleration(): number {
-    return 0;
+    override acceleration() {
+      return 0;
+    }
+  };
+
+  reset() {
+    this.#integrator.u = 0;
   }
 
   getAngle(): number {
-    return this.state.u + Math.PI / 2;
+    return this.#integrator.u + Math.PI / 2;
   }
 
   update(t: number, dt: number) {
-    this.integrate(t, dt);
+    this.#integrator.integrate(t, dt);
 
-    if (Math.abs(this.state.u) >= Math.PI / 2) {
-      this.state.u = ((Math.PI / 2) - Math.abs(Math.PI / 2 - Math.abs(this.state.u))) * Math.sign(this.state.u);
-      this.state.v *= -1;
+    if (Math.abs(this.#integrator.u) >= Math.PI / 2) {
+      this.#integrator.u = ((Math.PI / 2) - Math.abs(Math.PI / 2 - Math.abs(this.#integrator.u))) * Math.sign(this.#integrator.u);
+      this.#integrator.v *= -1;
     }
   }
 }

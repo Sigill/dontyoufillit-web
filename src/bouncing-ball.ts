@@ -1,47 +1,32 @@
-import { RK41DObject } from "./rk4-integrator";
+import { StaticBall } from "./static-ball";
 import { normalizeRadian, vectorLength } from "./utils";
-import * as Constants from "./constants";
 
-export interface StaticBall {
-  counter: number;
-  radius: number;
-  x: number;
-  y: number;
-}
 
-export class Ball extends RK41DObject {
+export abstract class BouncingBall {
   radius: number;
   x: number;
   y: number;
   direction: number;
 
   constructor(radius: number, x: number, y: number, angle: number) {
-    super();
-
     this.radius = radius;
     this.x = x;
     this.y = y;
 
     this.direction = angle;
-    this.state.u = 0;
-    this.state.v = Constants.DEFAULT_BALL_VELOCITY;
   }
 
-  override acceleration() {
-    return Constants.DEFAULT_BALL_ACCELERATION;
-  }
+  abstract get velocity(): number;
+
+  abstract stop(): void;
 
   update(t: number, dt: number, staticBalls: Array<StaticBall>) {
-    const previousStateU = this.state.u;
-
-    this.integrate(t, dt);
-
-    const d = this.state.u - previousStateU;
-    this.x += d * Math.cos(this.direction);
-    this.y += d * Math.sin(this.direction);
+    this.internalUpdate(t, dt);
 
     this.bounce(staticBalls);
   }
+
+  abstract internalUpdate(t: number, dt: number): void;
 
   private bounce(staticBalls: Array<StaticBall>) {
     if (this.x > 1 - this.radius) {
@@ -73,7 +58,9 @@ export class Ball extends RK41DObject {
 
         // http://en.wikipedia.org/wiki/Elastic_collision#Two-Dimensional_Collision_With_Two_Moving_Objects
         // Assuming no speed and an infinite mass for the second ball.
-        const phi = Math.atan2(normalY, normalX), theta = this.direction, velocity = this.state.v;
+        const phi = Math.atan2(normalY, normalX);
+        const theta = this.direction;
+        const velocity = this.velocity;
 
         const velocityX = -velocity * Math.cos(theta - phi) * Math.cos(phi) + velocity * Math.sin(theta - phi) * Math.cos(phi + Math.PI / 2);
         const velocityY = -velocity * Math.cos(theta - phi) * Math.sin(phi) + velocity * Math.sin(theta - phi) * Math.sin(phi + Math.PI / 2);
@@ -83,31 +70,4 @@ export class Ball extends RK41DObject {
       }
     }
   }
-}
-
-export function computeExpandedRadius(
-  {x, y}: { x: number; y: number; },
-  staticBalls: Array<{ radius: number; x: number; y: number; }>
-) {
-  let minRadius = Number.MAX_VALUE, available: number, o: { radius: number; x: number; y: number; };
-
-  for (let i = 0; i < staticBalls.length; ++i) {
-    o = staticBalls[i];
-    available = vectorLength(x - o.x, y - o.y) - o.radius;
-    if (minRadius > available) minRadius = available;
-  }
-
-  available = x;
-  if (minRadius > available) minRadius = available;
-
-  available = 1 - x;
-  if (minRadius > available) minRadius = available;
-
-  available = Math.abs(y);
-  if (minRadius > available) minRadius = available;
-
-  available = Math.abs(1 - y);
-  if (minRadius > available) minRadius = available;
-
-  return Math.abs(minRadius);
 }
