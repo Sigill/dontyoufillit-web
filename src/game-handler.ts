@@ -16,7 +16,8 @@ export class GameHandler {
 
   #state = GameHandler.PAUSED;
 
-  #lastUpdateTime?: number = undefined;
+  #timeCorrection = 0;
+  #pausedAt?: number;
 
   highscore = 0;
   score = 0;
@@ -44,11 +45,9 @@ export class GameHandler {
     return this.#ballEngine.staticBalls;
   }
 
-  #update(t: number) {
-    const lastUpdateTime = this.#lastUpdateTime ?? t;
-
-    this.#cannon.update(lastUpdateTime, t - lastUpdateTime);
-    const updatestate = this.#ballEngine.update(t, lastUpdateTime);
+  #update(frameTime: number, lastFrameTime: number) {
+    this.#cannon.update(lastFrameTime, frameTime - lastFrameTime);
+    const updatestate = this.#ballEngine.update(frameTime, lastFrameTime);
 
     this.score += updatestate.score;
     this.highscore = Math.max(this.score, this.highscore);
@@ -58,22 +57,37 @@ export class GameHandler {
       this.lives -= 1;
       this.observable.dispatchEvent('gameover', this.score);
     }
-
-    this.#lastUpdateTime = t;
   }
 
-  step(t: number) {
+  step(frameTime: number, lastFrametime: number) {
+    if (this.#state === GameHandler.PAUSED) {
+      this.#pausedAt = lastFrametime;
+    } else if (this.#state === GameHandler.RUNNING) {
+      this.observable.dispatchEvent('beginStep');
+
+      this.#update(frameTime - this.#timeCorrection, lastFrametime - this.#timeCorrection);
+
+      this.observable.dispatchEvent('endStep');
+
+      window.requestAnimationFrame(nextFrameTime => this.step(nextFrameTime / 1000, frameTime));
+    }
+
+    if (this.#state === GameHandler.GAMEOVER) {
+      this.observable.dispatchEvent('gameover', this.score);
+    }
+  }
+
+  start(frameTime: number) {
     this.observable.dispatchEvent('beginStep');
 
-    this.#update(t / 1000);
+    if (this.#pausedAt !== undefined) {
+      this.#timeCorrection += frameTime - this.#pausedAt;
+      this.#pausedAt = undefined;
+    }
 
     this.observable.dispatchEvent('endStep');
 
-    if (this.#state === GameHandler.RUNNING) {
-      window.requestAnimationFrame((t) => this.step(t));
-    } else if (this.#state === GameHandler.GAMEOVER) {
-      this.observable.dispatchEvent('gameover', this.score);
-    }
+    window.requestAnimationFrame(nextFrameTime => this.step(nextFrameTime / 1000, frameTime));
   }
 
   pause() {
@@ -82,9 +96,8 @@ export class GameHandler {
   }
 
   resume() {
-    this.#lastUpdateTime = undefined;
     this.#state = GameHandler.RUNNING;
-    window.requestAnimationFrame((t) => this.step(t));
+    window.requestAnimationFrame(nextFrameTime => this.start(nextFrameTime / 1000));
   }
 
   reset() {

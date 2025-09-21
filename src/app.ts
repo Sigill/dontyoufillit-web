@@ -1,6 +1,9 @@
 import Stats from "stats.js";
 import { BallEngineRK4 } from "./ball-engine-rk4";
-import { BallEngineMotionEquationDelta } from "./ball-engine-motion-equation";
+import {
+  BallEngineMotionEquationDelta,
+  BallEngineMotionEquationAbsolute,
+} from "./ball-engine-motion-equation";
 import { Cannon } from "./cannon";
 import { CssBoard } from "./css-board";
 import { GameHandler } from "./game-handler";
@@ -32,6 +35,7 @@ const screenContainer = selectElement('#screenContainer'),
 const cannon = new Cannon();
 // const ballEngine = new BallEngineRK4();
 const ballEngine = new BallEngineMotionEquationDelta();
+// const ballEngine = new BallEngineMotionEquationAbsolute();
 const game = new GameHandler({cannon, ballEngine});
 game.highscore = readStoredHighscore();
 
