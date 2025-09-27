@@ -1,48 +1,23 @@
 import { type Tab } from 'bootstrap';
 import * as Constants from "../src/constants";
-import { Wall } from "../src/collision-solver";
-import { computeCollisionsWithWalls } from "../src/collision-solver";
+import { computeCollisionWithBall } from "../src/collision-solver";
 import { selectElement } from '../src/utils';
 
 declare function getTab(element: string | Element): Tab;
 
 const tabs = selectElement('#v-pills-tab')!;
 
-const squareWalls: Array<Wall> = [
-  {x0: 0, y0: 1, x1: 1, y1: 1}, // top
-  {x0: 1, y0: 1, x1: 1, y1: 0}, // right
-  {x0: 1, y0: 0, x1: 0, y1: 0}, // bottom
-  {x0: 0, y0: 0, x1: 0, y1: 1}, // left
-];
+interface Ball {
+  radius: number;
+  x: number;
+  y: number;
+}
 
-const cases: Array<[string, { position: { x: number; y: number; }; direction: { x: number; y: number; }; walls: Array<Wall>; }]> = [
-  ['90 top', {position: {x: 0.5, y: 0.5}, direction: {x: 0.5, y: 1}, walls: [squareWalls[0]]} ],
-  ['90 right', {position: {x: 0.5, y: 0.5}, direction: {x: 0.5, y: 1}, walls: [squareWalls[1]]} ],
-  ['90 bottom', {position: {x: 0.5, y: 0.5}, direction: {x: 0.5, y: 1}, walls: [squareWalls[2]]} ],
-  ['90 left', {position: {x: 0.5, y: 0.5}, direction: {x: 0.5, y: 1}, walls: [squareWalls[3]]} ],
-  ['45 top', {position: {x: 0.5, y: 0.5}, direction: {x: 0, y: 1}, walls: [squareWalls[0]]} ],
-  ['45 right', {position: {x: 0.5, y: 0.5}, direction: {x: 0, y: 1}, walls: [squareWalls[1]]} ],
-  ['45 bottom', {position: {x: 0.5, y: 0.5}, direction: {x: 0, y: 1}, walls: [squareWalls[2]]} ],
-  ['45 left', {position: {x: 0.5, y: 0.5}, direction: {x: 0, y: 1}, walls: [squareWalls[3]]} ],
-  ['45 all', {position: {x: 0.5, y: 0.5}, direction: {x: 0, y: 1}, walls: squareWalls} ],
-  ['45 1', {
-    position: {x: 0.5, y: 0},
-    direction: {x: 0.5, y: 1},
-    walls: [{x0: 0.5, y0: 1, x1: 0, y1: 0}]
-  }],
-  ['45 2', {
-    position: {x: 0.5, y: 0},
-    direction: {x: 0.5, y: 1},
-    walls: [{x0: 0.5, y0: 1, x1: 1, y1: 0}]
-  }],
-  ['45 all', {
-    position: {x: 0.5, y: 0},
-    direction: {x: 0.5, y: 1},
-    walls: [
-      {x0: 0.5, y0: 1, x1: 0, y1: 0},
-      {x0: 0.5, y0: 1, x1: 1, y1: 0},
-    ]
-  }],
+const cases: Array<[string, { position: { x: number; y: number; }; direction: { x: number; y: number; }; ball: Ball; }]> = [
+  ['90 top', {position: {x: 0.5, y: 0.5}, direction: {x: 0.5, y: 1}, ball: {x: 0.5, y: 1, radius: 2 * Constants.DEFAULT_BALL_RADIUS}}],
+  ['90 bottom', {position: {x: 0.5, y: 0.5}, direction: {x: 0.5, y: 0}, ball: {x: 0.5, y: 0, radius: 2 * Constants.DEFAULT_BALL_RADIUS}}],
+  ['90 left', {position: {x: 0.5, y: 0.5}, direction: {x: 0, y: 0.5}, ball: {x: 0, y: 0.5, radius: 2 * Constants.DEFAULT_BALL_RADIUS}}],
+  ['90 right', {position: {x: 0.5, y: 0.5}, direction: {x: 1, y: 0.5}, ball: {x: 1, y: 0.5, radius: 2 * Constants.DEFAULT_BALL_RADIUS}}],
 ];
 
 for (const [title, config] of cases) {
@@ -97,7 +72,7 @@ for (const [title, config] of cases) {
       radius: Constants.DEFAULT_BALL_RADIUS,
     };
 
-    config.walls.forEach(w => line(w.x0, w.y0, w.x1, w.y1));
+    circle(config.ball.x, config.ball.y, config.ball.radius);
 
     circle(ballState.x, ballState.y, ballState.radius);
     line(ballState.x, ballState.y, config.direction.x, config.direction.y);
@@ -105,10 +80,8 @@ for (const [title, config] of cases) {
     const plotContainer = document.createElement('div');
     mainContainer.append(plotContainer);
 
-    const collisions = [...computeCollisionsWithWalls(ballState, config.walls)];
-    for (const collision of collisions) {
-      console.log(collision);
-      const { t } = collision;
+    const t = computeCollisionWithBall(ballState, config.ball, 1e-5, -ballState.velocity / ballState.acceleration, { epsilon: 1e-5 });
+    if (t !== undefined) {
       const c = {
         x: 1/2 * ballState.acceleration * Math.cos(angle) * t**2 + ballState.velocity * Math.cos(angle) * t + ballState.x,
         y: 1/2 * ballState.acceleration * Math.sin(angle) * t**2 + ballState.velocity * Math.sin(angle) * t + ballState.y,
@@ -117,14 +90,6 @@ for (const [title, config] of cases) {
         c.x, c.y,
         ballState.radius,
       );
-
-      const wall = collision.with.value;
-      const wallAngle = Math.atan2(wall.y1 - wall.y0, wall.x1 - wall.x0);
-      const q = {
-        x: c.x + wall.sigma * ballState.radius * -Math.sin(wallAngle),
-        y: c.y + wall.sigma * ballState.radius * Math.cos(wallAngle)
-      };
-      circle(q.x, q.y, 1/100);
     }
   });
 

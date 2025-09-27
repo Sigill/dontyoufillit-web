@@ -37,7 +37,7 @@ const cannon = new Cannon();
 // const ballEngine = new BallEngineRK4();
 // const ballEngine = new BallEngineMotionEquationDelta();
 // const ballEngine = new BallEngineMotionEquationAbsolute();
-const ballEngine = new BallEngineMath();
+const ballEngine = (window as any).ballEngine = new BallEngineMath();
 const game = new GameHandler({cannon, ballEngine});
 game.highscore = readStoredHighscore();
 

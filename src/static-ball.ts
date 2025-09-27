@@ -5,7 +5,9 @@ export interface StaticBall {
   radius: number;
   x: number;
   y: number;
-}export function computeExpandedRadius(
+}
+
+export function computeExpandedRadius(
   { x, y }: { x: number; y: number; },
   staticBalls: Array<{ radius: number; x: number; y: number; }>
 ) {

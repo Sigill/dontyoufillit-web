@@ -39,6 +39,7 @@ program.action(async ({ watch, serve, liveReload }: { watch: boolean; serve: boo
       { in: 'src/app.ts', out: 'www/app' },
       { in: 'src/app.css', out: 'www/app' },
       { in: 'dev/wall-collision.ts', out: 'dev/wall-collision' },
+      { in: 'dev/ball-collision.ts', out: 'dev/ball-collision' },
     ],
     loader: {
       '.html': 'text'

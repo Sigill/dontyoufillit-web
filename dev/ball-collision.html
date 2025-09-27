@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Ball collision</title>
+  <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="d-flex align-items-start">
+  <div class="nav flex-column nav-pills m-2" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+
+  </div>
+
+  <div id='main-container' style="display: flex; column-gap: 8px; margin-top: 8px;">
+  </div>
+</div>
+
+<script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  function getTab(e) {
+    return bootstrap.Tab.getOrCreateInstance(e);
+  }
+</script>
+<script type="module" src="../dist/dev/ball-collision.js"></script>
+</body>
+</html>

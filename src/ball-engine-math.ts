@@ -1,32 +1,31 @@
-import * as Constants from "./constants";
 import { BallEngine } from "./ball-engine";
+import {
+  BallObstacle,
+  Collision,
+  computeCollisionsWithBalls,
+  computeCollisionsWithWalls,
+  findImminentCollisions,
+  Wall,
+  WallObstacle,
+} from "./collision-solver";
+import * as Constants from "./constants";
 import { computeExpandedRadius, StaticBall } from "./static-ball";
-import { directionalArrow, ppAngle, solveQuadratic } from "./utils";
+import { directionalArrow, ppAngle } from "./utils";
 
-export interface Wall {
-  x0: number;
-  y0: number;
-  x1: number;
-  y1: number;
+type Obstacle = WallObstacle | BallObstacle<StaticBall>;
+
+function ppWallObstacle({ wall: w, sigma}: { wall: Wall, sigma: number}) {
+  return `wall x0:${w.x0.toFixed(3)} y0:${w.y0.toFixed(3)} x1:${w.x1.toFixed(3)} y1:${w.y1.toFixed(3)} sigma:${sigma}`;
 }
 
-interface WallObstacle {
-  type: 'wall';
-  value: Wall & {
-    sigma: number;
-  };
+function ppBallObstacle({x, y, counter}: StaticBall) {
+  return `ball x:${x.toFixed(3)} y:${y.toFixed(3)} counter:${counter}`;
 }
 
-type BallObstacle = {
-  type: 'ball';
-  value: StaticBall;
-};
-
-export type Obstacle = WallObstacle | BallObstacle;
-
-export interface Collision<O> {
-  t: number;
-  with: O;
+function ppObstacle(o: Obstacle) {
+  return o.type === 'wall'
+    ? ppWallObstacle(o.value)
+    : ppBallObstacle(o.value);
 }
 
 const GameWalls = {
@@ -35,59 +34,6 @@ const GameWalls = {
   bottom: {x0: 1, y0: 0, x1: 0, y1: 0}, // bottom
   left: {x0: 0, y0: 0, x1: 0, y1: 1}, // left
 };
-
-function wallName({x0, y0, x1, y1}: Wall) {
-  return Object.entries(GameWalls).find(([, v]) => v.x0 === x0 && v.y0 === y0 && v.x1 === x1 && v.y1 === y1)![0];
-}
-
-export function computeCollisionsWithLine(
-  xw: number, yw: number, alpha: number, // wall
-  xb: number, yb: number, beta: number, // ball
-  velocity: number,
-  acceleration: number,
-  radius: number,
-  t0: number,
-  tMax: number,
-  epsilon: number,
-  { verbose }: { verbose?: boolean } = {},
-): { t: number; sigma: number; } | undefined {
-  if (Math.abs(Math.sin(alpha - beta)) <= epsilon) {
-    // Parallel lines.
-    // TODO It might always collide, return t=undefined?
-    return;
-  }
-
-  const Delta = Math.sin(alpha - beta);
-  const c0 = (xb - xw) * Math.sin(alpha) - (yb - yw) * Math.cos(alpha);
-
-  function* gen() {
-    for (const sigma of [-1, 1]) {
-      for (const t of solveQuadratic(1 / 2 * acceleration * Delta, velocity * Delta, c0 - sigma * radius, epsilon)) {
-        if (t < t0) {
-          verbose && console.debug(`Excluding collision happening in the past at t=${t} sigma=${sigma}`);
-          continue;
-        }
-        if (t > tMax) {
-          verbose && console.debug(`Excluding collision happening after the ball has stopped at t=${t} sigma=${sigma}`);
-          continue;
-        }
-        verbose && console.debug(`Potential collision at t=${t} sigma=${sigma}`);
-        yield { t, sigma };
-      }
-    }
-  }
-
-  const collisions = [...gen()];
-  if (collisions.length > 0) {
-    const firstCollision = collisions.reduce((a, b) => {
-      const [first, second] = a.t < b.t ? [a, b] : [b, a];
-      verbose && console.debug(`Excluding subsequent collision at t=${second.t} sigma=${second.sigma}`);
-      return first;
-    });
-    verbose && console.debug(`First collision at t=${firstCollision.t} sigma=${firstCollision.sigma}`);
-    return firstCollision;
-  }
-}
 
 class MathBall implements StaticBall {
   counter: number;
@@ -117,62 +63,17 @@ interface BallState {
   acceleration: number;
 }
 
-export function* computeCollisionsWithWalls(
-  { t: t0, x, y, angle: ballAngle, velocity, acceleration, radius }: BallState & { radius: number; },
-  candidateWalls:  Array<Wall>,
-  {
-    epsilon = 1e-5,
-    verbose,
-  }: {
-    epsilon?: number;
-    verbose?: boolean;
-  } = {}
-): Generator<Collision<WallObstacle>, void, unknown> {
-  function* gen() {
-    for (const wall of candidateWalls) {
-      verbose && console.group(`Considering ${wallName(wall)} wall`);
-
-      const wallAngle = Math.atan2(wall.y1 - wall.y0, wall.x1 - wall.x0);
-
-      const collision = computeCollisionsWithLine(
-        wall.x0, wall.y0, wallAngle,
-        x, y, ballAngle, velocity, acceleration, radius,
-        epsilon,
-        -velocity / acceleration,
-        epsilon,
-        { verbose },
-      );
-
-      if (collision !== undefined) {
-        yield {t: collision.t + t0, with: { type: 'wall' as const, value: {...wall, sigma: collision.sigma }}};
-      }
-
-      verbose && console.groupEnd();
-    }
-  }
-
-  const collisions = [...gen()]
-    .sort((a, b) => a.t - b.t)
-    // Identify imminent collisions.
-    .filter(({t}, _, [first]) => t <= first.t + epsilon);
-
-  for (const {t, with: {value: wall}} of collisions) {
-    verbose && console.debug(`Collision at t=${t} with ${wallName(wall)} wall`);
-  }
-
-  yield* collisions;
-}
-
-function* computeCollisionsWithGameWalls(
-  ball: BallState & { radius: number; },
-  {
-    epsilon = 1e-5,
-    verbose,
-  }: {
-    epsilon?: number;
-    verbose?: boolean;
-  } = {}
-): Generator<Collision<WallObstacle>, void, unknown> {
+function computeCollisionsWithGameWalls(
+  ball: {
+    radius: number;
+    x: number;
+    y: number;
+    angle: number;
+    velocity: number;
+    acceleration: number;
+  },
+  { epsilon = 1e-5 }: { epsilon?: number } = {}
+): Array<Collision<WallObstacle>> {
   // // TODO IO: depending on direction of movement, only check the walls in that direction.
   const candidateWalls: Array<Wall> = [GameWalls.top, GameWalls.right, GameWalls.left];
 
@@ -181,36 +82,50 @@ function* computeCollisionsWithGameWalls(
     candidateWalls.push(GameWalls.bottom);
   }
 
-  yield* computeCollisionsWithWalls(ball, candidateWalls, { epsilon, verbose });
+  return computeCollisionsWithWalls(ball, candidateWalls, { epsilon });
 }
 
 function* computeFixedPoints(
-  { x, y, angle: ballAngle, velocity: velocity, acceleration, radius }: Omit<BallState, 't'> & { radius: number; },
-  { verbose }: { verbose?: boolean } = {},
+  ball: { radius: number; x: number; y: number; angle: number; velocity: number; acceleration: number; },
+  balls: Array<StaticBall>,
+  { epsilon = 1e-5 }: { epsilon?: number } = {},
 ): Generator<BallState & { with: Array<Obstacle>; }> {
+  let { x, y, velocity, angle} = ball;
+
   let t0 = 0;
+  const tMax = -ball.velocity / ball.acceleration;
 
-  const tMax = -velocity / acceleration;
+  yield { t: t0, x, y, velocity, angle, acceleration: ball.acceleration, with: [] };
 
-  yield {
-    t: t0,
-    x, y,
-    angle: ballAngle,
-    velocity,
-    acceleration,
-    with: []
-  };
+  const fixedBalls = balls.map<StaticBall & { sourceBall: StaticBall }>(b => {
+    let originalCounter = b.counter;
+    return {
+      ...b,
+      get counter() {
+        return originalCounter;
+      },
+      set counter(value: number) {
+        originalCounter = value;
+      },
+      sourceBall: b,
+    };
+  });
 
   for (let i = 0; true; ++i) {
-    verbose && console.group(`Fixed point #${i+1}`);
-
-    verbose && console.debug(`${t0} ${directionalArrow(Math.cos(ballAngle) * velocity, Math.sin(ballAngle) * velocity)} x=${x.toFixed(3)} y=${y.toFixed(3)} angle=${ppAngle(ballAngle)} v=${velocity.toFixed(3)}`);
-
-    const collisions = [...computeCollisionsWithGameWalls({t: t0, x, y, angle: ballAngle, velocity, acceleration, radius}, { verbose: verbose })];
-    // TODO handle collision with balls.
+    const ballState = { x, y, angle, velocity, acceleration: ball.acceleration, radius: ball.radius };
+    const wallCollisions = computeCollisionsWithGameWalls(ballState, { epsilon });
+    const ballCollisions = fixedBalls.length === 0 ? [] : computeCollisionsWithBalls(ballState, fixedBalls, { epsilon });
+    const collisions = findImminentCollisions<WallObstacle | BallObstacle<StaticBall & { sourceBall: StaticBall; }>>(
+      [ ...wallCollisions, ...ballCollisions, ],
+      {epsilon}
+    );
 
     if (collisions.length > 1) { // TODO handle collision against multiple objects.
       throw new Error('Collision against multiple objects');
+    }
+
+    for (const collision of collisions) {
+      collision.t += t0;
     }
 
     const collision = collisions.at(0);
@@ -218,46 +133,45 @@ function* computeFixedPoints(
     const t1 = collision?.t ?? tMax;
     const deltaT = t1 - t0;
 
-    x = 1/2 * Math.cos(ballAngle) * acceleration * deltaT**2 + Math.cos(ballAngle) * velocity * deltaT + x;
-    y = 1/2 * Math.sin(ballAngle) * acceleration * deltaT**2 + Math.sin(ballAngle) * velocity * deltaT + y;
-    velocity = velocity + acceleration * deltaT;
+    x += 1/2 * Math.cos(angle) * ball.acceleration * deltaT**2 + Math.cos(angle) * velocity * deltaT;
+    y += 1/2 * Math.sin(angle) * ball.acceleration * deltaT**2 + Math.sin(angle) * velocity * deltaT;
+    velocity = collision !== undefined ? velocity + ball.acceleration * deltaT : 0; // Avoid rounding errors.
+
+    const obstacles = [];
 
     if (collision !== undefined) {
       if (collision.with.type === 'wall') {
-        const wall = collision.with.value as Wall;
+        const { wall } = collision.with.value;
         const wallAngle = Math.atan2(wall.y1 - wall.y0, wall.x1 - wall.x0);
-        ballAngle = 2 * wallAngle - ballAngle;
+        angle = 2 * wallAngle - angle;
 
-        // TODO stop if collision with bottom wall.
-
-        verbose && console.log(ppAngle(ballAngle), directionalArrow(Math.cos(ballAngle), Math.sin(ballAngle)));
+        obstacles.push(collision.with);
       } else {
-        // TODO handle collision with balls.
+        const ball = collision.with.value;
+
+        ball.counter -= 1;
+        if (ball.counter === 0) {
+          fixedBalls.splice(fixedBalls.indexOf(ball), 1);
+        }
+
+        const theta = Math.atan2(y - ball.y, x - ball.x);
+        angle = 2 * (theta + Math.PI / 2) - angle;
+
+        obstacles.push({ type: 'ball' as const, value: collision.with.value.sourceBall });
       }
     }
 
-    yield {
-      t: t1,
-      x,
-      y,
-      angle: ballAngle,
-      velocity,
-      acceleration,
-      with: collision === undefined ? [] : [collision.with]
-    };
-
-    t0 = t1;
-
-    verbose && console.groupEnd();
+    yield { t: t1, x, y, angle, velocity, acceleration: ball.acceleration, with: obstacles };
 
     if (collision === undefined) {
-      verbose && console.debug(`No collision detected, stopping`);
       break;
     }
-    if (collision.with.type === 'wall' && collision.with.value === GameWalls.bottom) {
-      verbose && console.debug(`Collision with bottom wall, stopping`);
+
+    if (collision.with.type === 'wall' && collision.with.value.wall === GameWalls.bottom) {
       break;
     }
+
+    t0 = t1;
   }
 }
 
@@ -270,15 +184,21 @@ export class BallEngineMath extends BallEngine {
     // const time = performance.now() / 1000,
     const time = document.timeline.currentTime as number / 1000;
 
-    console.info(`Ball fired at t=${time}`);
-
     this.takeSnapshot();
 
     const fixedPoints = [...computeFixedPoints(
       {...ball, velocity: Constants.DEFAULT_BALL_VELOCITY, acceleration: Constants.DEFAULT_BALL_ACCELERATION},
-      { verbose: true }
+      this.staticBalls
     )];
-    console.info('Fixed points', [...fixedPoints]);
+
+    console.group('Fixed points');
+    for (const {t, x, y, angle, velocity, with: obstacles} of fixedPoints) {
+      for (const obstacle of obstacles) {
+        console.debug(`Collision with ${ppObstacle(obstacle)}`);
+      }
+      console.debug(`Δt:${t.toFixed(3)} ${directionalArrow(Math.cos(angle) * velocity, Math.sin(angle) * velocity)} x:${x.toFixed(3)} y:${y.toFixed(3)} v:${velocity.toFixed(3)} angle:${ppAngle(angle)}`);
+    }
+    console.groupEnd();
 
     this.currentBall = new MathBall(
       ball.radius,
@@ -288,24 +208,26 @@ export class BallEngineMath extends BallEngine {
     );
   }
 
-  update(frameTime: number, lastFrameTime: number, { verbose }: { verbose?: boolean} = {}): { score: number; gameover: boolean; } {
-    if (this.currentBall !== null) {
-      verbose && console.group(`BallEngineMath.update t0=${lastFrameTime.toFixed(3)} t1=${frameTime.toFixed(3)} Δt=${(frameTime - this.currentBall.firedAt).toFixed(3)}`);
+  update(frameTime: number): { score: number; gameover: boolean; } {
+    const currentBall = this.currentBall;
+    if (currentBall !== null) {
+      const pastFixedPoints = currentBall.fixedPoints.filter(c => currentBall.firedAt + c.t <= frameTime);
 
-      const pastFixedPoints = this.currentBall.fixedPoints.filter(c => this.currentBall!.firedAt + c.t <= frameTime);
-
-      const ballsHit = pastFixedPoints.reduce(
-        (balls, fp) => {
-          const obstacles = fp.with.filter(obstacle => obstacle.type === 'ball');
-          balls.push(...obstacles.map(obstacle => obstacle.value));
-          return balls;
-        },
-        new Array<StaticBall>()
+      const ballsHit = pastFixedPoints.flatMap(
+        fp => fp.with.filter(obstacle => obstacle.type === 'ball').map(obstacle => obstacle.value),
       );
+
+      if (ballsHit.length > 0) {
+        console.group('Balls hit');
+        for (const {x, y, counter} of ballsHit) {
+          console.debug(`x:${x.toFixed(3)} y:${y.toFixed(3)} counter:${counter}`);
+        }
+        console.groupEnd();
+      }
 
       // The last of the past fixed points is the one that will be used to compute the new position of the ball.
       // The ones before it have been consumed, let's discard them.
-      this.currentBall.fixedPoints.splice(0, pastFixedPoints.length - 1);
+      currentBall.fixedPoints.splice(0, pastFixedPoints.length - 1);
       // The last one is kept as it might still be the fixed point for the next frame.
       // Discard its obstacles as the collisions have already been accounted for.
       pastFixedPoints.at(-1)!.with.length = 0;
@@ -318,32 +240,31 @@ export class BallEngineMath extends BallEngine {
       }
 
       const fp = pastFixedPoints.at(-1)!;
-      console.log(`last fixed point t=${fp.t.toFixed(2)} x=${fp.x.toFixed(2)} y=${fp.y.toFixed(2)} ${directionalArrow(Math.cos(fp.angle), Math.sin(fp.angle))}`);
+      console.log(`last fixed point t:${fp.t.toFixed(2)} x:${fp.x.toFixed(2)} y:${fp.y.toFixed(2)} ${directionalArrow(Math.cos(fp.angle), Math.sin(fp.angle))}`);
 
-      const timeSinceFixedPoint = frameTime - (fp.t + this.currentBall.firedAt);
-      this.currentBall.x = fp.x + Math.cos(fp.angle) * fp.velocity * timeSinceFixedPoint + 1/2 * Math.cos(fp.angle) * fp.acceleration * timeSinceFixedPoint**2;
-      this.currentBall.y = fp.y + Math.sin(fp.angle) * fp.velocity * timeSinceFixedPoint + 1/2 * Math.sin(fp.angle) * fp.acceleration * timeSinceFixedPoint**2;
+      const timeSinceFixedPoint = frameTime - (fp.t + currentBall.firedAt);
+      currentBall.x = fp.x + Math.cos(fp.angle) * fp.velocity * timeSinceFixedPoint + 1/2 * Math.cos(fp.angle) * fp.acceleration * timeSinceFixedPoint**2;
+      currentBall.y = fp.y + Math.sin(fp.angle) * fp.velocity * timeSinceFixedPoint + 1/2 * Math.sin(fp.angle) * fp.acceleration * timeSinceFixedPoint**2;
 
-      // TODO gameover if collision with bottom wall.
-
-      if (frameTime - this.currentBall.firedAt >= 2.5) {
-        verbose && console.log(`Ball stopped firedAt=${this.currentBall.firedAt.toFixed(2)}`);
-
-        const expandedRadius = computeExpandedRadius(this.currentBall, this.staticBalls);
+      if (frameTime - currentBall.firedAt >= 2.5) {
+        const expandedRadius = computeExpandedRadius(currentBall, this.staticBalls);
         this.staticBalls.push({
           counter: 3,
           radius: expandedRadius,
-          x: this.currentBall.x,
-          y: this.currentBall.y,
+          x: currentBall.x,
+          y: currentBall.y,
         });
 
         this.currentBall = null;
       }
 
-      verbose && console.groupEnd();
+      return {
+        score: ballsHit.reduce((points, ball) => points += (ball.counter === 0 ? 1 : 0), 0),
+        gameover: false, // TODO gameover if collision with bottom wall.
+      };
     }
 
-    return { score: 0, gameover: false }; // TODO
+    return { score: 0, gameover: false };
   }
 
   override internalReset() {
