@@ -22,7 +22,7 @@ function ppBallObstacle({x, y, counter}: StaticBall) {
   return `ball x:${x.toFixed(3)} y:${y.toFixed(3)} counter:${counter}`;
 }
 
-function ppObstacle(o: Obstacle) {
+export function ppObstacle(o: Obstacle) {
   return o.type === 'wall'
     ? ppWallObstacle(o.value)
     : ppBallObstacle(o.value);
@@ -85,7 +85,7 @@ function computeCollisionsWithGameWalls(
   return computeCollisionsWithWalls(ball, candidateWalls, { epsilon });
 }
 
-function* computeFixedPoints(
+export function* computeFixedPoints(
   ball: { radius: number; x: number; y: number; angle: number; velocity: number; acceleration: number; },
   balls: Array<StaticBall>,
   { epsilon = 1e-5 }: { epsilon?: number } = {},
@@ -111,7 +111,7 @@ function* computeFixedPoints(
     };
   });
 
-  for (let i = 0; true; ++i) {
+  while(true) {
     const ballState = { x, y, angle, velocity, acceleration: ball.acceleration, radius: ball.radius };
     const wallCollisions = computeCollisionsWithGameWalls(ballState, { epsilon });
     const ballCollisions = fixedBalls.length === 0 ? [] : computeCollisionsWithBalls(ballState, fixedBalls, { epsilon });
@@ -135,7 +135,9 @@ function* computeFixedPoints(
 
     x += 1/2 * Math.cos(angle) * ball.acceleration * deltaT**2 + Math.cos(angle) * velocity * deltaT;
     y += 1/2 * Math.sin(angle) * ball.acceleration * deltaT**2 + Math.sin(angle) * velocity * deltaT;
-    velocity = collision !== undefined ? velocity + ball.acceleration * deltaT : 0; // Avoid rounding errors.
+    velocity = collision === undefined
+      ? 0 // Avoid rounding errors.
+      : velocity + ball.acceleration * deltaT;
 
     const obstacles = [];
 
@@ -143,6 +145,7 @@ function* computeFixedPoints(
       if (collision.obstacle.type === 'wall') {
         const { wall } = collision.obstacle.value;
         const wallAngle = Math.atan2(wall.y1 - wall.y0, wall.x1 - wall.x0);
+
         angle = 2 * wallAngle - angle;
 
         obstacles.push(collision.obstacle);
@@ -158,16 +161,24 @@ function* computeFixedPoints(
         angle = 2 * (theta + Math.PI / 2) - angle;
 
         obstacles.push({ type: 'ball' as const, value: collision.obstacle.value.sourceBall });
+
+        // if (y < ball.radius) {
+        //   velocity = 0;
+        // }
       }
     }
 
-    yield { t: t1, x, y, angle, velocity, acceleration: ball.acceleration, obstacles: obstacles };
+    yield { t: t1, x, y, angle, velocity, acceleration: ball.acceleration, obstacles };
 
-    if (collision === undefined) {
-      break;
-    }
-
-    if (collision.obstacle.type === 'wall' && collision.obstacle.value.wall === GameWalls.bottom) {
+    if (
+      collision === undefined
+      ||
+      (
+        collision.obstacle.type === 'wall' && collision.obstacle.value.wall === GameWalls.bottom
+        ||
+        collision.obstacle.type === 'ball' && y < ball.radius
+      )
+    ) {
       break;
     }
 
@@ -183,8 +194,6 @@ export class BallEngineMath extends BallEngine {
     // performance.now() could be anterior to the timestamp passed to a raf callback timestamp.
     // const time = performance.now() / 1000,
     const time = document.timeline.currentTime as number / 1000;
-
-    this.takeSnapshot();
 
     const fixedPoints = [...computeFixedPoints(
       {...ball, velocity: Constants.DEFAULT_BALL_VELOCITY, acceleration: Constants.DEFAULT_BALL_ACCELERATION},
@@ -213,17 +222,38 @@ export class BallEngineMath extends BallEngine {
     if (currentBall !== null) {
       const pastFixedPoints = currentBall.fixedPoints.filter(c => currentBall.firedAt + c.t <= frameTime);
 
-      const ballsHit = pastFixedPoints.flatMap(
-        fp => fp.obstacles.filter(obstacle => obstacle.type === 'ball').map(obstacle => obstacle.value),
-      );
-
-      if (ballsHit.length > 0) {
-        console.group('Balls hit');
-        for (const {x, y, counter} of ballsHit) {
-          console.debug(`x:${x.toFixed(3)} y:${y.toFixed(3)} counter:${counter}`);
+      const { gameover, score } = pastFixedPoints.reduce(({gameover, score}, fp) => {
+        if (!gameover) {
+          for (const obstacle of fp.obstacles) {
+            if (obstacle.type === 'ball') {
+              const ball = obstacle.value;
+              score += 1;
+              ball.counter -= 1;
+              if (ball.counter === 0) {
+                this.staticBalls.splice(this.staticBalls.indexOf(ball), 1);
+              }
+            } else if (obstacle.value.wall === GameWalls.bottom) {
+              gameover = true;
+            }
+          }
         }
-        console.groupEnd();
-      }
+        return { gameover, score };
+      }, { gameover: false, score: 0 });
+
+      // const ballsHit = pastFixedPoints.flatMap(
+      //   fp => fp.obstacles.filter(obstacle => obstacle.type === 'ball').map(obstacle => obstacle.value),
+      // );
+      // const bottomWallHit = pastFixedPoints.some(({obstacles}) => {
+      //   return obstacles.some(o => o.type === 'wall' && o.value.wall === GameWalls.bottom);
+      // }); // TODO check coordinates to find if ball hit another ball while being below the bottom line?
+
+      // if (ballsHit.length > 0) {
+      //   console.group('Balls hit');
+      //   for (const {x, y, counter} of ballsHit) {
+      //     console.debug(`x:${x.toFixed(3)} y:${y.toFixed(3)} counter:${counter}`);
+      //   }
+      //   console.groupEnd();
+      // }
 
       // The last of the past fixed points is the one that will be used to compute the new position of the ball.
       // The ones before it have been consumed, let's discard them.
@@ -232,21 +262,24 @@ export class BallEngineMath extends BallEngine {
       // Discard its obstacles as the collisions have already been accounted for.
       pastFixedPoints.at(-1)!.obstacles.length = 0;
 
-      for (const ball of ballsHit) {
-        ball.counter -= 1;
-        if (ball.counter === 0) {
-          this.staticBalls.splice(this.staticBalls.indexOf(ball), 1);
-        }
-      }
+      // for (const ball of ballsHit) {
+      //   ball.counter -= 1;
+      //   if (ball.counter === 0) {
+      //     this.staticBalls.splice(this.staticBalls.indexOf(ball), 1);
+      //   }
+      // }
 
       const fp = pastFixedPoints.at(-1)!;
-      console.log(`last fixed point t:${fp.t.toFixed(2)} x:${fp.x.toFixed(2)} y:${fp.y.toFixed(2)} ${directionalArrow(Math.cos(fp.angle), Math.sin(fp.angle))}`);
+      console.log(`Last fixed point t:${fp.t.toFixed(3)} x:${fp.x.toFixed(3)} y:${fp.y.toFixed(3)} ${directionalArrow(Math.cos(fp.angle), Math.sin(fp.angle))}`);
 
-      const timeSinceFixedPoint = frameTime - (fp.t + currentBall.firedAt);
-      currentBall.x = fp.x + Math.cos(fp.angle) * fp.velocity * timeSinceFixedPoint + 1/2 * Math.cos(fp.angle) * fp.acceleration * timeSinceFixedPoint**2;
-      currentBall.y = fp.y + Math.sin(fp.angle) * fp.velocity * timeSinceFixedPoint + 1/2 * Math.sin(fp.angle) * fp.acceleration * timeSinceFixedPoint**2;
+      currentBall.x = fp.x;
+      currentBall.y = fp.y;
 
-      if (frameTime - currentBall.firedAt >= 2.5) {
+      if (fp !== currentBall.fixedPoints.at(-1)) {
+        const timeSinceFixedPoint = frameTime - (fp.t + currentBall.firedAt);
+        currentBall.x += Math.cos(fp.angle) * fp.velocity * timeSinceFixedPoint + 1/2 * Math.cos(fp.angle) * fp.acceleration * timeSinceFixedPoint**2;
+        currentBall.y += Math.sin(fp.angle) * fp.velocity * timeSinceFixedPoint + 1/2 * Math.sin(fp.angle) * fp.acceleration * timeSinceFixedPoint**2;
+      } else if (!gameover) {
         const expandedRadius = computeExpandedRadius(currentBall, this.staticBalls);
         this.staticBalls.push({
           counter: 3,
@@ -258,10 +291,10 @@ export class BallEngineMath extends BallEngine {
         this.currentBall = null;
       }
 
-      return {
-        score: ballsHit.reduce((points, ball) => points += (ball.counter === 0 ? 1 : 0), 0),
-        gameover: false, // TODO gameover if collision with bottom wall.
-      };
+      // const bottomWallHit = currentBall.y <= currentBall.radius && Math.sin(fp.angle) < 0;
+      // console.log(currentBall.y, fp.angle, bottomWallHit);
+
+      return { score, gameover, };
     }
 
     return { score: 0, gameover: false };

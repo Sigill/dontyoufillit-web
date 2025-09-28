@@ -19,7 +19,7 @@ const logRebuildPlugin: esbuild.Plugin = {
       console.log(`Build finished in`, Date.now() - t, 'ms');;
     });
   },
-}
+};
 
 const distdir = path.join(root, 'dist');
 
@@ -40,6 +40,7 @@ program.action(async ({ watch, serve, liveReload }: { watch: boolean; serve: boo
       { in: 'src/app.css', out: 'www/app' },
       { in: 'dev/wall-collision.ts', out: 'dev/wall-collision' },
       { in: 'dev/ball-collision.ts', out: 'dev/ball-collision' },
+      { in: 'dev/debug.ts', out: 'dev/debug' },
     ],
     loader: {
       '.html': 'text'

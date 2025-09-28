@@ -8,7 +8,8 @@
     "build-esbuild": "npx tsx esbuild.ts",
     "build": "make",
     "dev": "make && npx tsx --watch esbuild.ts --watch --serve",
-    "lint": "eslint src/ dev/"
+    "lint": "eslint src/ dev/",
+    "test": "web-test-runner --node-resolve"
   },
   "repository": {
     "type": "git",
@@ -18,12 +19,16 @@
   "license": "MIT",
   "devDependencies": {
     "@eslint/js": "^9.30.0",
+    "@esm-bundle/chai": "^4.3.4-fix.0",
     "@observablehq/plot": "^0.6.17",
     "@types/app-root-dir": "^0.1.4",
     "@types/bootstrap": "^5.2.10",
     "@types/eslint__js": "^8.42.3",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^24.3.0",
     "@types/stats.js": "^0.17.4",
+    "@web/dev-server-esbuild": "^1.0.4",
+    "@web/test-runner": "^0.20.2",
     "app-root-dir": "^1.0.2",
     "bootstrap": "^5.3.8",
     "commander": "^14.0.0",

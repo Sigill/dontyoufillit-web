@@ -26,6 +26,12 @@ export abstract class BallEngine {
 
   fire(ball: { radius: number; angle: number; x: number; y: number; }) {
     this.takeSnapshot();
+
+    console.groupCollapsed('snapshot');
+    console.log(ball);
+    console.log(this.#snapshot.map(([, ball]) => ball));
+    console.groupEnd();
+
     this.internalFire(ball);
   }
 
