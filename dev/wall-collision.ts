@@ -118,11 +118,11 @@ for (const [title, config] of cases) {
         ballState.radius,
       );
 
-      const wall = collision.with.value;
+      const { wall, sigma } = collision.obstacle.value;
       const wallAngle = Math.atan2(wall.y1 - wall.y0, wall.x1 - wall.x0);
       const q = {
-        x: c.x + wall.sigma * ballState.radius * -Math.sin(wallAngle),
-        y: c.y + wall.sigma * ballState.radius * Math.cos(wallAngle)
+        x: c.x + sigma * ballState.radius * -Math.sin(wallAngle),
+        y: c.y + sigma * ballState.radius * Math.cos(wallAngle)
       };
       circle(q.x, q.y, 1/100);
     }

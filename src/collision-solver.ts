@@ -32,7 +32,7 @@ export interface BallObstacle<B extends StaticBall = StaticBall> {
 
 export interface Collision<O> {
   t: number;
-  with: O;
+  obstacle: O;
 }
 
 export function computeCollisionWithWall(
@@ -114,7 +114,7 @@ export function computeCollisionsWithWalls<W extends Wall>(
       const collision = computeCollisionWithWall(wall, ball, epsilon, tMax, { epsilon });
 
       if (collision !== undefined) {
-        yield { t: collision.t, with: { type: 'wall' as const, value: { wall, sigma: collision.sigma } } };
+        yield { t: collision.t, obstacle: { type: 'wall' as const, value: { wall, sigma: collision.sigma } } };
       }
     }
   }
@@ -133,7 +133,7 @@ export function computeCollisionsWithBalls<B extends StaticBall>(
     for (const otherBall of otherBalls) {
       const t = computeCollisionWithBall(ball, otherBall, epsilon, tMax, { epsilon });
       if (t !== undefined) {
-        yield { t, with: { type: 'ball' as const, value: otherBall } };
+        yield { t, obstacle: { type: 'ball' as const, value: otherBall } };
       }
     }
   }
