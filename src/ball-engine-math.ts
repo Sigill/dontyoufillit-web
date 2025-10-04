@@ -280,13 +280,15 @@ export class BallEngineMath extends BallEngine {
         currentBall.x += Math.cos(fp.angle) * fp.velocity * timeSinceFixedPoint + 1/2 * Math.cos(fp.angle) * fp.acceleration * timeSinceFixedPoint**2;
         currentBall.y += Math.sin(fp.angle) * fp.velocity * timeSinceFixedPoint + 1/2 * Math.sin(fp.angle) * fp.acceleration * timeSinceFixedPoint**2;
       } else if (!gameover) {
-        const expandedRadius = computeExpandedRadius(currentBall, this.staticBalls);
-        this.staticBalls.push({
-          counter: 3,
-          radius: expandedRadius,
-          x: currentBall.x,
-          y: currentBall.y,
-        });
+        if (currentBall.y >= 0) {
+          const expandedRadius = computeExpandedRadius(currentBall, this.staticBalls);
+          this.staticBalls.push({
+            counter: 3,
+            radius: expandedRadius,
+            x: currentBall.x,
+            y: currentBall.y,
+          });
+        }
 
         this.currentBall = null;
       }
