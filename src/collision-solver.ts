@@ -36,8 +36,8 @@ export interface Collision<O> {
 }
 
 export function computeCollisionWithWall(
-  {x0: x0, y0: y0, x1, y1}: Wall,
   {x, y, angle: beta, velocity, acceleration, radius}: MovingBall,
+  {x0, y0, x1, y1}: Wall,
   t0: number, tMax: number,
   { epsilon = 1e-5 }: { epsilon?: number } = {}
 ): { t: number; sigma: number; } | undefined {
@@ -111,7 +111,7 @@ export function computeCollisionsWithWalls<W extends Wall>(
     const tMax = -ball.velocity / ball.acceleration;
 
     for (const wall of walls) {
-      const collision = computeCollisionWithWall(wall, ball, epsilon, tMax, { epsilon });
+      const collision = computeCollisionWithWall(ball, wall, epsilon, tMax, { epsilon });
 
       if (collision !== undefined) {
         yield { t: collision.t, obstacle: { type: 'wall' as const, value: { wall, sigma: collision.sigma } } };

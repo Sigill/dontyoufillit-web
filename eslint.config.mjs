@@ -40,5 +40,11 @@ export default defineConfig(
         }
       ]
     },
+  },
+  {
+    files: ["**/*.test.ts"],
+    rules: {
+      "@typescript-eslint/no-unused-expressions": "off", // Otherwise expect(something).to.exist is considered as an unused expression.
+    }
   }
 );
