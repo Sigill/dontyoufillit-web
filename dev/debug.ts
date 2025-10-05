@@ -1,4 +1,4 @@
-import { computeFixedPoints, ppObstacle } from '../src/ball-engine-math';
+import { BallEngineMath, computeFixedPoints, ppObstacle } from '../src/ball-engine-math';
 import * as Constants from '../src/constants';
 import { directionalArrow, ppAngle } from '../src/utils';
 
@@ -43,27 +43,8 @@ for (const w of Object.values(GameWalls)) {
   line(w.x0, w.y0, w.x1, w.y1);
 }
 
-const ball = {
-  radius: 0.025,
-  angle: 1.11777866614725,
-  x: 0.5291787195544495,
-  y: -0.040057971592485836
-};
-
-const staticBalls = [
-  {
-    counter: 2,
-    radius: 0.2291734955593122,
-    x: 0.7708265044406878,
-    y: 0.39314678534851705
-  },
-  {
-    counter: 3,
-    radius: 0.1182261985595407,
-    x: 0.1182261985595407,
-    y: 0.7372921770564875
-  }
-];
+const ball = { radius: 0.025, angle: 0.41741294390696315, x: 0.5609427188476009, y: -0.07297354141019015, velocity: 1, acceleration: -0.4 };
+const staticBalls = [{ counter: 3, radius: 0.08292598608470797, x: 0.8538976933509962, y: 0.08292598608470797 }];
 
 ctx.fillStyle = 'white';
 for (const b of staticBalls) {
@@ -102,6 +83,11 @@ for (const [a, b] of pairwise(fixedPointsGenerator)) {
   }
   console.debug(`Δt:${t.toFixed(3)} ${directionalArrow(Math.cos(angle) * velocity, Math.sin(angle) * velocity)} x:${x.toFixed(3)} y:${y.toFixed(3)} v:${velocity.toFixed(3)} angle:${ppAngle(angle)}`);
 }
+
+const engine = new BallEngineMath();
+engine.staticBalls = staticBalls;
+engine.fire(ball);
+engine.update(2.5);
 
 // for (let i = 0; i < fixedPoints.length - 1; i += 1) {
 //   const a = fixedPoints[i];

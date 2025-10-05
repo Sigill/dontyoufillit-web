@@ -10,7 +10,7 @@ import {
 } from "./collision-solver";
 import * as Constants from "./constants";
 import { computeExpandedRadius, StaticBall } from "./static-ball";
-import { directionalArrow, ppAngle } from "./utils";
+import { directionalArrow, normalizeRadian, ppAngle } from "./utils";
 
 type Obstacle = WallObstacle | BallObstacle<StaticBall>;
 
@@ -41,16 +41,14 @@ class MathBall implements StaticBall {
   x: number;
   y: number;
 
-  firedAt: number;
+  firedAt?: number = undefined;
 
-  constructor(r: number, x: number, y: number, firedAt: number, readonly fixedPoints: Array<BallState & { obstacles: Obstacle[]; }>) {
+  constructor(r: number, x: number, y: number, readonly fixedPoints: Array<BallState & { obstacles: Obstacle[]; }>) {
     this.counter = 3;
 
     this.radius = r;
     this.x = x;
     this.y = y;
-
-    this.firedAt = firedAt;
   }
 }
 
@@ -166,18 +164,22 @@ export function* computeFixedPoints(
         //   velocity = 0;
         // }
       }
+
+      angle = normalizeRadian(angle);
     }
 
     yield { t: t1, x, y, angle, velocity, acceleration: ball.acceleration, obstacles };
 
+    // Stop if:
     if (
+      // There was no collision, which means the ball has stopped.
       collision === undefined
       ||
-      (
-        collision.obstacle.type === 'wall' && collision.obstacle.value.wall === GameWalls.bottom
-        ||
-        collision.obstacle.type === 'ball' && y < ball.radius
-      )
+      // The ball has collided with the bottom wall.
+      (collision.obstacle.type === 'wall' && collision.obstacle.value.wall === GameWalls.bottom)
+      ||
+      // The ball has hit a ball while touching with the bottom wall.
+      (collision.obstacle.type === 'ball' && y < ball.radius && Math.sin(angle) < 0)
     ) {
       break;
     }
@@ -191,10 +193,6 @@ export class BallEngineMath extends BallEngine {
   currentBall: MathBall | null = null;
 
   internalFire(ball: { radius: number; angle: number; x: number; y: number; }): void {
-    // performance.now() could be anterior to the timestamp passed to a raf callback timestamp.
-    // const time = performance.now() / 1000,
-    const time = document.timeline.currentTime as number / 1000;
-
     const fixedPoints = [...computeFixedPoints(
       {...ball, velocity: Constants.DEFAULT_BALL_VELOCITY, acceleration: Constants.DEFAULT_BALL_ACCELERATION},
       this.staticBalls
@@ -212,48 +210,41 @@ export class BallEngineMath extends BallEngine {
     this.currentBall = new MathBall(
       ball.radius,
       ball.x, ball.y,
-      time,
       fixedPoints,
     );
   }
 
   update(frameTime: number): { score: number; gameover: boolean; } {
     const currentBall = this.currentBall;
-    if (currentBall !== null) {
-      const pastFixedPoints = currentBall.fixedPoints.filter(c => currentBall.firedAt + c.t <= frameTime);
 
-      const { gameover, score } = pastFixedPoints.reduce(({gameover, score}, fp) => {
-        if (!gameover) {
+    if (currentBall !== null) {
+      const firedAt = currentBall.firedAt ??= frameTime;
+
+      const pastFixedPoints = currentBall.fixedPoints.filter(fp => firedAt + fp.t <= frameTime);
+
+      const score = pastFixedPoints.reduce(
+        (score, fp) => {
           for (const obstacle of fp.obstacles) {
             if (obstacle.type === 'ball') {
               const ball = obstacle.value;
-              score += 1;
               ball.counter -= 1;
               if (ball.counter === 0) {
+                score += 1;
                 this.staticBalls.splice(this.staticBalls.indexOf(ball), 1);
               }
-            } else if (obstacle.value.wall === GameWalls.bottom) {
-              gameover = true;
             }
           }
-        }
-        return { gameover, score };
-      }, { gameover: false, score: 0 });
+          return score;
+        },
+        0
+      );
 
-      // const ballsHit = pastFixedPoints.flatMap(
-      //   fp => fp.obstacles.filter(obstacle => obstacle.type === 'ball').map(obstacle => obstacle.value),
-      // );
-      // const bottomWallHit = pastFixedPoints.some(({obstacles}) => {
-      //   return obstacles.some(o => o.type === 'wall' && o.value.wall === GameWalls.bottom);
-      // }); // TODO check coordinates to find if ball hit another ball while being below the bottom line?
+      const fp = pastFixedPoints.at(-1)!;
+      console.log(`Last fixed point t:${fp.t.toFixed(3)} x:${fp.x.toFixed(3)} y:${fp.y.toFixed(3)} ${directionalArrow(Math.cos(fp.angle), Math.sin(fp.angle))}`);
 
-      // if (ballsHit.length > 0) {
-      //   console.group('Balls hit');
-      //   for (const {x, y, counter} of ballsHit) {
-      //     console.debug(`x:${x.toFixed(3)} y:${y.toFixed(3)} counter:${counter}`);
-      //   }
-      //   console.groupEnd();
-      // }
+      let hasHitBottomWall = fp.obstacles.some(({type, value}) => {
+        return type === 'wall' && value.wall === GameWalls.bottom;
+      });
 
       // The last of the past fixed points is the one that will be used to compute the new position of the ball.
       // The ones before it have been consumed, let's discard them.
@@ -262,25 +253,15 @@ export class BallEngineMath extends BallEngine {
       // Discard its obstacles as the collisions have already been accounted for.
       pastFixedPoints.at(-1)!.obstacles.length = 0;
 
-      // for (const ball of ballsHit) {
-      //   ball.counter -= 1;
-      //   if (ball.counter === 0) {
-      //     this.staticBalls.splice(this.staticBalls.indexOf(ball), 1);
-      //   }
-      // }
-
-      const fp = pastFixedPoints.at(-1)!;
-      console.log(`Last fixed point t:${fp.t.toFixed(3)} x:${fp.x.toFixed(3)} y:${fp.y.toFixed(3)} ${directionalArrow(Math.cos(fp.angle), Math.sin(fp.angle))}`);
-
       currentBall.x = fp.x;
       currentBall.y = fp.y;
 
       if (fp !== currentBall.fixedPoints.at(-1)) {
-        const timeSinceFixedPoint = frameTime - (fp.t + currentBall.firedAt);
+        const timeSinceFixedPoint = frameTime - (fp.t + firedAt);
         currentBall.x += Math.cos(fp.angle) * fp.velocity * timeSinceFixedPoint + 1/2 * Math.cos(fp.angle) * fp.acceleration * timeSinceFixedPoint**2;
         currentBall.y += Math.sin(fp.angle) * fp.velocity * timeSinceFixedPoint + 1/2 * Math.sin(fp.angle) * fp.acceleration * timeSinceFixedPoint**2;
-      } else if (!gameover) {
-        if (currentBall.y >= 0) {
+      } else { // This was the last fixed point, the ball has stopped.
+        if (!hasHitBottomWall && currentBall.y >= 0) {
           const expandedRadius = computeExpandedRadius(currentBall, this.staticBalls);
           this.staticBalls.push({
             counter: 3,
@@ -290,13 +271,12 @@ export class BallEngineMath extends BallEngine {
           });
         }
 
+        hasHitBottomWall = hasHitBottomWall || currentBall.y < currentBall.radius;
+
         this.currentBall = null;
       }
 
-      // const bottomWallHit = currentBall.y <= currentBall.radius && Math.sin(fp.angle) < 0;
-      // console.log(currentBall.y, fp.angle, bottomWallHit);
-
-      return { score, gameover, };
+      return { score, gameover: hasHitBottomWall };
     }
 
     return { score: 0, gameover: false };
