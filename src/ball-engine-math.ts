@@ -111,12 +111,12 @@ export function* computeFixedPoints(
     };
   });
 
-  while(true) {
+  while (true) {
     const ballState = { x, y, angle, velocity, acceleration: ball.acceleration, radius: ball.radius };
     const wallCollisions = computeCollisionsWithGameWalls(ballState, { epsilon });
     const ballCollisions = fixedBalls.length === 0 ? [] : computeCollisionsWithBalls(ballState, fixedBalls, { epsilon });
     const collisions = findImminentCollisions<WallObstacle | BallObstacle<StaticBall & { sourceBall: StaticBall; }>>(
-      [ ...wallCollisions, ...ballCollisions, ],
+      [ ...wallCollisions, ...ballCollisions ],
       {epsilon}
     );
 

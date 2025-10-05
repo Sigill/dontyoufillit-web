@@ -1,12 +1,34 @@
 import eslint from '@eslint/js';
+import tseslint from 'typescript-eslint';
+import stylistic from '@stylistic/eslint-plugin'
 import { defineConfig } from 'eslint/config';
 
 export default defineConfig(
   eslint.configs.recommended,
-  ...tseslint.configs.recommended,
+  tseslint.configs.recommended,
   {
     rules: {
-      indent: ["error", 2, {
+      "linebreak-style": ["error", "unix"],
+      semi: ["error", "always"],
+      eqeqeq: ["error", "smart"],
+      "no-template-curly-in-string": ["error"],
+      "multiline-ternary": ["error", "always-multiline"],
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-expressions": [
+        "error",
+        {
+          "allowShortCircuit": true, // Allows verbose && console.log().
+        }
+      ]
+    },
+  },
+  {
+    plugins: {
+      "@stylistic": stylistic,
+    },
+    rules: {
+      "@stylistic/quote-props": [ "error", "consistent-as-needed" ],
+      "@stylistic/indent": ["error", 2, {
         VariableDeclarator: "first",
 
         FunctionDeclaration: {
@@ -25,21 +47,9 @@ export default defineConfig(
         ObjectExpression: "first",
         ImportDeclaration: "first",
         MemberExpression: 1,
+        SwitchCase: 1,
       }],
-
-      "linebreak-style": ["error", "unix"],
-      semi: ["error", "always"],
-      eqeqeq: ["error", "smart"],
-      "no-template-curly-in-string": ["error"],
-      "multiline-ternary": ["error", "always-multiline"],
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-unused-expressions": [
-        "error",
-        {
-          "allowShortCircuit": true, // Allows verbose && console.log().
-        }
-      ]
-    },
+    }
   },
   {
     files: ["**/*.test.ts"],

@@ -66,7 +66,7 @@ describe('computeCollisionWithWall', () => {
 describe('computeCollisionWithWalls', () => {
   it("should return an empty array if the ball does not collide with any wall", () => {
     const collisions = computeCollisionsWithWalls(centerBall, [Walls.horizontalY0, Walls.horizontalY1], { epsilon: 1e-5 });
-    assert.isEmpty(collisions)
+    assert.isEmpty(collisions);
   });
 
   it("should return the first wall it collides with", () => {
@@ -85,24 +85,25 @@ describe('computeCollisionWithWalls', () => {
         type: "wall",
         value: {
           wall: Walls.verticalX1,
-          sigma: collision1.sigma
-        }
-      }
+          sigma: collision1.sigma,
+        },
+      },
     }]);
   });
 
   it("should return all the walls it collides with in case of multiple collisions", () => {
     const b = { ...centerBall, angle: Math.PI / 4 }; // 45° NE.
     const collisions = computeCollisionsWithWalls(b, [Walls.verticalX1, Walls.horizontalY1]);
-    assert.sameDeepMembers(collisions, [{
+    assert.sameDeepMembers(collisions, [
+      {
         t: 0.6502505912276093,
         obstacle: {
           type: "wall",
           value: {
             wall: Walls.verticalX1,
-            sigma: -1
-          }
-        }
+            sigma: -1,
+          },
+        },
       },
       {
         t: 0.6502505912276093,
@@ -110,10 +111,10 @@ describe('computeCollisionWithWalls', () => {
           type: "wall",
           value: {
             wall: Walls.horizontalY1,
-            sigma: 1
-          }
-        }
-      }
+            sigma: 1,
+          },
+        },
+      },
     ]);
   });
 });
@@ -144,7 +145,7 @@ describe('computeCollisionWithBall', () => {
     assert.exists(collision);
     assert.closeTo(collision, 0.3135013362902747, 1e-5);
 
-    const xc = 1/2 * -0.4 * collision!**2 + 1 * collision! + 0.5; // x location of ball at collision.
+    const xc = 1 / 2 * -0.4 * collision! ** 2 + 1 * collision! + 0.5; // x location of ball at collision.
     // Balls radiuses are 0.1 and 0.11, at collision time the distance between balls centers shall therefore be 0.21.
     assert.closeTo(Math.hypot(1 - xc, 0.5 - 0.46), 0.21, 1e-5);
   });
@@ -157,7 +158,7 @@ describe('computeCollisionWithBalls', () => {
 
   it("should return an empty array if the ball does not collide with any ball", () => {
     const collisions = computeCollisionsWithBalls(centerBall, [{x: 1, y: 0, radius: 0.1}, {x: 1, y: 1, radius: 0.1}], { epsilon: 1e-5 });
-    assert.isEmpty(collisions)
+    assert.isEmpty(collisions);
   });
 
   it("should return the first ball it collides with", () => {
@@ -172,8 +173,8 @@ describe('computeCollisionWithBalls', () => {
       t: 0.3135013362902747,
       obstacle: {
         type: "ball",
-        value: ball1
-      }
+        value: ball1,
+      },
     }]);
   });
 
@@ -184,16 +185,16 @@ describe('computeCollisionWithBalls', () => {
         t: 0.3135013362902747,
         obstacle: {
           type: "ball",
-          value: ball1
-        }
+          value: ball1,
+        },
       },
       {
         t: 0.3135013362902747,
         obstacle: {
           type: "ball",
-          value: ball3
-        }
-      }
+          value: ball3,
+        },
+      },
     ]);
   });
 });

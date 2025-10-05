@@ -1,4 +1,3 @@
-/* eslint-disable indent */
 import { computeFixedPoints, ppObstacle } from '../src/ball-engine-math';
 import * as Constants from '../src/constants';
 import { directionalArrow, ppAngle } from '../src/utils';
@@ -45,25 +44,25 @@ for (const w of Object.values(GameWalls)) {
 }
 
 const ball = {
-    "radius": 0.025,
-    "angle": 1.11777866614725,
-    "x": 0.5291787195544495,
-    "y": -0.040057971592485836
+  radius: 0.025,
+  angle: 1.11777866614725,
+  x: 0.5291787195544495,
+  y: -0.040057971592485836
 };
 
 const staticBalls = [
-    {
-        "counter": 2,
-        "radius": 0.2291734955593122,
-        "x": 0.7708265044406878,
-        "y": 0.39314678534851705
-    },
-    {
-        "counter": 3,
-        "radius": 0.1182261985595407,
-        "x": 0.1182261985595407,
-        "y": 0.7372921770564875
-    }
+  {
+    counter: 2,
+    radius: 0.2291734955593122,
+    x: 0.7708265044406878,
+    y: 0.39314678534851705
+  },
+  {
+    counter: 3,
+    radius: 0.1182261985595407,
+    x: 0.1182261985595407,
+    y: 0.7372921770564875
+  }
 ];
 
 ctx.fillStyle = 'white';
