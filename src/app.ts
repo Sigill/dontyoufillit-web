@@ -15,6 +15,24 @@ function readStoredHighscore(): number {
   return parseInt(localStorage.getItem('highscore') || '0', 10);
 }
 
+const queryParams = new URLSearchParams(window.location.search);
+
+function makeBallEngine() {
+  const engineName = queryParams.get('ball-engine') ?? 'math';
+  switch (engineName) {
+    case 'math':
+      return new BallEngineMath();
+    case 'rk4':
+      return new BallEngineRK4();
+    case 'motion-equation-delta':
+      return new BallEngineMotionEquationDelta();
+    case 'motion-equation-absolute':
+      return new BallEngineMotionEquationAbsolute();
+    default:
+      throw new Error(`Unknown ball engine: ${engineName}.`);
+  }
+}
+
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms
 stats.dom.style.removeProperty('top');
@@ -24,20 +42,17 @@ stats.dom.style.bottom = '0px';
 stats.dom.style.display = 'none';
 document.body.appendChild(stats.dom);
 
-const screenContainer = selectElement('#screenContainer'),
-      startScreen = selectElement('#start-screen'),
-      optionsScreen = selectElement('#optionsScreen'),
-      pauseScreen = selectElement('#pause-screen'),
-      gameoverScreen = selectElement('#gameover-screen'),
-      licenseScreen = selectElement('#licenseScreen'),
-      startWithThreeLivesButton = selectElement<HTMLInputElement>('#checkbox-start-three-lives'),
-      showFramerateCheckbox = selectElement<HTMLInputElement>('#showFramerateCheckbox');
+const screenContainer = selectElement('#screenContainer');
+const startScreen = selectElement('#start-screen');
+const optionsScreen = selectElement('#optionsScreen');
+const pauseScreen = selectElement('#pause-screen');
+const gameoverScreen = selectElement('#gameover-screen');
+const licenseScreen = selectElement('#licenseScreen');
+const startWithThreeLivesButton = selectElement<HTMLInputElement>('#checkbox-start-three-lives');
+const showFramerateCheckbox = selectElement<HTMLInputElement>('#showFramerateCheckbox');
 
 const cannon = new Cannon();
-// const ballEngine = new BallEngineRK4();
-// const ballEngine = new BallEngineMotionEquationDelta();
-// const ballEngine = new BallEngineMotionEquationAbsolute();
-const ballEngine = (window as any).ballEngine = new BallEngineMath();
+const ballEngine = (window as any).ballEngine = makeBallEngine();
 const game = new GameHandler({cannon, ballEngine});
 game.highscore = readStoredHighscore();
 
@@ -54,8 +69,6 @@ function showFps(enabled: boolean) {
   showFramerateCheckbox.checked = enabled;
   stats.dom.style.display = enabled ? 'block' : 'none';
 }
-
-const queryParams = new URLSearchParams(window.location.search);
 
 if (queryParams.get('show-fps') !== undefined) {
   showFps(asBool(queryParams.get('show-fps')));
