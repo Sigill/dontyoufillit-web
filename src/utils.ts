@@ -2,17 +2,8 @@ export function vectorLength(x: number, y: number) {
   return Math.sqrt(x * x + y * y);
 }
 
-// TODO Improve this
-export function normalizeRadian(a: number) {
-  while (a > 2 * Math.PI) {
-    a -= 2 * Math.PI;
-  }
-
-  while (a < 0) {
-    a += 2 * Math.PI;
-  }
-
-  return a;
+export function normalizeRadian(angle: number) {
+  return ((angle % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
 }
 
 export function px(v: number) {
