@@ -162,7 +162,7 @@ ESBUILD_SOURCE_FILES = \
 	dev/wall-collision.ts
 
 dist/www/app.css dist/www/app.js dist/dev/wall-collision.ts: $(ESBUILD_SOURCE_FILES)
-	npx tsx esbuild.ts
+	node esbuild.ts
 
 dist/www/.htaccess: .htaccess
 	cp .htaccess dist/www/

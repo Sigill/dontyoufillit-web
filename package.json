@@ -5,9 +5,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build-esbuild": "npx tsx esbuild.ts",
+    "build-esbuild": "node esbuild.ts",
     "build": "make",
-    "dev": "make && npx tsx --watch esbuild.ts --watch --serve",
+    "dev": "make && node --watch esbuild.ts --watch --serve",
     "lint": "eslint src/ dev/",
     "test": "web-test-runner --node-resolve"
   },
@@ -36,7 +36,6 @@
     "esbuild": "^0.25.5",
     "eslint": "^9.30.0",
     "stats.js": "^0.17.0",
-    "tsx": "^4.20.5",
     "typescript-eslint": "^8.35.0"
   }
 }
