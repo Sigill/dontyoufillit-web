@@ -9,8 +9,7 @@ docker build -t dontyoufillit-ci -f docker/Dockerfile docker/
 
 docker run --rm -v $PWD:/repo:ro --mount source=dontyoufillit-ci-cache,target=/cache dontyoufillit-ci bash -c "
 set -e
-git config --global --add safe.directory /repo/.git
-git clone --depth 1 -b ${current_branch} /repo /src
+git clone --depth 1 -b ${current_branch} file:///repo /src
 cd /src
 mkdir -p /cache/node_modules
 rsync -a /cache/node_modules/ /src/node_modules/
