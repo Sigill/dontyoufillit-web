@@ -1,17 +1,20 @@
 import { vectorLength } from "./utils";
 
-export interface StaticBall {
-  counter: number;
+export interface BallGeometry {
   radius: number;
   x: number;
   y: number;
 }
 
+export interface StaticBall extends BallGeometry {
+  counter: number;
+}
+
 export function computeExpandedRadius(
   { x, y }: { x: number; y: number; },
-  staticBalls: Array<{ radius: number; x: number; y: number; }>,
+  staticBalls: Array<BallGeometry>,
 ) {
-  let minRadius = Number.MAX_VALUE, available: number, o: { radius: number; x: number; y: number; };
+  let minRadius = Number.MAX_VALUE, available: number, o: BallGeometry;
 
   for (let i = 0; i < staticBalls.length; ++i) {
     o = staticBalls[i];

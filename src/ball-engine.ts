@@ -1,8 +1,8 @@
-import { StaticBall } from "./static-ball";
+import { BallGeometry, StaticBall } from "./static-ball";
 
 export abstract class BallEngine {
   staticBalls: Array<StaticBall>;
-  abstract currentBall: Omit<StaticBall, 'counter'> | null;
+  abstract currentBall: BallGeometry | null;
 
   #snapshot = new Array<[StaticBall, StaticBall]>();
 

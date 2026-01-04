@@ -1,4 +1,4 @@
-import { StaticBall } from "./static-ball";
+import { BallGeometry, StaticBall } from "./static-ball";
 import { BallEngine } from "./ball-engine";
 import { Cannon } from "./cannon";
 import { getOrInsert, selectElement } from "./utils";
@@ -77,7 +77,7 @@ export class CssBoard extends HTMLElement {
     }
   }
 
-  private transformBall(b: Omit<StaticBall, 'counter'>, dom: HTMLDivElement) {
+  private transformBall(b: BallGeometry, dom: HTMLDivElement) {
     dom.style.left = (b.x - b.radius) * 100 + '%';
     dom.style.bottom = (b.y - b.radius) * 100 + '%';
   }
