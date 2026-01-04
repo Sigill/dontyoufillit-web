@@ -70,7 +70,7 @@ clean:
 	rm -rf dist/
 
 define svg-to-png =
-	rsvg-convert -o $@ -w $(1) -h $(1) $< && pngcrush -brute -c $(2) -q -ow $@
+	rsvg-convert -o $@ -w $(1) -h $(1) $< && pngcrush -brute -c $(2) -q -ow $@ $$(mktemp -p dist/tmp)
 endef
 
 dist/www/icon-16x16.png: img/icon3.svg
