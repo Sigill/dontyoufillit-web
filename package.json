@@ -5,11 +5,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build-esbuild": "node esbuild.ts",
+    "build:js": "node esbuild.ts",
     "build": "make",
     "dev": "make && node --watch esbuild.ts --watch --serve",
     "lint": "eslint src/ dev/",
-    "test": "web-test-runner --node-resolve"
+    "test": "web-test-runner --node-resolve",
+    "typecheck": "tsc --noEmit"
   },
   "repository": {
     "type": "git",

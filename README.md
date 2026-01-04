@@ -6,6 +6,25 @@ It has been developed with HTML5 technologies, so it should work on any modern b
 
 You can play it [here](https://sigill.github.io/dontyoufillit/).
 
+## Building the Project
+
+This project uses Make and npm scripts. The following commands are available:
+
+### Build Commands
+
+- `make` - Build the project.
+- `./ci.sh` - Perform an out-of-source build in a Docker container. This requires all changes to be committed first.
+
+### Development
+
+- `npm run dev` - Start the development server with watch mode and hot reload.
+
+### Code Quality
+
+- `npm run typecheck` - Run TypeScript type checking.
+- `npm run lint` - Run ESLint on the source code.
+- `npm run test` - Run tests using Web Test Runner.
+
 ## License
 
 This game is released under the terms of the MIT License. See the LICENSE file for more details.
