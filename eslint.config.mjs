@@ -1,6 +1,6 @@
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
-import stylistic from '@stylistic/eslint-plugin'
+import stylistic from '@stylistic/eslint-plugin';
 import { defineConfig } from 'eslint/config';
 
 export default defineConfig(
@@ -9,15 +9,15 @@ export default defineConfig(
   {
     rules: {
       "linebreak-style": ["error", "unix"],
-      semi: ["error", "always"],
-      eqeqeq: ["error", "smart"],
+      "semi": ["error", "always"],
+      "eqeqeq": ["error", "smart"],
       "no-template-curly-in-string": ["error"],
       "multiline-ternary": ["error", "always-multiline"],
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-expressions": [
         "error",
         {
-          "allowShortCircuit": true, // Allows verbose && console.log().
+          allowShortCircuit: true, // Allows verbose && console.log().
         }
       ]
     },
