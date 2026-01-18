@@ -14,14 +14,32 @@ import { directionalArrow, normalizeRadian, ppAngle } from "./utils";
 
 type Obstacle = WallObstacle | BallObstacle<StaticBall>;
 
-function ppWallObstacle({ wall: w, sigma}: { wall: Wall, sigma: number}) {
+/**
+ * Pretty prints a wall obstacle.
+ *
+ * @param params The wall and sigma value.
+ * @returns A string representation of the wall obstacle.
+ */
+function ppWallObstacle({ wall: w, sigma }: { wall: Wall; sigma: number }) {
   return `wall x0:${w.x0.toFixed(3)} y0:${w.y0.toFixed(3)} x1:${w.x1.toFixed(3)} y1:${w.y1.toFixed(3)} sigma:${sigma}`;
 }
 
-function ppBallObstacle({x, y, counter}: StaticBall) {
+/**
+ * Pretty prints a ball obstacle.
+ *
+ * @param ball The static ball to represent.
+ * @returns A string representation of the ball obstacle.
+ */
+function ppBallObstacle({ x, y, counter }: StaticBall) {
   return `ball x:${x.toFixed(3)} y:${y.toFixed(3)} counter:${counter}`;
 }
 
+/**
+ * Pretty prints an obstacle.
+ *
+ * @param o The obstacle to represent.
+ * @returns A string representation of the obstacle.
+ */
 export function ppObstacle(o: Obstacle) {
   return o.type === 'wall'
     ? ppWallObstacle(o.value)
@@ -72,7 +90,7 @@ function computeCollisionsWithGameWalls(
   },
   { epsilon = 1e-5 }: { epsilon?: number } = {}
 ): Array<Collision<WallObstacle>> {
-  // // TODO IO: depending on direction of movement, only check the walls in that direction.
+  // TODO IO: depending on direction of movement, only check the walls in that direction.
   const candidateWalls: Array<Wall> = [GameWalls.top, GameWalls.right, GameWalls.left];
 
   // Only consider the bottom border if above it.
@@ -83,6 +101,15 @@ function computeCollisionsWithGameWalls(
   return computeCollisionsWithWalls(ball, candidateWalls, { epsilon });
 }
 
+/**
+ * Computes the key points in the ball's trajectory (collisions, start, end).
+ *
+ * @param ball The initial state of the ball.
+ * @param balls The list of static balls (obstacles) in the game.
+ * @param options Configuration options.
+ * @param options.epsilon The precision for collision detection.
+ * @returns A generator that yields the state of the ball at each significant event (collision or stop).
+ */
 export function* computeFixedPoints(
   ball: { radius: number; x: number; y: number; angle: number; velocity: number; acceleration: number; },
   balls: Array<StaticBall>,
@@ -188,10 +215,22 @@ export function* computeFixedPoints(
   }
 }
 
+/**
+ * An implementation of the BallEngine that computes the exact trajectory of the ball
+ * by solving the equations of motion.
+ *
+ * This implementation is more precise than the temporal discretization implementation, but
+ * it is also more complex (and still not totally exacts because of floating point arithmetic).
+ */
 export class BallEngineMath extends BallEngine {
   staticBalls: Array<StaticBall> = [];
   currentBall: MathBall | null = null;
 
+  /**
+   * Fires the ball and pre-computes all its future collisions and path.
+   *
+   * @param ball The initial state of the ball being fired
+   */
   internalFire(ball: { radius: number; angle: number; x: number; y: number; }): void {
     const fixedPoints = [...computeFixedPoints(
       {...ball, velocity: Constants.DEFAULT_BALL_VELOCITY, acceleration: Constants.DEFAULT_BALL_ACCELERATION},
@@ -214,6 +253,14 @@ export class BallEngineMath extends BallEngine {
     );
   }
 
+  /**
+   * Updates the game state based on the current time.
+   * Unlike the temporal discretization engine, this one checks against the pre-calculated fixed points
+   * to determine the ball's position and any events (scoring, game over).
+   *
+   * @param frameTime The current time of the frame
+   * @returns The score gained in this frame and whether the game is over
+   */
   update(frameTime: number): { score: number; gameover: boolean; } {
     const currentBall = this.currentBall;
 
@@ -280,9 +327,5 @@ export class BallEngineMath extends BallEngine {
     }
 
     return { score: 0, gameover: false };
-  }
-
-  override internalReset() {
-    this.currentBall = null;
   }
 }

@@ -1,5 +1,18 @@
 import { BallGeometry, StaticBall } from "./static-ball";
 
+/**
+ * A BallEngine is meant to implement the game physics.
+ *
+ * This involves computing the ball position according to the way it bounces
+ * against the walls and the other balls.
+ *
+ * Because there are multiple ways to implement this, actual implementations must
+ * inherit from this class and implement the {@link BallEngine.update | update}
+ * and {@link BallEngine.internalFire | internalFire} methods.
+ *
+ * It additionally provides a snapshot capability to allow saving and restoring
+ * the game in the state it was before a new ball is fired.
+ */
 export abstract class BallEngine {
   staticBalls: Array<StaticBall>;
   abstract currentBall: BallGeometry | null;
@@ -44,5 +57,10 @@ export abstract class BallEngine {
     this.internalReset();
   }
 
-  abstract internalReset(): void;
+  /**
+   * Resets the engine by clearing the current ball.
+   */
+  internalReset() {
+    this.currentBall = null;
+  }
 }

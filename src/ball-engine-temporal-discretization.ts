@@ -4,11 +4,29 @@ import { computeExpandedRadius } from "./static-ball";
 import { normalizeRadian } from "./utils";
 
 
+/**
+ * A BallEngine implementation that uses temporal discretization to update the physics.
+ *
+ * This engine updates the current ball's position and speed at a fixed frequency
+ * (1000 times per second) regardless of the frame rate. This ensures an accurate
+ * enough simulation.
+ *
+ * This is an abstract class. Implementations shall extend this class to provide the
+ * `internalFire()` method where a {@link BouncingBall} object (which provides the
+ * actual ball physics) is built.
+ */
 export abstract class BallEngineTemporalDiscretization extends BallEngine {
   currentBall: BouncingBall | null = null;
 
-  /*
-   * Position of the current ball is important, so it will be calculated 1000 times per second.
+  /**
+   * Updates the game state by progressing the physics simulation using fixed time steps.
+   *
+   * It calculates the number of steps to perform based on the time elapsed since the
+   * last frame, with a resolution of 1ms per step.
+   *
+   * @param frameTime The current frame time in seconds.
+   * @param lastFrameTime The last frame time in seconds.
+   * @returns An object containing the score increment and game over status.
    */
   override update(frameTime: number, lastFrameTime: number): { score: number; gameover: boolean; } {
     const updateState = {

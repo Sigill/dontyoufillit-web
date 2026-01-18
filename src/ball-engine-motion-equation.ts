@@ -3,17 +3,32 @@ import { BouncingBall } from "./bouncing-ball";
 import * as Constants from "./constants";
 
 
+/**
+ * A specialized bouncing ball that uses the displacement/velocity delta equations of motion.
+ */
 class BouncingBallMotionEquationDelta extends BouncingBall {
   #v = Constants.DEFAULT_BALL_VELOCITY;
 
+  /**
+   * Returns the current scalar velocity.
+   */
   get velocity(): number {
     return this.#v;
   }
 
+  /**
+   * Stops the ball by setting its velocity to zero.
+   */
   override stop() {
     this.#v = 0;
   }
 
+  /**
+   * Updates the ball's position using delta-based equations of motion.
+   *
+   * @param frameTime Current time in seconds.
+   * @param lastFrameTime Last update time in seconds.
+   */
   override internalUpdate(frameTime: number, lastFrameTime: number) {
     const deltaT = frameTime - lastFrameTime;
     const deltaU = this.#v * deltaT + 1/2 * Constants.DEFAULT_BALL_ACCELERATION * deltaT**2;
@@ -24,30 +39,47 @@ class BouncingBallMotionEquationDelta extends BouncingBall {
   }
 }
 
+/**
+ * A BallEngine implementation using delta-based equations of motion for physics.
+ */
 export class BallEngineMotionEquationDelta extends BallEngineTemporalDiscretization {
+  /**
+   * Replaces the current ball with a new BouncingBallMotionEquationDelta instance.
+   */
   override internalFire({radius: radius, angle, x, y}: { radius: number; angle: number; x: number; y: number; }) {
     this.currentBall = new BouncingBallMotionEquationDelta(radius, x, y, angle);
   }
-
-  override internalReset() {
-    this.currentBall = null;
-  }
 }
 
+/**
+ * A specialized bouncing ball that uses absolute equations of motion from the time of firing.
+ */
 class BouncingBallMotionEquationAbsolute extends BouncingBall {
   #u = 0;
   #v = Constants.DEFAULT_BALL_VELOCITY;
 
+  /** Time when the ball was fired. */
   #firedAt?: number;
 
+  /**
+   * Returns the current scalar velocity.
+   */
   get velocity(): number {
     return this.#v;
   }
 
+  /**
+   * Stops the ball by setting its velocity to zero.
+   */
   override stop() {
     this.#v = 0;
   }
 
+  /**
+   * Updates the ball's position using absolute equations of motion.
+   *
+   * @param frameTime Current time in seconds.
+   */
   override internalUpdate(frameTime: number) {
     this.#firedAt ??= frameTime;
 
@@ -65,12 +97,14 @@ class BouncingBallMotionEquationAbsolute extends BouncingBall {
   }
 }
 
+/**
+ * A BallEngine implementation using absolute equations of motion for physics.
+ */
 export class BallEngineMotionEquationAbsolute extends BallEngineTemporalDiscretization {
+  /**
+   * Replaces the current ball with a new BouncingBallMotionEquationAbsolute instance.
+   */
   override internalFire({radius: radius, angle, x, y}: { radius: number; angle: number; x: number; y: number; }) {
     this.currentBall = new BouncingBallMotionEquationAbsolute(radius, x, y, angle);
-  }
-
-  override internalReset() {
-    this.currentBall = null;
   }
 }

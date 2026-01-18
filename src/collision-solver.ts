@@ -20,11 +20,26 @@ export interface MovingBall extends StaticBall {
   acceleration: number;
 }
 
+/**
+ * Represents a wall obstacle.
+ *
+ * @template W The type of wall.
+ * @property type Discriminator for the obstacle type.
+ * @property value The wall and the side on which the collision occurs.
+ * @property value.sigma Indicates on which side of the wall (modeled as a line) the collision occurs.
+ */
 export interface WallObstacle<W extends Wall = Wall> {
   type: 'wall';
-  value: { wall: W; sigma: number };
+  value: { wall: W; sigma: 1 | -1 };
 }
 
+/**
+ * Represents a ball obstacle.
+ *
+ * @template B The type of ball.
+ * @property type Discriminator for the obstacle type.
+ * @property value The ball obstacle.
+ */
 export interface BallObstacle<B extends StaticBall = StaticBall> {
   type: 'ball';
   value: B;
@@ -40,7 +55,7 @@ export function computeCollisionWithWall(
   {x0, y0, x1, y1}: Wall,
   t0: number, tMax: number,
   { epsilon = 1e-5 }: { epsilon?: number } = {}
-): { t: number; sigma: number; } | undefined {
+): { t: number; sigma: 1 | -1; } | undefined {
   const alpha = Math.atan2(y1 - y0, x1 - x0);
 
   if (Math.abs(Math.sin(alpha - beta)) <= epsilon) {
@@ -53,7 +68,7 @@ export function computeCollisionWithWall(
   const c0 = (x - x0) * Math.sin(alpha) - (y - y0) * Math.cos(alpha);
 
   function* gen() {
-    for (const sigma of [-1, 1]) {
+    for (const sigma of [-1, 1] as const) {
       for (const t of solveQuadratic(1 / 2 * acceleration * Delta, velocity * Delta, c0 - sigma * radius, epsilon)) {
         if (t >= t0 && t <= tMax) {
           yield { t, sigma };
