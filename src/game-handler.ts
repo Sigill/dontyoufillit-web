@@ -66,12 +66,12 @@ export class GameHandler {
     if (this.#state === GameHandler.RUNNING) {
       this.observable.dispatchEvent('beginStep');
 
-      this.#update(frameTime - this.#timeCorrection, lastFrametime - this.#timeCorrection);
+      this.#update((frameTime - this.#timeCorrection) / 1000, (lastFrametime - this.#timeCorrection) / 1000);
 
       this.observable.dispatchEvent('endStep');
 
       if (this.#state === GameHandler.RUNNING) {
-        this.#animationFrameId = window.requestAnimationFrame(nextFrameTime => this.#step(nextFrameTime / 1000, frameTime));
+        this.#animationFrameId = window.requestAnimationFrame(nextFrameTime => this.#step(nextFrameTime, frameTime));
       }
     }
   }
@@ -87,7 +87,7 @@ export class GameHandler {
     // Causes the initial frame to be rendered.
     this.observable.dispatchEvent('endStep');
 
-    this.#animationFrameId = window.requestAnimationFrame(nextFrameTime => this.#step(nextFrameTime / 1000, frameTime));
+    this.#animationFrameId = window.requestAnimationFrame(nextFrameTime => this.#step(nextFrameTime, frameTime));
   }
 
   pause() {
@@ -101,7 +101,7 @@ export class GameHandler {
 
   resume() {
     this.#state = GameHandler.RUNNING;
-    window.requestAnimationFrame(nextFrameTime => this.#startOrResume(nextFrameTime / 1000));
+    window.requestAnimationFrame(nextFrameTime => this.#startOrResume(nextFrameTime));
   }
 
   reset() {
