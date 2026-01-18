@@ -4,7 +4,7 @@ DontYouFillIt is a Breakout-style game mixed with snooker.
 
 It has been developed with HTML5 technologies, so it should work on any modern browser (including mobile ones).
 
-You can play it [here](https://sigill.github.io/dontyoufillit/).
+You can [play the game online](https://sigill.github.io/dontyoufillit/).
 
 ## Building the Project
 
