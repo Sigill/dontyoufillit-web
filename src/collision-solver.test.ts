@@ -1,4 +1,4 @@
-import { assert } from '@esm-bundle/chai';
+import { assert } from 'chai';
 import { computeCollisionsWithBalls, computeCollisionsWithWalls, computeCollisionWithBall, computeCollisionWithWall, Wall } from './collision-solver';
 
 const Walls = {

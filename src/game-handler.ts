@@ -17,7 +17,8 @@ export class GameHandler {
   #state = GameHandler.PAUSED;
 
   #timeCorrection = 0;
-  #pausedAt?: number;
+  #lastFrameTime?: number;
+  #animationFrameId?: number;
 
   highscore = 0;
   score = 0;
@@ -59,45 +60,48 @@ export class GameHandler {
     }
   }
 
-  step(frameTime: number, lastFrametime: number) {
-    if (this.#state === GameHandler.PAUSED) {
-      this.#pausedAt = lastFrametime;
-    } else if (this.#state === GameHandler.RUNNING) {
+  #step(frameTime: number, lastFrametime: number) {
+    this.#lastFrameTime = frameTime;
+
+    if (this.#state === GameHandler.RUNNING) {
       this.observable.dispatchEvent('beginStep');
 
       this.#update(frameTime - this.#timeCorrection, lastFrametime - this.#timeCorrection);
 
       this.observable.dispatchEvent('endStep');
 
-      window.requestAnimationFrame(nextFrameTime => this.step(nextFrameTime / 1000, frameTime));
-    }
-
-    if (this.#state === GameHandler.GAMEOVER) {
-      this.observable.dispatchEvent('gameover', this.score);
+      if (this.#state === GameHandler.RUNNING) {
+        this.#animationFrameId = window.requestAnimationFrame(nextFrameTime => this.#step(nextFrameTime / 1000, frameTime));
+      }
     }
   }
 
-  start(frameTime: number) {
+  #startOrResume(frameTime: number) {
     this.observable.dispatchEvent('beginStep');
 
-    if (this.#pausedAt !== undefined) {
-      this.#timeCorrection += frameTime - this.#pausedAt;
-      this.#pausedAt = undefined;
+    if (this.#lastFrameTime !== undefined) {
+      this.#timeCorrection += frameTime - this.#lastFrameTime;
+      this.#lastFrameTime = undefined;
     }
 
+    // Causes the initial frame to be rendered.
     this.observable.dispatchEvent('endStep');
 
-    window.requestAnimationFrame(nextFrameTime => this.step(nextFrameTime / 1000, frameTime));
+    this.#animationFrameId = window.requestAnimationFrame(nextFrameTime => this.#step(nextFrameTime / 1000, frameTime));
   }
 
   pause() {
     this.#state = GameHandler.PAUSED;
-    // cancelAnimationFrame?
+
+    if (this.#animationFrameId !== undefined) {
+      window.cancelAnimationFrame(this.#animationFrameId);
+      this.#animationFrameId = undefined;
+    }
   }
 
   resume() {
     this.#state = GameHandler.RUNNING;
-    window.requestAnimationFrame(nextFrameTime => this.start(nextFrameTime / 1000));
+    window.requestAnimationFrame(nextFrameTime => this.#startOrResume(nextFrameTime / 1000));
   }
 
   reset() {
