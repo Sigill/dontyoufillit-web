@@ -1,9 +1,10 @@
+import { CANON_ANGULAR_SPEED } from "./constants";
 import { RK41DObject } from "./rk4-integrator";
 
 export class Cannon {
   #integrator = new class extends RK41DObject {
     constructor() {
-      super(0, Math.PI / 3);
+      super(0, CANON_ANGULAR_SPEED);
     }
 
     override acceleration() {
