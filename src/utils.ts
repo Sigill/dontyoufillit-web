@@ -83,6 +83,11 @@ export function directionalArrow(vx: number, vy: number) {
 }
 
 export function solveQuadratic(a: number, b: number, c: number, epsilon = 0) {
+  if (Math.abs(a) <= epsilon) {
+    if (Math.abs(b) <= epsilon) return []; // No solution or infinite solutions
+    return [-c / b];
+  }
+
   const delta = b ** 2 - 4 * a * c;
   if (delta < -epsilon) return [];
   if (delta > epsilon) return [
