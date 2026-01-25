@@ -256,7 +256,11 @@ function renderPlot(currentPlotElement: HTMLElement, currentPlotData: Point[], h
 addTouchOrClickEvent(grid, (evt) => {
   evt.preventDefault();
 
-  if (instances.some(({engine: { currentBall }}) => currentBall !== null)) {
+  if (
+    instances.some(({engine: { currentBall }}) => currentBall !== null)
+    ||
+    instances.every(({state}) => state === GameState.GAMEOVER)
+  ) {
     return;
   }
 
