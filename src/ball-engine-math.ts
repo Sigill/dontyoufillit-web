@@ -261,11 +261,11 @@ export class BallEngineMath extends BallEngine {
    * @param frameTime The current time of the frame
    * @returns The score gained in this frame and whether the game is over
    */
-  update(frameTime: number): { score: number; gameover: boolean; } {
+  update(frameTime: number, lastFrameTime: number): { score: number; gameover: boolean; } {
     const currentBall = this.currentBall;
 
     if (currentBall !== null) {
-      const firedAt = currentBall.firedAt ??= frameTime;
+      const firedAt = currentBall.firedAt ??= lastFrameTime;
 
       const pastFixedPoints = currentBall.fixedPoints.filter(fp => firedAt + fp.t <= frameTime);
 
