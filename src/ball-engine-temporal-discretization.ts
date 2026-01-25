@@ -3,7 +3,6 @@ import { BouncingBall } from "./bouncing-ball";
 import { computeExpandedRadius } from "./static-ball";
 import { normalizeRadian } from "./utils";
 
-
 /**
  * A BallEngine implementation that uses temporal discretization to update the physics.
  *
@@ -40,12 +39,65 @@ export abstract class BallEngineTemporalDiscretization extends BallEngine {
 
       for (let i = 1; i <= steps; ++i) {
         const loopCurrentUpdateTime = (lastFrameTime * (steps - i) + frameTime * i) / steps;
-        this.currentBall.update(loopCurrentUpdateTime, loopLastUpdateTime, this.staticBalls);
 
+        // 1. Integrate
+        this.currentBall.update(loopCurrentUpdateTime, loopLastUpdateTime);
+
+        // 2. Check Walls
+        // Right wall
+        if (this.currentBall.x > 1 - this.currentBall.radius) {
+          const limit = 1 - this.currentBall.radius;
+          const penetration = this.currentBall.x - limit;
+          this.currentBall.x = limit - penetration; // Reflect position
+          this.currentBall.direction = normalizeRadian(Math.PI - this.currentBall.direction);
+        }
+        // Left wall
+        else if (this.currentBall.x < this.currentBall.radius) {
+          const limit = this.currentBall.radius;
+          const penetration = limit - this.currentBall.x;
+          this.currentBall.x = limit + penetration; // Reflect position
+          this.currentBall.direction = normalizeRadian(Math.PI - this.currentBall.direction);
+        }
+
+        // Top Wall
+        if (this.currentBall.y > 1 - this.currentBall.radius) {
+          const limit = 1 - this.currentBall.radius;
+          const penetration = this.currentBall.y - limit;
+          this.currentBall.y = limit - penetration; // Reflect position
+          this.currentBall.direction = normalizeRadian(-this.currentBall.direction);
+        }
+
+        // 3. Check Static Balls
         for (let j = this.staticBalls.length - 1; j >= 0; --j) {
-          if (this.staticBalls[j].counter === 0) {
-            ++updateState.score;
-            this.staticBalls.splice(j, 1);
+          const staticBall = this.staticBalls[j];
+          const dx = this.currentBall.x - staticBall.x;
+          const dy = this.currentBall.y - staticBall.y;
+          const distSq = dx*dx + dy*dy;
+          const minDist = this.currentBall.radius + staticBall.radius;
+
+          if (distSq < minDist * minDist) {
+            const dist = Math.sqrt(distSq);
+            // Avoid division by zero
+            if (dist > 0) {
+              const newDist = 2 * minDist - dist;
+              const nx = dx / dist;
+              const ny = dy / dist;
+
+              // Reflect position
+              this.currentBall.x = staticBall.x + nx * newDist;
+              this.currentBall.y = staticBall.y + ny * newDist;
+
+              // Reflect direction
+              const alpha = Math.atan2(ny, nx);
+              const tangentAngle = alpha + Math.PI / 2;
+              this.currentBall.direction = normalizeRadian(2 * tangentAngle - this.currentBall.direction);
+            }
+
+            staticBall.counter--;
+            if (staticBall.counter === 0) {
+              this.staticBalls.splice(j, 1);
+              updateState.score++;
+            }
           }
         }
 

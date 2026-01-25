@@ -41,7 +41,7 @@ class BouncingBallRK4 extends BouncingBall {
    * @param frameTime Current time in seconds.
    * @param lastFrameTime Last update time in seconds.
    */
-  override internalUpdate(frameTime: number, lastFrameTime: number) {
+  override update(frameTime: number, lastFrameTime: number) {
     const previousStateU = this.#integrator.u;
 
     this.#integrator.integrate(lastFrameTime, frameTime - lastFrameTime);

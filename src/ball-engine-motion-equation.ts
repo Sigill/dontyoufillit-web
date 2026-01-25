@@ -29,7 +29,7 @@ class BouncingBallMotionEquationDelta extends BouncingBall {
    * @param frameTime Current time in seconds.
    * @param lastFrameTime Last update time in seconds.
    */
-  override internalUpdate(frameTime: number, lastFrameTime: number) {
+  override update(frameTime: number, lastFrameTime: number) {
     const deltaT = frameTime - lastFrameTime;
     const deltaU = this.#v * deltaT + 1/2 * Constants.DEFAULT_BALL_ACCELERATION * deltaT**2;
     this.#v += Constants.DEFAULT_BALL_ACCELERATION * deltaT;
@@ -80,7 +80,7 @@ class BouncingBallMotionEquationAbsolute extends BouncingBall {
    *
    * @param frameTime Current time in seconds.
    */
-  override internalUpdate(frameTime: number) {
+  override update(frameTime: number) {
     this.#firedAt ??= frameTime;
 
     const prevU = this.#u;
