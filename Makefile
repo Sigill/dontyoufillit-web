@@ -31,7 +31,7 @@ CACHED_FILES = dist/www/play.html \
 
 WEB_FILES = $(FAVICONS) $(APL_ICONS) $(PWA_ICONS) \
             dist/www/play_online.html dist/www/play.html dist/www/app.js dist/www/app.css dist/www/cache.manifest dist/www/.htaccess dist/www/manifest.json \
-            dist/dev/wall-collision.js dist/dev/ball-collision.js
+            dist/dev/wall-collision.js dist/dev/ball-collision.js dist/dev/ball-engine-comparator.js
 
 AND_RES = dist/android/res
 MDPI = $(AND_RES)/mipmap-mdpi
@@ -159,11 +159,12 @@ ESBUILD_SOURCE_FILES = \
 	src/constants.ts \
 	src/css-board.ts \
 	src/game-handler.ts \
+	dev/ball-engine-comparator.ts \
 	dev/ball-collision.ts \
 	dev/wall-collision.ts \
-	dev/debug.ts
+	dev/debug.ts \
 
-dist/www/app.css dist/www/app.js dist/dev/ball-collision.js dist/dev/wall-collision.js dist/dev/debug.js: $(ESBUILD_SOURCE_FILES)
+dist/www/app.css dist/www/app.js dist/dev/ball-engine-comparator.js dist/dev/ball-collision.js dist/dev/wall-collision.js dist/dev/debug.js: $(ESBUILD_SOURCE_FILES)
 	node esbuild.ts
 
 dist/www/.htaccess: .htaccess

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>DontYouFillIt Ball Engine Comparator</title>
+  <link rel="stylesheet" href="../dist/www/app.css">
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background-color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      overflow: hidden;
+    }
+
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(2, auto);
+      grid-template-rows: repeat(2, auto);
+      gap: 2vh;
+      margin-left: 4vh;
+    }
+
+    .cell {
+      position: relative;
+      background: #000;
+      border: 1px solid #333;
+
+      /* Match .centered-container layout */
+      height: 44vh;
+      aspect-ratio: 3 / 4;
+      display: grid;
+      grid-template-rows: 1fr 7fr;
+      font-size: calc(33vh / 12); /* 33vh is approx width (44 * 0.75) */
+
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    .cell .hud, .cell .game {
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+    }
+
+    #plot-container {
+      flex: 1;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 10px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #plot-container figure {
+      margin: 0;
+      background: #111;
+      border: 1px solid #333;
+    }
+  </style>
+</head>
+<body>
+  <div id="grid"></div>
+  <div id="plot-container"></div>
+
+  <template id="default-ball">
+    <div class="ball" data-counter="3">
+      <div class="disk"></div><div class="num"></div><div class="bar bar-1"></div><div class="bar bar-2"></div>
+    </div>
+  </template>
+
+  <template id="hud-template">
+    <div class="left-col">
+      <div id="engine-name" style="font-size: 50%;"></div><div class="value" style="display: hidden;"></div>
+      <div class="value highscore" style="display: none;"></div>
+      <div class="label">Score</div><div class="value score"></div>
+    </div>
+
+    <div class="right-col" style="display: none;">
+      <span class="lives"></span>
+      <div class="pause"></div>
+    </div>
+  </template>
+
+  <template id="css-board-template">
+    <div id="StaticBallLayer"></div>
+    <div class="Cannon">
+      <div class="In">
+        <div class="Base"></div>
+        <div class="Dome"></div>
+        <div id="Turret" class="Turret"></div>
+      </div>
+    </div>
+    <div id="LiveBallLayer"></div>
+  </template>
+
+<script type="module" src="../dist/dev/ball-engine-comparator.js"></script>
+</body>
+</html>
