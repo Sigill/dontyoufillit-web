@@ -220,7 +220,7 @@ export function* computeFixedPoints(
  * by solving the equations of motion.
  *
  * This implementation is more precise than the temporal discretization implementation, but
- * it is also more complex (and still not totally exacts because of floating point arithmetic).
+ * it is also more complex (and still not totally exact because of floating point arithmetic).
  */
 export class BallEngineMath extends BallEngine {
   staticBalls: Array<StaticBall> = [];
