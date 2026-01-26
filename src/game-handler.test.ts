@@ -32,10 +32,10 @@ class MockBallEngine extends BallEngine {
  * Mock Cannon that records all update calls.
  */
 class MockCannon extends Cannon {
-  updateCalls: Array<{ t: number; dt: number }> = [];
+  updateCalls: Array<{ frameTime: number; lastFrameTime: number }> = [];
 
-  override update(t: number, dt: number) {
-    this.updateCalls.push({ t, dt });
+  override update(frameTime: number, lastFrameTime: number) {
+    this.updateCalls.push({ frameTime, lastFrameTime });
   }
 
   override reset() {
@@ -149,8 +149,8 @@ describe('GameHandler pause/resume mechanism', () => {
       // frameTime = 0.032, lastFrameTime = 0.016
       assert.closeTo(mockBallEngine.updateCalls[0].frameTime, 0.032, 0.001);
       assert.closeTo(mockBallEngine.updateCalls[0].lastFrameTime, 0.016, 0.001);
-      assert.closeTo(mockCannon.updateCalls[0].t, 0.016, 0.001);
-      assert.closeTo(mockCannon.updateCalls[0].dt, 0.016, 0.001);
+      assert.closeTo(mockCannon.updateCalls[0].frameTime, 0.032, 0.001);
+      assert.closeTo(mockCannon.updateCalls[0].lastFrameTime, 0.016, 0.001);
 
       // Pause the game
       gameHandler.pause();
@@ -180,8 +180,8 @@ describe('GameHandler pause/resume mechanism', () => {
       assert.closeTo(mockBallEngine.updateCalls[0].lastFrameTime, 0.032, 0.001);
 
       assert.equal(mockCannon.updateCalls.length, 1);
-      assert.closeTo(mockCannon.updateCalls[0].t, 0.032, 0.001);
-      assert.closeTo(mockCannon.updateCalls[0].dt, 0.016, 0.001);
+      assert.closeTo(mockCannon.updateCalls[0].frameTime, 0.048, 0.001);
+      assert.closeTo(mockCannon.updateCalls[0].lastFrameTime, 0.032, 0.001);
     });
 
     it('should maintain continuous game time across multiple pause/resume cycles', () => {
@@ -213,8 +213,8 @@ describe('GameHandler pause/resume mechanism', () => {
       // Game time should continue from where it left off (~48ms -> ~64ms)
       assert.closeTo(mockBallEngine.updateCalls[0].frameTime, 0.064, 0.001);
       assert.closeTo(mockBallEngine.updateCalls[0].lastFrameTime, 0.048, 0.001);
-      assert.closeTo(mockCannon.updateCalls[0].t, 0.048, 0.001);
-      assert.closeTo(mockCannon.updateCalls[0].dt, 0.016, 0.001);
+      assert.closeTo(mockCannon.updateCalls[0].frameTime, 0.064, 0.001);
+      assert.closeTo(mockCannon.updateCalls[0].lastFrameTime, 0.048, 0.001);
 
       gameHandler.pause();
 
@@ -231,8 +231,8 @@ describe('GameHandler pause/resume mechanism', () => {
       // Game time should continue from ~64ms -> ~80ms
       assert.closeTo(mockBallEngine.updateCalls[0].frameTime, 0.080, 0.001);
       assert.closeTo(mockBallEngine.updateCalls[0].lastFrameTime, 0.064, 0.001);
-      assert.closeTo(mockCannon.updateCalls[0].t, 0.064, 0.001);
-      assert.closeTo(mockCannon.updateCalls[0].dt, 0.016, 0.001);
+      assert.closeTo(mockCannon.updateCalls[0].frameTime, 0.080, 0.001);
+      assert.closeTo(mockCannon.updateCalls[0].lastFrameTime, 0.064, 0.001);
     });
   });
 

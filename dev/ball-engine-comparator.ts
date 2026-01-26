@@ -99,7 +99,7 @@ function render() {
 
 function step(frameTime: number, lastFrameTime: number) {
   // Update Shared Cannon
-  cannon.update(frameTime / 1000, (frameTime - lastFrameTime) / 1000);
+  cannon.update(frameTime / 1000, lastFrameTime / 1000);
 
   // Update All Engines
   let anyBallActive = false;

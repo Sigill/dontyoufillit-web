@@ -19,7 +19,7 @@ describe('Cannon', () => {
   it('should move linearly with small dt', () => {
     // Speed is CANON_ANGULAR_SPEED (positive initially)
     const dt = 0.1;
-    cannon.update(0, dt);
+    cannon.update(dt, 0);
     // Expected change: speed * dt
     const expectedAngle = Math.PI / 2 + CANON_ANGULAR_SPEED * dt;
     assert.closeTo(cannon.getAngle(), expectedAngle, 0.0001);
@@ -32,12 +32,12 @@ describe('Cannon', () => {
     const timeToLimit = (Math.PI / 2) / CANON_ANGULAR_SPEED;
 
     // Step exactly to the limit
-    cannon.update(0, timeToLimit);
+    cannon.update(timeToLimit, 0);
     assert.closeTo(cannon.getAngle(), Math.PI, 0.0001); // PI/2 + PI/2
 
     // Step a bit more, should bounce back
     const dt = 0.1;
-    cannon.update(timeToLimit, dt);
+    cannon.update(timeToLimit + dt, timeToLimit);
 
     // Should be at: limit - (speed * dt)
     // internal u should be: (PI/2) - (speed * dt)
@@ -60,7 +60,7 @@ describe('Cannon', () => {
     const totalDist = 3 * Math.PI;
     const dt = totalDist / CANON_ANGULAR_SPEED;
 
-    cannon.update(0, dt);
+    cannon.update(dt, 0);
 
     // Should end up back at 0 (internal u=0) -> getAngle() = PI/2
     assert.closeTo(cannon.getAngle(), Math.PI / 2, 0.0001);

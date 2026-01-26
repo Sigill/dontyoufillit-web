@@ -47,7 +47,7 @@ export class GameHandler {
   }
 
   #update(frameTime: number, lastFrameTime: number) {
-    this.#cannon.update(lastFrameTime, frameTime - lastFrameTime);
+    this.#cannon.update(frameTime, lastFrameTime);
     const updatestate = this.#ballEngine.update(frameTime, lastFrameTime);
 
     this.score += updatestate.score;
