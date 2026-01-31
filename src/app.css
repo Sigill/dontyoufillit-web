@@ -129,11 +129,6 @@ dontyoufillit-css-board {
     border-style: solid solid dashed;
   }
 
-  .game.lazer-mode & #LiveBallLayer {
-    border-color: #ff00ff;
-    box-shadow: 0 0 15px #ff00ff, inset 0 0 15px #ff00ff;
-  }
-
   .Cannon {
     position: absolute;
     background-color: transparent;
@@ -243,6 +238,15 @@ dontyoufillit-css-board {
   .ball[data-counter="3"] .bar-2 {
     left: 20%;
     top: 57.5%;
+  }
+
+  .game.lazer-mode & {
+    #LiveBallLayer .ball .disk,
+    .Cannon .Base,
+    .Cannon .Dome,
+    .Cannon .Turret {
+      background: red;
+    }
   }
 }
 
