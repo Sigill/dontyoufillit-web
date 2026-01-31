@@ -327,6 +327,14 @@ dontyoufillit-css-board {
   text-align: center;
 }
 
+.screen .description {
+  font-size: 150%;
+  margin: 0.5em auto;
+  text-align: center;
+  color: #aaa;
+  font-style: italic;
+}
+
 a {
   color: #428bca;
   text-decoration: none;
