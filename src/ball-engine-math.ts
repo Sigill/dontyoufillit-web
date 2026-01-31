@@ -269,22 +269,44 @@ export class BallEngineMath extends BallEngine {
 
       const pastFixedPoints = currentBall.fixedPoints.filter(fp => firedAt + fp.t <= frameTime);
 
-      const score = pastFixedPoints.reduce(
-        (score, fp) => {
-          for (const obstacle of fp.obstacles) {
-            if (obstacle.type === 'ball') {
-              const ball = obstacle.value;
-              ball.counter -= 1;
-              if (ball.counter === 0) {
+      let shouldGrow = true; // Track if ball should grow when stopped
+      let stoppedByCollision = false; // Track if stopped by collision handler
+
+      let score = 0;
+
+      // Process fixed points, but stop at first ball collision if handler says to stop
+      for (const fp of pastFixedPoints) {
+        if (stoppedByCollision) break;
+
+        for (const obstacle of fp.obstacles) {
+          if (obstacle.type === 'ball') {
+            const ball = obstacle.value;
+            const collisionResult = this.collisionHandler.onBallCollision(ball);
+
+            ball.counter -= collisionResult.counterDecrement;
+            if (ball.counter < 0) ball.counter = 0;
+            if (ball.counter === 0) {
+              if (collisionResult.scoreOnDestroy) {
                 score += 1;
-                this.staticBalls.splice(this.staticBalls.indexOf(ball), 1);
               }
+              this.staticBalls.splice(this.staticBalls.indexOf(ball), 1);
+            }
+
+            // If handler says to stop, mark for immediate removal and break
+            if (collisionResult.stopCurrentBall) {
+              shouldGrow = collisionResult.growOnStop;
+              stoppedByCollision = true;
+              break;
             }
           }
-          return score;
-        },
-        0
-      );
+        }
+      }
+
+      // If stopped by collision handler, remove ball immediately
+      if (stoppedByCollision) {
+        this.internalReset();
+        return { score, gameover: false };
+      }
 
       const fp = pastFixedPoints.at(-1)!;
       console.log(`Last fixed point t:${fp.t.toFixed(3)} x:${fp.x.toFixed(3)} y:${fp.y.toFixed(3)} ${directionalArrow(Math.cos(fp.angle), Math.sin(fp.angle))}`);
@@ -308,7 +330,7 @@ export class BallEngineMath extends BallEngine {
         currentBall.x += Math.cos(fp.angle) * fp.velocity * timeSinceFixedPoint + 1/2 * Math.cos(fp.angle) * fp.acceleration * timeSinceFixedPoint**2;
         currentBall.y += Math.sin(fp.angle) * fp.velocity * timeSinceFixedPoint + 1/2 * Math.sin(fp.angle) * fp.acceleration * timeSinceFixedPoint**2;
       } else { // This was the last fixed point, the ball has stopped.
-        if (!hasHitBottomWall && currentBall.y >= 0) {
+        if (!hasHitBottomWall && currentBall.y >= 0 && shouldGrow) {
           const expandedRadius = computeExpandedRadius(currentBall, this.staticBalls);
           this.staticBalls.push({
             counter: 3,
@@ -320,7 +342,7 @@ export class BallEngineMath extends BallEngine {
 
         hasHitBottomWall = hasHitBottomWall || currentBall.y < currentBall.radius;
 
-        this.currentBall = null;
+        this.internalReset();
       }
 
       return { score, gameover: hasHitBottomWall };

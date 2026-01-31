@@ -76,9 +76,12 @@ export abstract class BallEngineTemporalDiscretization extends BallEngine {
           const minDist = this.currentBall.radius + staticBall.radius;
 
           if (distSq < minDist * minDist) {
+            // Get collision result from handler
+            const collisionResult = this.collisionHandler.onBallCollision(staticBall);
+
             const dist = Math.sqrt(distSq);
             // Avoid division by zero
-            if (dist > 0) {
+            if (dist > 0 && !collisionResult.stopCurrentBall) {
               const newDist = 2 * minDist - dist;
               const nx = dx / dist;
               const ny = dy / dist;
@@ -93,10 +96,21 @@ export abstract class BallEngineTemporalDiscretization extends BallEngine {
               this.currentBall.direction = normalizeRadian(2 * tangentAngle - this.currentBall.direction);
             }
 
-            staticBall.counter--;
+            // Apply counter decrement from handler
+            staticBall.counter -= collisionResult.counterDecrement;
+            if (staticBall.counter < 0) staticBall.counter = 0;
             if (staticBall.counter === 0) {
               this.staticBalls.splice(j, 1);
-              updateState.score++;
+              if (collisionResult.scoreOnDestroy) {
+                updateState.score++;
+              }
+            }
+
+            // If handler says to stop, remove ball immediately without growth
+            if (collisionResult.stopCurrentBall) {
+              this.currentBall.stop();
+              this.internalReset();
+              return updateState;
             }
           }
         }
@@ -104,7 +118,7 @@ export abstract class BallEngineTemporalDiscretization extends BallEngine {
         if (this.currentBall.y < this.currentBall.radius && normalizeRadian(this.currentBall.direction) > Math.PI) {
           this.currentBall.stop();
           updateState.gameover = true;
-          this.currentBall = null;
+          this.internalReset();
           break;
         }
 
@@ -119,7 +133,7 @@ export abstract class BallEngineTemporalDiscretization extends BallEngine {
               y: this.currentBall.y,
             });
           }
-          this.currentBall = null;
+          this.internalReset();
           break;
         }
         loopLastUpdateTime = loopCurrentUpdateTime;

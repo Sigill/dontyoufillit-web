@@ -1,3 +1,4 @@
+import { CollisionHandler, DefaultCollisionHandler } from "./collision-handler";
 import { BallGeometry, StaticBall } from "./static-ball";
 
 /**
@@ -16,6 +17,9 @@ import { BallGeometry, StaticBall } from "./static-ball";
 export abstract class BallEngine {
   staticBalls: Array<StaticBall>;
   abstract currentBall: BallGeometry | null;
+
+  /** The collision handler that determines how ball-to-ball collisions are processed. */
+  collisionHandler: CollisionHandler = DefaultCollisionHandler;
 
   #snapshot = new Array<[StaticBall, StaticBall]>();
 
@@ -62,5 +66,6 @@ export abstract class BallEngine {
    */
   internalReset() {
     this.currentBall = null;
+    this.collisionHandler = DefaultCollisionHandler;
   }
 }

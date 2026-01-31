@@ -129,6 +129,11 @@ dontyoufillit-css-board {
     border-style: solid solid dashed;
   }
 
+  .game.lazer-mode & #LiveBallLayer {
+    border-color: #ff00ff;
+    box-shadow: 0 0 15px #ff00ff, inset 0 0 15px #ff00ff;
+  }
+
   .Cannon {
     position: absolute;
     background-color: transparent;

@@ -6,6 +6,7 @@ import {
 } from "./ball-engine-motion-equation";
 import { BallEngineMath } from "./ball-engine-math";
 import { Cannon } from "./cannon";
+import { LazerCollisionHandler } from "./collision-handler";
 import { CssBoard } from "./css-board";
 import { GameHandler } from "./game-handler";
 import { HUD } from "./hud";
@@ -50,6 +51,7 @@ const gameoverScreen = selectElement('#gameover-screen');
 const licenseScreen = selectElement('#licenseScreen');
 const startWithThreeLivesButton = selectElement<HTMLInputElement>('#checkbox-start-three-lives');
 const showFramerateCheckbox = selectElement<HTMLInputElement>('#showFramerateCheckbox');
+const lazerBonusButton = selectElement<HTMLElement>('#lazer-bonus-button');
 
 const cannon = new Cannon();
 const ballEngine = (window as any).ballEngine = makeBallEngine();
@@ -91,7 +93,32 @@ game.observable.addEventListener('endStep', () => {
   if (showFramerateCheckbox.checked) {
     stats.end();
   }
+
+  // Visual feedback for lazer mode.
+  selectElement<HTMLElement>('.game').classList.toggle('lazer-mode', game.activeCollisionHandler === LazerCollisionHandler);
+
+  updateLazerButtonState();
 });
+
+function updateLazerButtonState() {
+  const isLazerActive = game.activeCollisionHandler === LazerCollisionHandler;
+  if (isLazerActive) {
+    lazerBonusButton.innerText = 'Cancel Lazer';
+    lazerBonusButton.style.opacity = '1';
+    lazerBonusButton.style.cursor = 'pointer';
+    (lazerBonusButton.parentElement as HTMLElement).style.pointerEvents = 'auto';
+  } else if (game.canEnableCollisionHandler(LazerCollisionHandler)) {
+    lazerBonusButton.innerText = 'Lazer ball (5 pts)';
+    lazerBonusButton.style.opacity = '1';
+    lazerBonusButton.style.cursor = 'pointer';
+    (lazerBonusButton.parentElement as HTMLElement).style.pointerEvents = 'auto';
+  } else {
+    lazerBonusButton.innerText = 'Lazer ball (5 pts)';
+    lazerBonusButton.style.opacity = '0.5';
+    lazerBonusButton.style.cursor = 'not-allowed';
+    (lazerBonusButton.parentElement as HTMLElement).style.pointerEvents = 'none';
+  }
+}
 
 addTouchOrClickEvent(selectElement<HTMLElement>('.fullscreen-container'), (evt) => {
   evt.preventDefault();
@@ -176,6 +203,17 @@ selectElement('#pause-screen #options-button').addEventListener('click', functio
   pushScreen(optionsScreen);
 });
 
+lazerBonusButton.addEventListener('click', function (evt) {
+  evt.preventDefault();
+  if (game.canEnableCollisionHandler(LazerCollisionHandler) || game.activeCollisionHandler === LazerCollisionHandler) {
+    game.toggleCollisionHandler(LazerCollisionHandler);
+    updateLazerButtonState();
+  }
+
+  game.resume();
+  popScreen();
+});
+
 selectElement('#pause-screen #menu-button').addEventListener('click', function (evt) {
   evt.preventDefault();
   popScreen();
@@ -248,6 +286,9 @@ document.addEventListener('visibilitychange', () => {
 function pauseGame() {
   if (game.state === GameHandler.RUNNING) {
     game.pause();
+
+    updateLazerButtonState();
+
     pushScreen(pauseScreen);
   }
 }

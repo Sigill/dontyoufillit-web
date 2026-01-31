@@ -1,11 +1,10 @@
-import * as chai from 'chai';
+import { assert } from 'chai';
 import sinon from 'sinon';
 import { BallEngine } from './ball-engine';
 import { Cannon } from './cannon';
+import { DefaultCollisionHandler, LazerCollisionHandler } from './collision-handler';
 import { GameHandler } from './game-handler';
 import { BallGeometry } from './static-ball';
-
-const { assert } = chai;
 
 /**
  * Mock BallEngine that records all update calls.
@@ -24,6 +23,7 @@ class MockBallEngine extends BallEngine {
   }
 
   internalReset(): void {
+    super.internalReset();
     this.updateCalls = [];
   }
 }
@@ -265,4 +265,43 @@ describe('GameHandler pause/resume mechanism', () => {
       assert.equal(mockBallEngine.updateCalls.length, 1);
     });
   });
+
+  describe('Lazer collision handler', () => {
+    it('should be enableable if score >= 5', () => {
+      gameHandler.score = 5;
+      assert.isTrue(gameHandler.canEnableCollisionHandler(LazerCollisionHandler));
+      gameHandler.toggleCollisionHandler(LazerCollisionHandler);
+      assert.equal(gameHandler.activeCollisionHandler, LazerCollisionHandler);
+      assert.equal(gameHandler.score, 5); // Score not deducted yet
+    });
+
+    it('should allow cancellation (toggling off)', () => {
+      gameHandler.score = 5;
+      gameHandler.toggleCollisionHandler(LazerCollisionHandler);
+      assert.equal(gameHandler.activeCollisionHandler, LazerCollisionHandler);
+      gameHandler.toggleCollisionHandler(LazerCollisionHandler);
+      assert.strictEqual(gameHandler.activeCollisionHandler, DefaultCollisionHandler);
+      assert.equal(gameHandler.score, 5);
+    });
+
+    it('should deduct score only when fired', () => {
+      gameHandler.score = 10;
+      gameHandler.toggleCollisionHandler(LazerCollisionHandler);
+      assert.equal(gameHandler.score, 10);
+      gameHandler.fire();
+      assert.equal(gameHandler.score, 5);
+    });
+
+    it('should automatically reset after firing and finishing', () => {
+      gameHandler.score = 10;
+      gameHandler.toggleCollisionHandler(LazerCollisionHandler);
+      gameHandler.fire();
+      assert.equal(gameHandler.activeCollisionHandler, LazerCollisionHandler);
+
+      // Simulate ball finishing
+      mockBallEngine.reset(); // This calls internalReset() in the real implementation
+      assert.strictEqual(gameHandler.activeCollisionHandler, DefaultCollisionHandler);
+    });
+  });
 });
+

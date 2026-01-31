@@ -1,5 +1,6 @@
 import { BallEngine } from "./ball-engine";
 import { Cannon } from "./cannon";
+import { CollisionHandler, DefaultCollisionHandler } from "./collision-handler";
 import * as Constants from './constants';
 import { Observable } from "./observable";
 
@@ -114,6 +115,8 @@ export class GameHandler {
   fire() {
     this.#takeSnapshot();
 
+    this.score -= this.activeCollisionHandler.cost ?? 0;
+
     this.#ballEngine.fire({
       radius: Constants.DEFAULT_BALL_RADIUS,
       angle: this.#cannon.getAngle(),
@@ -143,5 +146,31 @@ export class GameHandler {
     this.restoreSnapshot();
 
     this.resume();
+  }
+
+  /**
+   * Returns true if the player can afford to enable the specified collision handler.
+   */
+  canEnableCollisionHandler(handler: CollisionHandler) {
+    return handler.cost === undefined || this.score >= handler.cost;
+  }
+
+  /**
+   * Toggles a collision handler for the next ball.
+   * If another collision handler was active, it will be replaced.
+   */
+  toggleCollisionHandler(handler: CollisionHandler) {
+    if (this.#ballEngine.collisionHandler === handler) {
+      this.#ballEngine.collisionHandler = DefaultCollisionHandler;
+    } else {
+      this.#ballEngine.collisionHandler = handler;
+    }
+  }
+
+  /**
+   * Returns the currently active collision handler.
+   */
+  get activeCollisionHandler(): CollisionHandler {
+    return this.#ballEngine.collisionHandler;
   }
 }
