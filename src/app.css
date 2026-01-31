@@ -195,13 +195,18 @@ dontyoufillit-css-board {
     background: white;
   }
 
-  .ball .num {
+  .ball:not([data-counter]) .num,
+  .ball:not([data-counter]) .bar {
+    display: none;
+  }
+
+  .ball[data-counter] .num {
     position: absolute;
     background-color: black;
     height: 70%;
   }
 
-  .ball .bar {
+  .ball[data-counter] .bar {
     position: absolute;
     background-color: white;
     /* Should be 30%, but this might create stitching issues */
