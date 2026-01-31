@@ -87,7 +87,7 @@ for (const [a, b] of pairwise(fixedPointsGenerator)) {
 const engine = new BallEngineMath();
 engine.staticBalls = staticBalls;
 engine.fire(ball);
-engine.update(2.5);
+engine.update(2.5, 0);
 
 // for (let i = 0; i < fixedPoints.length - 1; i += 1) {
 //   const a = fixedPoints[i];
