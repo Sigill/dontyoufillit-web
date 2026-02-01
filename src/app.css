@@ -347,19 +347,17 @@ dontyoufillit-css-board {
     display: inline-block;
 
     .badge {
-      display: block !important;
-      position: absolute !important;
-      top: -0.3em !important;
-      right: -0.3em !important;
-      background-color: #ff4d4d !important;
-      color: white !important;
-      border-radius: 1em !important;
-      padding: 0.15em 0.4em !important;
-      font-size: 0.5em !important;
-      line-height: 1 !important;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
-      pointer-events: none !important;
-      border: 1px solid white !important;
+      display: block;
+      position: absolute;
+      top: -0.3em;
+      right: -0.3em;
+      border-radius: 1em;
+      padding: 0.15em 0.4em;
+      font-size: 0.5em;
+      line-height: 1;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      pointer-events: none;
+      border: 1px solid white;
     }
   }
 
@@ -373,15 +371,26 @@ dontyoufillit-css-board {
       border-radius: 0.25em;
     }
 
-    &.active > span {
-      background-color: white;
-      color: black;
+    .on-active { display: none; }
+    .on-inactive { display: block; }
+
+    &.active {
+      > span {
+        background-color: white;
+        color: black;
+      }
+
+      .on-active { display: block; }
+      .on-inactive { display: none; }
     }
 
-    &.disabled > span {
+    &.disabled {
       opacity: 0.65;
-      cursor: not-allowed;
-      pointer-events: none;
+
+      > span {
+        cursor: not-allowed;
+        pointer-events: none;
+      }
     }
   }
 }
