@@ -389,7 +389,10 @@ dontyoufillit-css-board {
 
       > span {
         cursor: not-allowed;
-        pointer-events: none;
+
+        &:active {
+          pointer-events: none; /* Needs to be in :active otherwise it will block the cursor rule above. */
+        }
       }
     }
   }
