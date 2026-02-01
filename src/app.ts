@@ -100,29 +100,12 @@ game.observable.addEventListener('endStep', () => {
   updateLazerButtonState();
 });
 
-const lazerBonusBadge = selectElement<HTMLElement>('#lazer-bonus-badge');
-
 function updateLazerButtonState() {
   const isLazerActive = game.activeCollisionHandler === LazerCollisionHandler;
-  if (isLazerActive) {
-    lazerBonusButton.innerText = 'Cancel';
-    lazerBonusBadge.style.display = 'none';
-    lazerBonusButton.style.opacity = '1';
-    lazerBonusButton.style.cursor = 'pointer';
-    (lazerBonusButton.parentElement as HTMLElement).style.pointerEvents = 'auto';
-  } else if (game.canEnableCollisionHandler(LazerCollisionHandler)) {
-    lazerBonusButton.innerText = 'Lazer';
-    lazerBonusBadge.style.display = 'block';
-    lazerBonusButton.style.opacity = '1';
-    lazerBonusButton.style.cursor = 'pointer';
-    (lazerBonusButton.parentElement as HTMLElement).style.pointerEvents = 'auto';
-  } else {
-    lazerBonusButton.innerText = 'Lazer';
-    lazerBonusBadge.style.display = 'block';
-    lazerBonusButton.style.opacity = '0.5';
-    lazerBonusButton.style.cursor = 'not-allowed';
-    (lazerBonusButton.parentElement as HTMLElement).style.pointerEvents = 'none';
-  }
+  const canEnable = game.canEnableCollisionHandler(LazerCollisionHandler);
+
+  lazerBonusButton.classList.toggle('active', isLazerActive);
+  lazerBonusButton.classList.toggle('disabled', !isLazerActive && !canEnable);
 }
 
 addTouchOrClickEvent(selectElement<HTMLElement>('.fullscreen-container'), (evt) => {
