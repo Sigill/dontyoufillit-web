@@ -2,13 +2,37 @@ import { BallGeometry, StaticBall } from "./static-ball";
 import { BallEngine } from "./ball-engine";
 import { Cannon } from "./cannon";
 import { getOrInsert, selectElement } from "./utils";
+/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+import { h, Fragment } from "./jsx";
 import * as Constants from './constants';
 
-
-export function makeBallDom() {
-  const template = selectElement<HTMLTemplateElement>('#default-ball').content.cloneNode(true) as DocumentFragment;
-  return template.firstElementChild as HTMLDivElement;
+export function makeBallDom(): HTMLDivElement {
+  return (
+    <div className="ball">
+      <div className="disk"></div>
+      <div className="num"></div>
+      <div className="bar bar-1"></div>
+      <div className="bar bar-2"></div>
+    </div>
+  );
 }
+
+export function makeCssBoardDom() {
+  return (
+    <>
+      <div id="StaticBallLayer"></div>
+      <div className="Cannon">
+        <div className="In">
+          <div id="Turret" className="Turret"></div>
+          <div className="Base"></div>
+          <div className="Dome"></div>
+        </div>
+      </div>
+      <div id="LiveBallLayer"></div>
+    </>
+  );
+}
+
 
 export class CssBoard extends HTMLElement {
   private ballsDom = new Map<StaticBall, HTMLDivElement>();
@@ -21,13 +45,7 @@ export class CssBoard extends HTMLElement {
   constructor() {
     super();
 
-    const fragment = selectElement<HTMLTemplateElement>('#css-board-template')
-      .content.cloneNode(true);
-
-    // const shadowRoot = this.attachShadow({ mode: "open" });
-    // shadowRoot.appendChild(fragment);
-
-    this.appendChild(fragment);
+    this.appendChild(makeCssBoardDom());
 
     this.staticBallLayer = selectElement('#StaticBallLayer', this);
     this.liveBallLayer = selectElement('#LiveBallLayer', this);

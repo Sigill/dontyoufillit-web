@@ -152,17 +152,29 @@ dist/www/manifest.json: src/manifest.json
 ESBUILD_SOURCE_FILES = \
 	src/app.css \
 	src/app.ts \
+	src/ball-engine-math.ts \
+	src/ball-engine-motion-equation.ts \
 	src/ball-engine-rk4.ts \
+	src/ball-engine-temporal-discretization.ts \
 	src/ball-engine.ts \
 	src/bouncing-ball.ts \
 	src/cannon.ts \
+	src/collision-handler.ts \
+	src/collision-solver.ts \
 	src/constants.ts \
-	src/css-board.ts \
+	src/css-board.tsx \
 	src/game-handler.ts \
-	dev/ball-engine-comparator.ts \
+	src/hud.tsx \
+	src/jsx.tsx \
+	src/manifest.json \
+	src/observable.ts \
+	src/rk4-integrator.ts \
+	src/static-ball.ts \
+	src/utils.ts \
 	dev/ball-collision.ts \
-	dev/wall-collision.ts \
+	dev/ball-engine-comparator.ts \
 	dev/debug.ts \
+	dev/wall-collision.ts \
 
 dist/www/app.css dist/www/app.js dist/dev/ball-engine-comparator.js dist/dev/ball-collision.js dist/dev/wall-collision.js dist/dev/debug.js: $(ESBUILD_SOURCE_FILES)
 	node esbuild.ts

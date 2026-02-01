@@ -49,6 +49,8 @@ program.action(async ({ watch, serve, liveReload }: { watch: boolean; serve: boo
     plugins: [
       logRebuildPlugin
     ],
+    jsxFactory: 'h',
+    jsxFragment: 'Fragment',
     sourcemap: 'linked',
     footer: {
       ...(liveReload

@@ -4,6 +4,28 @@ import {
   lazyAssign,
   selectElement,
 } from "./utils";
+/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+import { h, Fragment } from "./jsx";
+
+export function makeHudDom() {
+  return (
+    <>
+      <div className="left-col">
+        <div className="label">Highscore</div><div className="value highscore"></div>
+        <div className="label">Score</div><div className="value score"></div>
+      </div>
+
+      <div className="right-col">
+        <span className="lives"></span>
+
+        <div className="pause">
+          <div className="pause-bar"></div>
+          <div className="pause-bar"></div>
+        </div>
+      </div>
+    </>
+  );
+}
 
 export class HUD extends HTMLElement {
   private readonly highscoreSpan: HTMLSpanElement;
@@ -15,13 +37,7 @@ export class HUD extends HTMLElement {
   constructor() {
     super();
 
-    const fragment = selectElement<HTMLTemplateElement>('#hud-template')
-      .content.cloneNode(true);
-
-    // const shadowRoot = this.attachShadow({ mode: "open" });
-    // shadowRoot.appendChild(fragment);
-
-    this.appendChild(fragment);
+    this.appendChild(makeHudDom());
 
     addTouchOrClickEvent(
       this.querySelector<HTMLDivElement>('.pause')!,
