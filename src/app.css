@@ -242,8 +242,6 @@ dontyoufillit-css-board {
 
   .game.lazer-mode & {
     #LiveBallLayer .ball .disk,
-    .Cannon .Base,
-    .Cannon .Dome,
     .Cannon .Turret {
       background: red;
     }
