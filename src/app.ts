@@ -100,20 +100,25 @@ game.observable.addEventListener('endStep', () => {
   updateLazerButtonState();
 });
 
+const lazerBonusBadge = selectElement<HTMLElement>('#lazer-bonus-badge');
+
 function updateLazerButtonState() {
   const isLazerActive = game.activeCollisionHandler === LazerCollisionHandler;
   if (isLazerActive) {
-    lazerBonusButton.innerText = 'Cancel Lazer';
+    lazerBonusButton.innerText = 'Cancel';
+    lazerBonusBadge.style.display = 'none';
     lazerBonusButton.style.opacity = '1';
     lazerBonusButton.style.cursor = 'pointer';
     (lazerBonusButton.parentElement as HTMLElement).style.pointerEvents = 'auto';
   } else if (game.canEnableCollisionHandler(LazerCollisionHandler)) {
-    lazerBonusButton.innerText = 'Lazer ball (5 pts)';
+    lazerBonusButton.innerText = 'Lazer';
+    lazerBonusBadge.style.display = 'block';
     lazerBonusButton.style.opacity = '1';
     lazerBonusButton.style.cursor = 'pointer';
     (lazerBonusButton.parentElement as HTMLElement).style.pointerEvents = 'auto';
   } else {
-    lazerBonusButton.innerText = 'Lazer ball (5 pts)';
+    lazerBonusButton.innerText = 'Lazer';
+    lazerBonusBadge.style.display = 'block';
     lazerBonusButton.style.opacity = '0.5';
     lazerBonusButton.style.cursor = 'not-allowed';
     (lazerBonusButton.parentElement as HTMLElement).style.pointerEvents = 'none';
@@ -269,6 +274,17 @@ game.observable.addEventListener('gameover', function () {
   pushScreen(gameoverScreen);
 });
 
+function setupCollapsible(headerSelector: string, containerSelector: string) {
+  const header = selectElement(headerSelector);
+  const container = selectElement(containerSelector);
+
+  header.addEventListener('click', () => {
+    container.classList.toggle('expanded');
+  });
+}
+
+setupCollapsible('.bonus-info-trigger', '.bonus-header');
+
 pushScreen(startScreen);
 
 hud.onPause = ev => {
@@ -288,6 +304,7 @@ function pauseGame() {
     game.pause();
 
     updateLazerButtonState();
+    selectElement('.bonus-header').classList.remove('expanded');
 
     pushScreen(pauseScreen);
   }

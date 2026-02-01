@@ -326,22 +326,129 @@ dontyoufillit-css-board {
   background-color: white;
   color: black;
   border-radius: 0.25em;
-  padding: 0.25em;
+  padding: 0 0.1em;
   font-weight: bold;
   cursor: pointer;
   line-height: 1.5;
+  display: inline-block;
+}
+
+.screen .button.secondary {
+  font-size: 150%;
+  margin: 0.8em auto;
+
+  span {
+    padding: 0.2em;
+  }
+}
+
+.badge-button {
+  position: relative;
+  display: inline-block;
+}
+
+.badge {
+  position: absolute !important;
+  top: -0.3em !important;
+  right: -0.3em !important;
+  background-color: #ff4d4d !important;
+  color: white !important;
+  border-radius: 1em !important;
+  padding: 0.15em 0.4em !important;
+  font-size: 0.5em !important;
+  line-height: 1 !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+  pointer-events: none !important;
+  border: 1px solid white !important;
 }
 .screen .score {
   font-size: 200%;
   text-align: center;
 }
 
-.screen .description {
-  font-size: 150%;
-  margin: 0.5em auto;
+.description {
+  min-height: 0;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  font-size: 100%;
+  margin: 0.4em auto;
   text-align: center;
   color: #aaa;
   font-style: italic;
+  max-width: 90%;
+}
+
+.expanded .description {
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out 0.1s;
+}
+
+.bonus-section {
+  margin: 0.5em auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.bonus-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5em;
+  width: 100%;
+}
+
+.bonus-title {
+  font-size: 133%; /* Match relative size */
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #ccc;
+  letter-spacing: 0.1em;
+  margin-right: 0.5ex;
+  display: inline-block;
+}
+
+.bonus-info-trigger {
+  font-size: 60%;
+  color: #888;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  &:hover {
+    color: white;
+    .bonus-title { color: white; }
+  }
+}
+
+.info-link {
+  text-decoration: underline;
+}
+
+.bonus-description-container {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease-in-out;
+  width: 100%;
+}
+
+.expanded .bonus-description-container {
+  grid-template-rows: 1fr;
+}
+
+.bonus-description-wrapper {
+  overflow: hidden;
+  width: 100%;
+}
+
+.pause-divider {
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin: 1em auto;
+  width: 80%;
 }
 
 a {

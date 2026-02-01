@@ -74,8 +74,23 @@
       <div class="fullscreen vcentered">
         <div class="vcentered-inner">
           <p class="title">Game paused</p>
-          <p class="button"><span id="lazer-bonus-button">Lazer ball (5 pts)</span></p>
-          <p class="description">Remove the fist encountered ball. No Bounce.</p>
+          <div class="bonus-section">
+            <div class="bonus-header">
+              <div class="bonus-info-trigger">
+                <span class="bonus-title">Bonuses</span><span class="info-link">Info</span>
+              </div>
+              <div class="bonus-description-container">
+                <div class="bonus-description-wrapper">
+                  <p class="description">Remove the first encountered ball. No Bounce.</p>
+                </div>
+              </div>
+            </div>
+            <p class="button secondary badge-button">
+              <span id="lazer-bonus-button">Lazer</span>
+              <span id="lazer-bonus-badge" class="badge">-5</span>
+            </p>
+          </div>
+          <hr class="pause-divider">
           <p class="button"><span id="continue-button">Continue</span></p>
           <p class="button"><span id="options-button">Options</span></p>
           <p class="button"><span id="menu-button">Menu</span></p>
