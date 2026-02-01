@@ -104,8 +104,8 @@ function updateLazerButtonState() {
   const isLazerActive = game.activeCollisionHandler === LazerCollisionHandler;
   const canEnable = game.canEnableCollisionHandler(LazerCollisionHandler);
 
-  lazerBonusButton.classList.toggle('active', isLazerActive);
-  lazerBonusButton.classList.toggle('disabled', !isLazerActive && !canEnable);
+  lazerBonusButton.parentElement!.classList.toggle('active', isLazerActive);
+  lazerBonusButton.parentElement!.classList.toggle('disabled', !isLazerActive && !canEnable);
 }
 
 addTouchOrClickEvent(selectElement<HTMLElement>('.fullscreen-container'), (evt) => {

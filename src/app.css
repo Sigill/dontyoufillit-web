@@ -363,19 +363,22 @@ dontyoufillit-css-board {
     }
   }
 
-  > span.toggle-button {
-    background-color: transparent;
-    border: 1px solid white;
-    color: white;
-    transition: background-color 0.2s, color 0.2s, opacity 0.2s;
-    cursor: pointer;
+  &.toggle-button {
+    > span {
+      background-color: transparent;
+      border: 1px solid white;
+      color: white;
+      padding: 0.2em;
+      cursor: pointer;
+      border-radius: 0.25em;
+    }
 
-    &.active {
+    &.active > span {
       background-color: white;
       color: black;
     }
 
-    &.disabled {
+    &.disabled > span {
       opacity: 0.65;
       cursor: not-allowed;
       pointer-events: none;
