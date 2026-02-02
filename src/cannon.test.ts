@@ -1,5 +1,5 @@
 import * as chai from 'chai';
-import { Cannon } from './cannon';
+import { MovingCannon as Cannon } from './cannon';
 import { CANON_ANGULAR_SPEED } from './constants';
 
 const { assert } = chai;

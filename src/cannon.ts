@@ -1,10 +1,18 @@
 import { CANON_ANGULAR_SPEED } from "./constants";
 
+export abstract class Cannon {
+  /**
+   * Gets the current angle of the cannon.
+   * @returns The angle in radians, adjusted by 90 degrees (PI/2).
+   */
+  abstract getAngle(): number;
+}
+
 /**
  * Represents the cannon that fires balls.
  * It oscillates back and forth within a specific angular range.
  */
-export class Cannon {
+export class MovingCannon extends Cannon {
   #angle = 0;
   #angularVelocity = CANON_ANGULAR_SPEED;
 
@@ -16,10 +24,6 @@ export class Cannon {
     this.#angularVelocity = CANON_ANGULAR_SPEED;
   }
 
-  /**
-   * Gets the current angle of the cannon.
-   * @returns The angle in radians, adjusted by 90 degrees (PI/2).
-   */
   getAngle(): number {
     return this.#angle + Math.PI / 2;
   }

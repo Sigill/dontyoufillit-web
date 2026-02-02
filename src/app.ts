@@ -5,7 +5,7 @@ import {
   BallEngineMotionEquationAbsolute,
 } from "./ball-engine-motion-equation";
 import { BallEngineMath } from "./ball-engine-math";
-import { Cannon } from "./cannon";
+import { MovingCannon as Cannon } from "./cannon";
 import { LazerCollisionHandler } from "./collision-handler";
 import { CssBoard } from "./css-board";
 import { GameHandler } from "./game-handler";

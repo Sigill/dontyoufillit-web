@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 import { BallEngine } from './ball-engine';
-import { Cannon } from './cannon';
+import { MovingCannon as Cannon } from './cannon';
 import { DefaultCollisionHandler, LazerCollisionHandler } from './collision-handler';
 import { GameHandler } from './game-handler';
 import { BallGeometry } from './static-ball';

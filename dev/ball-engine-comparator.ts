@@ -1,6 +1,6 @@
 import { BallEngineRK4 } from "../src/ball-engine-rk4";
 import { BallEngineMath } from "../src/ball-engine-math";
-import { Cannon } from "../src/cannon";
+import { MovingCannon as Cannon } from "../src/cannon";
 import { CssBoard } from "../src/css-board";
 import { HUD } from "../src/hud";
 import { selectElement, addTouchOrClickEvent } from "../src/utils";

@@ -1,5 +1,5 @@
 import { BallEngine } from "./ball-engine";
-import { Cannon } from "./cannon";
+import { MovingCannon as Cannon } from "./cannon";
 import { CollisionHandler, DefaultCollisionHandler } from "./collision-handler";
 import * as Constants from './constants';
 import { Observable } from "./observable";
