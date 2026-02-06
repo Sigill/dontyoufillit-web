@@ -6,6 +6,7 @@ import { selectElement } from "../core/utils";
 import { makeCannonBall } from "../core/ball";
 import { AimingBot } from "./bots/aiming-bot";
 import { Bot } from "./bot-type";
+import { DEFAULT_BALL_ACCELERATION, DEFAULT_BALL_VELOCITY } from "../core/constants";
 
 enum GameState {
   PAUSED = 1,
@@ -65,8 +66,12 @@ requestAnimationFrame((frameTime: number) => {
   requestAnimationFrame(nextFrameTime => step(nextFrameTime, frameTime));
 });
 
+const speedup = 8;
+const velocity = DEFAULT_BALL_VELOCITY * speedup;
+const acceleration = DEFAULT_BALL_ACCELERATION * speedup * speedup;
+
 activeBot.act(ballEngine, cannon);
-ballEngine.fire(makeCannonBall({angle: cannon.getAngle()}));
+ballEngine.fire(makeCannonBall({angle: cannon.getAngle(), velocity, acceleration}));
 
 setInterval(() => {
   if (state === GameState.RUNNING && ballEngine.currentBall === null) {
@@ -75,6 +80,6 @@ setInterval(() => {
 
     // fire
     const angle = cannon.getAngle();
-    ballEngine.fire(makeCannonBall({angle}));
+    ballEngine.fire(makeCannonBall({angle, velocity, acceleration}));
   }
-}, 200);
+}, 50);

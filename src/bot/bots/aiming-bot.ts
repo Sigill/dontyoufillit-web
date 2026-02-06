@@ -13,7 +13,7 @@ export class AimingBot implements Bot {
 
     // Scan angles from 0.1 to PI - 0.1
     for (let angle = 0.1; angle < Math.PI - 0.1; angle += 0.05) {
-      const simulationEngine = new BallEngineMath();
+      const simulationEngine = new BallEngineMath({ verbose: false });
       simulationEngine.staticBalls = ballEngine.staticBalls.map(b => ({ ...b }));
 
       const ball = makeCannonBall({ angle });

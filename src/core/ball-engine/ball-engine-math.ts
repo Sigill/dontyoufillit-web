@@ -222,14 +222,16 @@ export class BallEngineMath extends BallEngine {
   internalFire(ball: MovingBall): void {
     const fixedPoints = [...computeFixedPoints(ball, this.staticBalls)];
 
-    console.group('Fixed points');
-    for (const {t, x, y, angle, velocity, obstacles: obstacles} of fixedPoints) {
-      for (const obstacle of obstacles) {
-        console.debug(`Collision with ${ppObstacle(obstacle)}`);
+    if (this.verbose) {
+      console.group('Fixed points');
+      for (const {t, x, y, angle, velocity, obstacles: obstacles} of fixedPoints) {
+        for (const obstacle of obstacles) {
+          console.debug(`Collision with ${ppObstacle(obstacle)}`);
+        }
+        console.debug(`Δt:${t.toFixed(3)} ${directionalArrow(Math.cos(angle) * velocity, Math.sin(angle) * velocity)} x:${x.toFixed(3)} y:${y.toFixed(3)} v:${velocity.toFixed(3)} angle:${ppAngle(angle)}`);
       }
-      console.debug(`Δt:${t.toFixed(3)} ${directionalArrow(Math.cos(angle) * velocity, Math.sin(angle) * velocity)} x:${x.toFixed(3)} y:${y.toFixed(3)} v:${velocity.toFixed(3)} angle:${ppAngle(angle)}`);
+      console.groupEnd();
     }
-    console.groupEnd();
 
     this.currentBall = new MathBall(
       ball.radius,
@@ -294,7 +296,10 @@ export class BallEngineMath extends BallEngine {
       }
 
       const fp = pastFixedPoints.at(-1)!;
-      console.log(`Last fixed point t:${fp.t.toFixed(3)} x:${fp.x.toFixed(3)} y:${fp.y.toFixed(3)} ${directionalArrow(Math.cos(fp.angle), Math.sin(fp.angle))}`);
+
+      if (this.verbose) {
+        console.log(`Last fixed point t:${fp.t.toFixed(3)} x:${fp.x.toFixed(3)} y:${fp.y.toFixed(3)} ${directionalArrow(Math.cos(fp.angle), Math.sin(fp.angle))}`);
+      }
 
       let hasHitBottomWall = fp.obstacles.some(({type, value}) => {
         return type === 'wall' && value.wall === GameWalls.bottom;

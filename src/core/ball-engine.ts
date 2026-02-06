@@ -15,6 +15,7 @@ import { BallGeometry, MovingBall, StaticBall } from "./ball";
  * the game in the state it was before a new ball is fired.
  */
 export abstract class BallEngine {
+  readonly verbose: boolean;
   staticBalls: Array<StaticBall>;
   abstract currentBall: BallGeometry | null;
 
@@ -23,7 +24,8 @@ export abstract class BallEngine {
 
   #snapshot = new Array<[StaticBall, StaticBall]>();
 
-  constructor() {
+  constructor({ verbose = false }: { verbose?: boolean } = {}) {
+    this.verbose = verbose;
     this.staticBalls = [];
   }
 
@@ -44,10 +46,12 @@ export abstract class BallEngine {
   fire(ball: MovingBall) {
     this.takeSnapshot();
 
-    console.groupCollapsed('snapshot');
-    console.log(ball);
-    console.log(this.#snapshot.map(([, ball]) => ball));
-    console.groupEnd();
+    if (this.verbose) {
+      console.groupCollapsed('snapshot');
+      console.log(ball);
+      console.log(this.#snapshot.map(([, ball]) => ball));
+      console.groupEnd();
+    }
 
     this.internalFire(ball);
   }
