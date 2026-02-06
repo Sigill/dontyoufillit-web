@@ -1,12 +1,23 @@
-import { makeCannonBall } from "../../core/ball";
+import { makeCannonBall, StaticBall } from "../../core/ball";
 import { BallEngineMath } from "../../core/ball-engine/ball-engine-math";
 import { ManualCannon } from "../bot";
 import { Bot } from "../bot-type";
 
+/**
+ * A greedy bot that evaluates the best angle based on the immediate next turn.
+ *
+ * It scans a wide range of firing angles and simulates a single trajectory for each.
+ * The bot's decision logic follows a strict hierarchy:
+ * 1. Prefer any "safe" angle (one that doesn't result in a game over) over an "unsafe" one.
+ * 2. Between two angles of equal safety, choose the one that maximizes the number of ball hits.
+ *
+ * Unlike the LookAheadAimingBot, this bot does not consider the long-term consequences
+ * of how its current shot will set up the board for subsequent turns.
+ */
 export class AimingBot implements Bot {
   name = "AimingBot";
 
-  act(ballEngine: BallEngineMath, cannon: ManualCannon): void {
+  act(staticBalls: Array<StaticBall>, cannon: ManualCannon): void {
     let bestAngle = cannon.getAngle();
     let maxHits = -1;
     let isBestSafe = false;
@@ -14,7 +25,7 @@ export class AimingBot implements Bot {
     // Scan angles from 0.1 to PI - 0.1
     for (let angle = 0.1; angle < Math.PI - 0.1; angle += 0.05) {
       const simulationEngine = new BallEngineMath({ verbose: false });
-      simulationEngine.staticBalls = ballEngine.staticBalls.map(b => ({ ...b }));
+      simulationEngine.staticBalls = staticBalls.map(b => ({ ...b }));
 
       const ball = makeCannonBall({ angle });
       simulationEngine.fire(ball);

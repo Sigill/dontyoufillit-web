@@ -23,24 +23,30 @@ export abstract class BallEngine {
   collisionHandler: CollisionHandler = DefaultCollisionHandler;
 
   #snapshot = new Array<[StaticBall, StaticBall]>();
+  readonly #withSnapshots: boolean;
 
-  constructor({ verbose = false }: { verbose?: boolean } = {}) {
+  constructor({ verbose = false, withSnapshots = true }: { verbose?: boolean, withSnapshots?: boolean } = {}) {
     this.verbose = verbose;
+    this.#withSnapshots = withSnapshots;
     this.staticBalls = [];
   }
 
   takeSnapshot(): void {
-    this.#snapshot = this.staticBalls.map<[StaticBall, StaticBall]>(b => [b, structuredClone(b)]);
+    if (this.#withSnapshots) {
+      this.#snapshot = this.staticBalls.map<[StaticBall, StaticBall]>(b => [b, structuredClone(b)]);
+    }
   }
 
   restoreSnapshot() {
-    this.staticBalls = this.#snapshot.map(([ball, snapshot]) => {
-      ball.counter = snapshot.counter;
-      ball.radius = snapshot.radius;
-      ball.x = snapshot.x;
-      ball.y = snapshot.y;
-      return ball;
-    });
+    if (this.#withSnapshots) {
+      this.staticBalls = this.#snapshot.map(([ball, snapshot]) => {
+        ball.counter = snapshot.counter;
+        ball.radius = snapshot.radius;
+        ball.x = snapshot.x;
+        ball.y = snapshot.y;
+        return ball;
+      });
+    }
   }
 
   fire(ball: MovingBall) {
@@ -49,7 +55,7 @@ export abstract class BallEngine {
     if (this.verbose) {
       console.groupCollapsed('snapshot');
       console.log(ball);
-      console.log(this.#snapshot.map(([, ball]) => ball));
+      console.log(this.staticBalls);
       console.groupEnd();
     }
 
