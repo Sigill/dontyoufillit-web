@@ -8,7 +8,6 @@ import {
   Wall,
   WallObstacle,
 } from "./collision-solver";
-import * as Constants from "./constants";
 import { computeExpandedRadius } from "./static-ball";
 import { BallGeometry, BallState, MovingBall, StaticBall } from "./ball";
 import { directionalArrow, normalizeRadian, ppAngle } from "./utils";
@@ -221,10 +220,7 @@ export class BallEngineMath extends BallEngine {
    * @param ball The initial state of the ball being fired
    */
   internalFire(ball: MovingBall): void {
-    const fixedPoints = [...computeFixedPoints(
-      {...ball, velocity: Constants.DEFAULT_BALL_VELOCITY, acceleration: Constants.DEFAULT_BALL_ACCELERATION},
-      this.staticBalls
-    )];
+    const fixedPoints = [...computeFixedPoints(ball, this.staticBalls)];
 
     console.group('Fixed points');
     for (const {t, x, y, angle, velocity, obstacles: obstacles} of fixedPoints) {
