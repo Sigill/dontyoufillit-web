@@ -4,6 +4,8 @@ import { CssBoard } from "../ui/css-board";
 import { HUD } from "../ui/hud";
 import { selectElement } from "../core/utils";
 import { makeCannonBall } from "../core/ball";
+import { AimingBot } from "./bots/aiming-bot";
+import { Bot } from "./bot-type";
 
 enum GameState {
   PAUSED = 1,
@@ -11,60 +13,11 @@ enum GameState {
   GAMEOVER = 3,
 }
 
-interface Bot {
-  name: string;
-  act(ballEngine: BallEngineMath, cannon: Cannon): void;
-}
-
-class StaticBot implements Bot {
-  name = "StaticBot";
-  act(): void {
-    // Does nothing, just keeps the default angle.
-  }
-}
-
-class AimingBot implements Bot {
-  name = "AimingBot";
-
-  act(ballEngine: BallEngineMath, cannon: ManualCannon): void {
-    let bestAngle = cannon.getAngle();
-    let maxHits = -1;
-    let isBestSafe = false;
-
-    // Scan angles from 0.1 to PI - 0.1
-    for (let angle = 0.1; angle < Math.PI - 0.1; angle += 0.05) {
-      const simulationEngine = new BallEngineMath();
-      simulationEngine.staticBalls = ballEngine.staticBalls.map(b => ({ ...b }));
-
-      const ball = makeCannonBall({ angle });
-      simulationEngine.fire(ball);
-      const { score: hits, gameover } = simulationEngine.update(3, 0);
-      const isSafe = !gameover;
-
-      if (isSafe && !isBestSafe) {
-        // Found first safe angle
-        maxHits = hits;
-        bestAngle = angle;
-        isBestSafe = true;
-      } else if (isSafe === isBestSafe) {
-        // Both safe or both unsafe, pick the one with more hits
-        if (hits > maxHits) {
-          maxHits = hits;
-          bestAngle = angle;
-        }
-      }
-    }
-
-    cannon.angle = bestAngle;
-  }
-}
-
 const BOTS: Record<string, Bot> = {
-  StaticBot: new StaticBot(),
-  AimingBot: new AimingBot(),
+  [AimingBot.name]: new AimingBot(),
 };
 
-class ManualCannon implements Cannon {
+export class ManualCannon implements Cannon {
   angle = Math.PI / 2;
 
   getAngle(): number {
@@ -73,8 +26,8 @@ class ManualCannon implements Cannon {
 }
 
 const queryParams = new URLSearchParams(window.location.search);
-const botName = queryParams.get('bot') || 'AimingBot';
-const activeBot = BOTS[botName] || BOTS.AimingBot;
+const botName = queryParams.get('bot') || AimingBot.name;
+const activeBot = BOTS[botName] || BOTS[AimingBot.name];
 
 const cannon = new ManualCannon();
 const ballEngine = (window as any).ballEngine = new BallEngineMath();
