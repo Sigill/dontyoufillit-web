@@ -5,6 +5,7 @@ import { HUD } from "../ui/hud";
 import { selectElement } from "../core/utils";
 import { makeCannonBall } from "../core/ball";
 import { AimingBot } from "./bots/aiming-bot";
+import { SimulationBot } from "./bots/simulation-bot";
 import { Bot } from "./bot-type";
 import { DEFAULT_BALL_ACCELERATION, DEFAULT_BALL_VELOCITY } from "../core/constants";
 
@@ -14,8 +15,12 @@ enum GameState {
   GAMEOVER = 3,
 }
 
+const queryParams = new URLSearchParams(window.location.search);
+const depth = parseInt(queryParams.get('depth') || '2', 10);
+
 const BOTS: Record<string, Bot> = {
   [AimingBot.name]: new AimingBot(),
+  [SimulationBot.name]: new SimulationBot(depth),
 };
 
 export class ManualCannon implements Cannon {
@@ -26,7 +31,6 @@ export class ManualCannon implements Cannon {
   }
 }
 
-const queryParams = new URLSearchParams(window.location.search);
 const botName = queryParams.get('bot') || AimingBot.name;
 const activeBot = BOTS[botName] || BOTS[AimingBot.name];
 
@@ -76,7 +80,9 @@ ballEngine.fire(makeCannonBall({angle: cannon.getAngle(), velocity, acceleration
 setInterval(() => {
   if (state === GameState.RUNNING && ballEngine.currentBall === null) {
     // bot action
+    console.time('bot thinking');
     activeBot.act(ballEngine, cannon);
+    console.timeEnd('bot thinking');
 
     // fire
     const angle = cannon.getAngle();

@@ -134,6 +134,8 @@ export function* computeFixedPoints(
     );
 
     if (collisions.length > 1) { // TODO handle collision against multiple objects.
+      console.log('ball', ball);
+      console.log('fixedBalls', fixedBalls);
       throw new Error('Collision against multiple objects');
     }
 
