@@ -1,7 +1,7 @@
-import { BallEngine } from "./ball-engine";
+import { BallEngine } from "../ball-engine";
 import { BouncingBall } from "./bouncing-ball";
-import { computeExpandedRadius } from "./static-ball";
-import { normalizeRadian } from "./utils";
+import { computeExpandedRadius } from "../static-ball";
+import { normalizeRadian } from "../utils";
 
 /**
  * A BallEngine implementation that uses temporal discretization to update the physics.

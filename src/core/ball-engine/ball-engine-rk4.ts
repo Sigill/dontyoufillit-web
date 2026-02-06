@@ -1,8 +1,8 @@
 import { BallEngineTemporalDiscretization } from "./ball-engine-temporal-discretization";
-import { MovingBall } from "./ball";
+import { MovingBall } from "../ball";
 import { BouncingBall } from "./bouncing-ball";
-import * as Constants from "./constants";
-import { RK41DObject } from "./rk4-integrator";
+import * as Constants from "../constants";
+import { RK41DObject } from "../rk4-integrator";
 
 
 /**

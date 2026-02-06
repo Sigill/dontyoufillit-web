@@ -1,7 +1,7 @@
 import { BallEngineTemporalDiscretization } from "./ball-engine-temporal-discretization";
-import { MovingBall } from "./ball";
+import { MovingBall } from "../ball";
 import { BouncingBall } from "./bouncing-ball";
-import * as Constants from "./constants";
+import * as Constants from "../constants";
 
 
 /**

@@ -8,7 +8,7 @@
     "build:js": "node esbuild.ts",
     "build": "make",
     "dev": "make && node --watch esbuild.ts --watch --serve",
-    "lint": "eslint src/ dev/",
+    "lint": "eslint src/",
     "test": "web-test-runner --node-resolve",
     "typecheck": "tsc --noEmit"
   },

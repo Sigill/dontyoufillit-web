@@ -1,5 +1,11 @@
 import { assert } from 'chai';
-import { computeCollisionsWithBalls, computeCollisionsWithWalls, computeCollisionWithBall, computeCollisionWithWall, Wall } from './collision-solver';
+import {
+  computeCollisionsWithBalls,
+  computeCollisionsWithWalls,
+  computeCollisionWithBall,
+  computeCollisionWithWall,
+  Wall,
+} from './collision-solver';
 
 const Walls = {
   horizontalY0: { x0: 0, y0: 0, x1: 1, y1: 0 },

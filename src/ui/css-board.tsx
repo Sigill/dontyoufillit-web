@@ -1,10 +1,10 @@
-import { BallGeometry, StaticBall } from "./ball";
-import { BallEngine } from "./ball-engine";
-import { Cannon } from "./cannon";
-import { getOrInsert, selectElement } from "./utils";
+import { BallGeometry, StaticBall } from "../core/ball";
+import { BallEngine } from "../core/ball-engine";
+import { Cannon } from "../core/cannon";
+import { getOrInsert, selectElement } from "../core/utils";
 /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 import { h, Fragment } from "./jsx";
-import * as Constants from './constants';
+import * as Constants from '../core/constants';
 
 export function makeBallDom(): HTMLDivElement {
   return (

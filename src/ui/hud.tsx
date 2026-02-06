@@ -3,7 +3,7 @@ import {
   lazySetInnerText,
   lazyAssign,
   selectElement,
-} from "./utils";
+} from "../core/utils";
 /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 import { h, Fragment } from "./jsx";
 

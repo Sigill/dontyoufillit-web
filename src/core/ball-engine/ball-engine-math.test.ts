@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import { computeFixedPoints } from './ball-engine-math';
-import { makeBalls } from './ball';
-import { DEFAULT_BALL_RADIUS, DEFAULT_BALL_VELOCITY, DEFAULT_BALL_ACCELERATION } from './constants';
+import { makeBalls } from '../ball';
+import { DEFAULT_BALL_RADIUS, DEFAULT_BALL_VELOCITY, DEFAULT_BALL_ACCELERATION } from '../constants';
 
 describe('computeFixedPoints()', () => {
   // it('should stops when a collision with a ball occured but the bottom wall has not been cleared', () => {

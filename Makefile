@@ -150,34 +150,35 @@ dist/www/manifest.json: src/manifest.json
 	cp $< $@
 
 ESBUILD_SOURCE_FILES = \
-	src/app.css \
-	src/app.ts \
-	src/ball-engine-math.ts \
-	src/ball-engine-motion-equation.ts \
-	src/ball-engine-rk4.ts \
-	src/ball-engine-temporal-discretization.ts \
-	src/ball-engine.ts \
-	src/bouncing-ball.ts \
-	src/bot.ts \
-	src/cannon.ts \
-	src/collision-handler.ts \
-	src/collision-solver.ts \
-	src/constants.ts \
-	src/css-board.tsx \
-	src/game-handler.ts \
-	src/hud.tsx \
-	src/jsx.tsx \
+	src/game/app.css \
+	src/game/app.ts \
+	src/core/ball-engine/ball-engine-math.ts \
+	src/core/ball-engine/ball-engine-motion-equation.ts \
+	src/core/ball-engine/ball-engine-rk4.ts \
+	src/core/ball-engine/ball-engine-temporal-discretization.ts \
+	src/core/ball-engine.ts \
+	src/core/ball-engine/bouncing-ball.ts \
+	src/bot/bot.ts \
+	src/core/ball.ts \
+	src/core/cannon.ts \
+	src/core/collision-handler.ts \
+	src/core/collision-solver.ts \
+	src/core/constants.ts \
+	src/ui/css-board.tsx \
+	src/core/game-handler.ts \
+	src/ui/hud.tsx \
+	src/ui/jsx.tsx \
 	src/manifest.json \
-	src/observable.ts \
-	src/rk4-integrator.ts \
-	src/static-ball.ts \
-	src/utils.ts \
-	dev/ball-collision.ts \
-	dev/ball-engine-comparator.ts \
-	dev/debug.ts \
-	dev/wall-collision.ts \
+	src/core/observable.ts \
+	src/core/rk4-integrator.ts \
+	src/core/static-ball.ts \
+	src/core/utils.ts \
+	src/dev/ball-collision.ts \
+	src/dev/ball-engine-comparator.ts \
+	src/dev/debug.ts \
+	src/dev/wall-collision.ts
 
-dist/www/app.css dist/www/app.js dist/dev/ball-engine-comparator.js dist/dev/ball-collision.js dist/dev/wall-collision.js dist/dev/debug.js: $(ESBUILD_SOURCE_FILES)
+dist/www/app.css dist/www/app.js dist/dev/ball-engine-comparator.js dist/dev/ball-collision.js dist/dev/wall-collision.js dist/dev/debug.js dist/bot/bot.js: $(ESBUILD_SOURCE_FILES)
 	node esbuild.ts
 
 dist/www/.htaccess: .htaccess

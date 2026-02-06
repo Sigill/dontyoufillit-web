@@ -1,15 +1,15 @@
-import { BallEngineRK4 } from "../src/ball-engine-rk4";
-import { BallEngineMath } from "../src/ball-engine-math";
-import { MovingCannon as Cannon } from "../src/cannon";
-import { CssBoard } from "../src/css-board";
-import { HUD } from "../src/hud";
-import { selectElement, addTouchOrClickEvent } from "../src/utils";
-import { BallEngine } from "../src/ball-engine";
-import * as Constants from '../src/constants';
+import { BallEngineRK4 } from "../core/ball-engine/ball-engine-rk4";
+import { BallEngineMath } from "../core/ball-engine/ball-engine-math";
+import { MovingCannon as Cannon } from "../core/cannon";
+import { CssBoard } from "../ui/css-board";
+import { HUD } from "../ui/hud";
+import { selectElement, addTouchOrClickEvent } from "../core/utils";
+import { BallEngine } from "../core/ball-engine";
+import * as Constants from '../core/constants';
 import * as Plot from "@observablehq/plot";
 import Stats from 'stats.js';
-import { BallEngineMotionEquationDelta, BallEngineMotionEquationAbsolute } from "../src/ball-engine-motion-equation";
-import { makeCannonBall } from "../src/ball";
+import { BallEngineMotionEquationDelta, BallEngineMotionEquationAbsolute } from "../core/ball-engine/ball-engine-motion-equation";
+import { makeCannonBall } from "../core/ball";
 
 const grid = selectElement('#grid');
 const plotContainer = selectElement('#plot-container');

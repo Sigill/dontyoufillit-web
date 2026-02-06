@@ -1,16 +1,16 @@
 import Stats from "stats.js";
-import { BallEngineRK4 } from "./ball-engine-rk4";
+import { BallEngineRK4 } from "../core/ball-engine/ball-engine-rk4";
 import {
   BallEngineMotionEquationDelta,
   BallEngineMotionEquationAbsolute,
-} from "./ball-engine-motion-equation";
-import { BallEngineMath } from "./ball-engine-math";
-import { MovingCannon as Cannon } from "./cannon";
-import { LazerCollisionHandler } from "./collision-handler";
-import { CssBoard } from "./css-board";
-import { GameHandler } from "./game-handler";
-import { HUD } from "./hud";
-import { addTouchOrClickEvent, asBool, selectElement } from "./utils";
+} from "../core/ball-engine/ball-engine-motion-equation";
+import { BallEngineMath } from "../core/ball-engine/ball-engine-math";
+import { MovingCannon as Cannon } from "../core/cannon";
+import { LazerCollisionHandler } from "../core/collision-handler";
+import { GameHandler } from "../core/game-handler";
+import { addTouchOrClickEvent, asBool, selectElement } from "../core/utils";
+import { HUD } from "../ui/hud";
+import { CssBoard } from "../ui/css-board";
 
 function readStoredHighscore(): number {
   return parseInt(localStorage.getItem('highscore') || '0', 10);
@@ -64,7 +64,7 @@ selectElement<HTMLDivElement>('.hud').appendChild(hud);
 const renderer = new CssBoard();
 selectElement<HTMLDivElement>('.game').appendChild(renderer);
 
-// Object.assign(window, {cannon, ballEngine, game, hud, renderer}); // For debug.
+Object.assign(window, {cannon, ballEngine, game, hud, renderer}); // For debug.
 
 function showFps(enabled: boolean) {
   localStorage.setItem('show-fps', enabled.toString());

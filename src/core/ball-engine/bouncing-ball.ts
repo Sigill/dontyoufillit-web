@@ -1,4 +1,4 @@
-import { BallGeometry, MovingBall } from "./ball";
+import { BallGeometry, MovingBall } from "../ball";
 
 /**
  * Represents a ball that bounces against walls and other balls.

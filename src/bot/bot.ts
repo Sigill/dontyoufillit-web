@@ -1,9 +1,9 @@
-import { BallEngineMath } from "./ball-engine-math";
-import { Cannon } from "./cannon";
-import { CssBoard } from "./css-board";
-import { HUD } from "./hud";
-import { selectElement } from "./utils";
-import { makeCannonBall } from "./ball";
+import { BallEngineMath } from "../core/ball-engine/ball-engine-math";
+import { Cannon } from "../core/cannon";
+import { CssBoard } from "../ui/css-board";
+import { HUD } from "../ui/hud";
+import { selectElement } from "../core/utils";
+import { makeCannonBall } from "../core/ball";
 
 enum GameState {
   PAUSED = 1,

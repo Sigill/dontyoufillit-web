@@ -1,4 +1,4 @@
-import { BallEngine } from "./ball-engine";
+import { BallEngine } from "../ball-engine";
 import {
   BallObstacle,
   Collision,
@@ -7,10 +7,10 @@ import {
   findImminentCollisions,
   Wall,
   WallObstacle,
-} from "./collision-solver";
-import { computeExpandedRadius } from "./static-ball";
-import { BallGeometry, BallState, MovingBall, StaticBall } from "./ball";
-import { directionalArrow, normalizeRadian, ppAngle } from "./utils";
+} from "../collision-solver";
+import { computeExpandedRadius } from "../static-ball";
+import { BallGeometry, BallState, MovingBall, StaticBall } from "../ball";
+import { directionalArrow, normalizeRadian, ppAngle } from "../utils";
 
 type Obstacle = WallObstacle | BallObstacle<StaticBall>;
 

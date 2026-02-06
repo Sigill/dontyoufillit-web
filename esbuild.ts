@@ -36,13 +36,13 @@ program.action(async ({ watch, serve, liveReload }: { watch: boolean; serve: boo
     minify: false,
     outdir: distdir,
     entryPoints: [
-      { in: 'src/app.ts', out: 'www/app' },
-      { in: 'src/app.css', out: 'www/app' },
-      { in: 'dev/ball-engine-comparator.ts', out: 'dev/ball-engine-comparator' },
-      { in: 'dev/wall-collision.ts', out: 'dev/wall-collision' },
-      { in: 'dev/ball-collision.ts', out: 'dev/ball-collision' },
-      { in: 'dev/debug.ts', out: 'dev/debug' },
-      { in: 'src/bot.ts', out: 'www/bot' },
+      { in: 'src/game/app.ts', out: 'www/app' },
+      { in: 'src/game/app.css', out: 'www/app' },
+      { in: 'src/dev/ball-engine-comparator.ts', out: 'dev/ball-engine-comparator' },
+      { in: 'src/dev/wall-collision.ts', out: 'dev/wall-collision' },
+      { in: 'src/dev/ball-collision.ts', out: 'dev/ball-collision' },
+      { in: 'src/dev/debug.ts', out: 'dev/debug' },
+      { in: 'src/bot/bot.ts', out: 'bot/bot' },
     ],
     loader: {
       '.html': 'text'

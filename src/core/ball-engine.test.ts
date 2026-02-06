@@ -1,7 +1,7 @@
 import { assert } from 'chai';
-import { BallEngineMath } from './ball-engine-math';
-import { BallEngineMotionEquationAbsolute, BallEngineMotionEquationDelta } from './ball-engine-motion-equation';
-import { BallEngineRK4 } from './ball-engine-rk4';
+import { BallEngineMath } from './ball-engine/ball-engine-math';
+import { BallEngineMotionEquationAbsolute, BallEngineMotionEquationDelta } from './ball-engine/ball-engine-motion-equation';
+import { BallEngineRK4 } from './ball-engine/ball-engine-rk4';
 import { makeMovingBall, makeStaticBall, MovingBall, StaticBall } from './ball';
 import { DEFAULT_BALL_RADIUS } from './constants';
 
