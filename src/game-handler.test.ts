@@ -4,7 +4,7 @@ import { BallEngine } from './ball-engine';
 import { MovingCannon as Cannon } from './cannon';
 import { DefaultCollisionHandler, LazerCollisionHandler } from './collision-handler';
 import { GameHandler } from './game-handler';
-import { BallGeometry } from './static-ball';
+import { BallGeometry } from "./ball";
 
 /**
  * Mock BallEngine that records all update calls.
@@ -304,4 +304,3 @@ describe('GameHandler pause/resume mechanism', () => {
     });
   });
 });
-

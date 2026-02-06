@@ -49,14 +49,14 @@ export abstract class BallEngineTemporalDiscretization extends BallEngine {
           const limit = 1 - this.currentBall.radius;
           const penetration = this.currentBall.x - limit;
           this.currentBall.x = limit - penetration; // Reflect position
-          this.currentBall.direction = normalizeRadian(Math.PI - this.currentBall.direction);
+          this.currentBall.angle = normalizeRadian(Math.PI - this.currentBall.angle);
         }
         // Left wall
         else if (this.currentBall.x < this.currentBall.radius) {
           const limit = this.currentBall.radius;
           const penetration = limit - this.currentBall.x;
           this.currentBall.x = limit + penetration; // Reflect position
-          this.currentBall.direction = normalizeRadian(Math.PI - this.currentBall.direction);
+          this.currentBall.angle = normalizeRadian(Math.PI - this.currentBall.angle);
         }
 
         // Top Wall
@@ -64,7 +64,7 @@ export abstract class BallEngineTemporalDiscretization extends BallEngine {
           const limit = 1 - this.currentBall.radius;
           const penetration = this.currentBall.y - limit;
           this.currentBall.y = limit - penetration; // Reflect position
-          this.currentBall.direction = normalizeRadian(-this.currentBall.direction);
+          this.currentBall.angle = normalizeRadian(-this.currentBall.angle);
         }
 
         // 3. Check Static Balls
@@ -93,7 +93,7 @@ export abstract class BallEngineTemporalDiscretization extends BallEngine {
               // Reflect direction
               const alpha = Math.atan2(ny, nx);
               const tangentAngle = alpha + Math.PI / 2;
-              this.currentBall.direction = normalizeRadian(2 * tangentAngle - this.currentBall.direction);
+              this.currentBall.angle = normalizeRadian(2 * tangentAngle - this.currentBall.angle);
             }
 
             // Apply counter decrement from handler
@@ -115,7 +115,7 @@ export abstract class BallEngineTemporalDiscretization extends BallEngine {
           }
         }
 
-        if (this.currentBall.y < this.currentBall.radius && normalizeRadian(this.currentBall.direction) > Math.PI) {
+        if (this.currentBall.y < this.currentBall.radius && normalizeRadian(this.currentBall.angle) > Math.PI) {
           this.currentBall.stop();
           updateState.gameover = true;
           this.internalReset();

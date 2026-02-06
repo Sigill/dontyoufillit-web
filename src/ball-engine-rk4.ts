@@ -1,4 +1,5 @@
 import { BallEngineTemporalDiscretization } from "./ball-engine-temporal-discretization";
+import { MovingBall } from "./ball";
 import { BouncingBall } from "./bouncing-ball";
 import * as Constants from "./constants";
 import { RK41DObject } from "./rk4-integrator";
@@ -47,8 +48,8 @@ class BouncingBallRK4 extends BouncingBall {
     this.#integrator.integrate(lastFrameTime, frameTime - lastFrameTime);
 
     const deltaU = this.#integrator.u - previousStateU;
-    this.x += deltaU * Math.cos(this.direction);
-    this.y += deltaU * Math.sin(this.direction);
+    this.x += deltaU * Math.cos(this.angle);
+    this.y += deltaU * Math.sin(this.angle);
   }
 }
 
@@ -59,7 +60,7 @@ export class BallEngineRK4 extends BallEngineTemporalDiscretization {
   /**
    * Replaces the current ball with a new BouncingBallRK4 instance.
    */
-  override internalFire({radius: radius, angle, x, y}: { radius: number; angle: number; x: number; y: number; }) {
-    this.currentBall = new BouncingBallRK4(radius, x, y, angle);
+  override internalFire(ball: MovingBall) {
+    this.currentBall = new BouncingBallRK4(ball);
   }
 }

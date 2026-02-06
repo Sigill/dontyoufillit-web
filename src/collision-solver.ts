@@ -1,3 +1,4 @@
+import { BallGeometry, MovingBall } from "./ball";
 import { solveQuadratic } from "./utils";
 
 
@@ -6,18 +7,6 @@ export interface Wall {
   y0: number;
   x1: number;
   y1: number;
-}
-
-export interface StaticBall {
-  radius: number;
-  x: number;
-  y: number;
-}
-
-export interface MovingBall extends StaticBall {
-  angle: number;
-  velocity: number;
-  acceleration: number;
 }
 
 /**
@@ -40,7 +29,7 @@ export interface WallObstacle<W extends Wall = Wall> {
  * @property type Discriminator for the obstacle type.
  * @property value The ball obstacle.
  */
-export interface BallObstacle<B extends StaticBall = StaticBall> {
+export interface BallObstacle<B extends BallGeometry = BallGeometry> {
   type: 'ball';
   value: B;
 };
@@ -85,7 +74,7 @@ export function computeCollisionWithWall(
 
 export function computeCollisionWithBall(
   ball: MovingBall,
-  otherBall: StaticBall,
+  otherBall: BallGeometry,
   t0: number, tMax: number,
   { epsilon = 1e-5 }: { epsilon?: number } = {}
 ): number | undefined {
@@ -137,7 +126,7 @@ export function computeCollisionsWithWalls<W extends Wall>(
   return findImminentCollisions([...gen()], { epsilon });
 }
 
-export function computeCollisionsWithBalls<B extends StaticBall>(
+export function computeCollisionsWithBalls<B extends BallGeometry>(
   ball: MovingBall,
   otherBalls: Array<B>,
   { epsilon = 1e-5 }: { epsilon?: number } = {}

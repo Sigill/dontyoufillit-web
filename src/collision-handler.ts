@@ -1,4 +1,4 @@
-import { StaticBall } from "./static-ball";
+import { StaticBall } from "./ball";
 
 /**
  * Defines the result of a ball-to-ball collision.

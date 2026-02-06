@@ -1,7 +1,7 @@
 import { BallEngineMath, computeFixedPoints, ppObstacle } from '../src/ball-engine-math';
+import { makeBalls } from '../src/ball';
 import * as Constants from '../src/constants';
 import { directionalArrow, ppAngle } from '../src/utils';
-
 
 const GameWalls = {
   top: {x0: 0, y0: 1, x1: 1, y1: 1}, // top
@@ -43,8 +43,9 @@ for (const w of Object.values(GameWalls)) {
   line(w.x0, w.y0, w.x1, w.y1);
 }
 
-const ball = { radius: 0.025, angle: 0.41741294390696315, x: 0.5609427188476009, y: -0.07297354141019015, velocity: 1, acceleration: -0.4 };
-const staticBalls = [{ counter: 3, radius: 0.08292598608470797, x: 0.8538976933509962, y: 0.08292598608470797 }];
+const { ball, staticBalls } = makeBalls({
+  ball: {},
+});
 
 ctx.fillStyle = 'white';
 for (const b of staticBalls) {

@@ -1,14 +1,5 @@
+import { BallGeometry } from "./ball";
 import { vectorLength } from "./utils";
-
-export interface BallGeometry {
-  radius: number;
-  x: number;
-  y: number;
-}
-
-export interface StaticBall extends BallGeometry {
-  counter: number;
-}
 
 export function computeExpandedRadius(
   { x, y }: { x: number; y: number; },

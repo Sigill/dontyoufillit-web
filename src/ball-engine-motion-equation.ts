@@ -1,4 +1,5 @@
 import { BallEngineTemporalDiscretization } from "./ball-engine-temporal-discretization";
+import { MovingBall } from "./ball";
 import { BouncingBall } from "./bouncing-ball";
 import * as Constants from "./constants";
 
@@ -7,20 +8,27 @@ import * as Constants from "./constants";
  * A specialized bouncing ball that uses the displacement/velocity delta equations of motion.
  */
 class BouncingBallMotionEquationDelta extends BouncingBall {
-  #v = Constants.DEFAULT_BALL_VELOCITY;
+  #velocity: number;
+  readonly #acceleration: number;
+
+  constructor(ball: MovingBall) {
+    super(ball);
+    this.#velocity = ball.velocity;
+    this.#acceleration = ball.acceleration;
+  }
 
   /**
    * Returns the current scalar velocity.
    */
   get velocity(): number {
-    return this.#v;
+    return this.#velocity;
   }
 
   /**
    * Stops the ball by setting its velocity to zero.
    */
   override stop() {
-    this.#v = 0;
+    this.#velocity = 0;
   }
 
   /**
@@ -31,11 +39,11 @@ class BouncingBallMotionEquationDelta extends BouncingBall {
    */
   override update(frameTime: number, lastFrameTime: number) {
     const deltaT = frameTime - lastFrameTime;
-    const deltaU = this.#v * deltaT + 1/2 * Constants.DEFAULT_BALL_ACCELERATION * deltaT**2;
-    this.#v += Constants.DEFAULT_BALL_ACCELERATION * deltaT;
+    const deltaU = this.#velocity * deltaT + 1/2 * this.#acceleration * deltaT**2;
+    this.#velocity += this.#acceleration * deltaT;
 
-    this.x += deltaU * Math.cos(this.direction);
-    this.y += deltaU * Math.sin(this.direction);
+    this.x += deltaU * Math.cos(this.angle);
+    this.y += deltaU * Math.sin(this.angle);
   }
 }
 
@@ -46,8 +54,8 @@ export class BallEngineMotionEquationDelta extends BallEngineTemporalDiscretizat
   /**
    * Replaces the current ball with a new BouncingBallMotionEquationDelta instance.
    */
-  override internalFire({radius: radius, angle, x, y}: { radius: number; angle: number; x: number; y: number; }) {
-    this.currentBall = new BouncingBallMotionEquationDelta(radius, x, y, angle);
+  override internalFire(ball: MovingBall) {
+    this.currentBall = new BouncingBallMotionEquationDelta(ball);
   }
 }
 
@@ -92,8 +100,8 @@ class BouncingBallMotionEquationAbsolute extends BouncingBall {
 
     const deltaU = this.#u - prevU;
 
-    this.x += deltaU * Math.cos(this.direction);
-    this.y += deltaU * Math.sin(this.direction);
+    this.x += deltaU * Math.cos(this.angle);
+    this.y += deltaU * Math.sin(this.angle);
   }
 }
 
@@ -104,7 +112,7 @@ export class BallEngineMotionEquationAbsolute extends BallEngineTemporalDiscreti
   /**
    * Replaces the current ball with a new BouncingBallMotionEquationAbsolute instance.
    */
-  override internalFire({radius: radius, angle, x, y}: { radius: number; angle: number; x: number; y: number; }) {
-    this.currentBall = new BouncingBallMotionEquationAbsolute(radius, x, y, angle);
+  override internalFire(ball: MovingBall) {
+    this.currentBall = new BouncingBallMotionEquationAbsolute(ball);
   }
 }

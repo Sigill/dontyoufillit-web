@@ -1,5 +1,5 @@
 import { CollisionHandler, DefaultCollisionHandler } from "./collision-handler";
-import { BallGeometry, StaticBall } from "./static-ball";
+import { BallGeometry, MovingBall, StaticBall } from "./ball";
 
 /**
  * A BallEngine is meant to implement the game physics.
@@ -41,7 +41,7 @@ export abstract class BallEngine {
     });
   }
 
-  fire(ball: { radius: number; angle: number; x: number; y: number; }) {
+  fire(ball: MovingBall) {
     this.takeSnapshot();
 
     console.groupCollapsed('snapshot');
@@ -52,7 +52,7 @@ export abstract class BallEngine {
     this.internalFire(ball);
   }
 
-  abstract internalFire(ball: { radius: number; angle: number; x: number; y: number; }): void;
+  abstract internalFire(ball: MovingBall): void;
 
   abstract update(frameTime: number, lastFrameTime: number): { score: number; gameover: boolean; };
 

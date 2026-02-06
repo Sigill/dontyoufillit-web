@@ -9,7 +9,8 @@ import {
   WallObstacle,
 } from "./collision-solver";
 import * as Constants from "./constants";
-import { computeExpandedRadius, StaticBall } from "./static-ball";
+import { computeExpandedRadius } from "./static-ball";
+import { BallGeometry, BallState, MovingBall, StaticBall } from "./ball";
 import { directionalArrow, normalizeRadian, ppAngle } from "./utils";
 
 type Obstacle = WallObstacle | BallObstacle<StaticBall>;
@@ -53,8 +54,7 @@ const GameWalls = {
   left: {x0: 0, y0: 0, x1: 0, y1: 1}, // left
 };
 
-class MathBall implements StaticBall {
-  counter: number;
+class MathBall implements BallGeometry {
   radius: number;
   x: number;
   y: number;
@@ -62,21 +62,10 @@ class MathBall implements StaticBall {
   firedAt?: number = undefined;
 
   constructor(r: number, x: number, y: number, readonly fixedPoints: Array<BallState & { obstacles: Obstacle[]; }>) {
-    this.counter = 3;
-
     this.radius = r;
     this.x = x;
     this.y = y;
   }
-}
-
-interface BallState {
-  t: number;
-  x: number;
-  y: number;
-  angle: number;
-  velocity: number;
-  acceleration: number;
 }
 
 function computeCollisionsWithGameWalls(
@@ -111,7 +100,7 @@ function computeCollisionsWithGameWalls(
  * @returns A generator that yields the state of the ball at each significant event (collision or stop).
  */
 export function* computeFixedPoints(
-  ball: { radius: number; x: number; y: number; angle: number; velocity: number; acceleration: number; },
+  ball: MovingBall,
   balls: Array<StaticBall>,
   { epsilon = 1e-5 }: { epsilon?: number } = {},
 ): Generator<BallState & { obstacles: Array<Obstacle>; }> {
@@ -231,7 +220,7 @@ export class BallEngineMath extends BallEngine {
    *
    * @param ball The initial state of the ball being fired
    */
-  internalFire(ball: { radius: number; angle: number; x: number; y: number; }): void {
+  internalFire(ball: MovingBall): void {
     const fixedPoints = [...computeFixedPoints(
       {...ball, velocity: Constants.DEFAULT_BALL_VELOCITY, acceleration: Constants.DEFAULT_BALL_ACCELERATION},
       this.staticBalls
@@ -340,7 +329,7 @@ export class BallEngineMath extends BallEngine {
           });
         }
 
-        hasHitBottomWall = hasHitBottomWall || currentBall.y < currentBall.radius;
+        hasHitBottomWall = hasHitBottomWall || (currentBall.y < currentBall.radius && Math.sin(fp.angle) < 0);
 
         this.internalReset();
       }

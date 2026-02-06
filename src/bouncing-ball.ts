@@ -1,10 +1,12 @@
+import { BallGeometry, MovingBall } from "./ball";
+
 /**
  * Represents a ball that bounces against walls and other balls.
  *
  * This is an abstract class that handles the collision logic (bouncing)
  * while leaving the movement integration to its subclasses.
  */
-export abstract class BouncingBall {
+export abstract class BouncingBall implements BallGeometry {
   /** The radius of the ball. */
   radius: number;
   /** The x-coordinate of the ball's center. */
@@ -12,14 +14,14 @@ export abstract class BouncingBall {
   /** The y-coordinate of the ball's center. */
   y: number;
   /** The current direction of movement in radians. */
-  direction: number;
+  angle: number;
 
-  constructor(radius: number, x: number, y: number, angle: number) {
+  constructor({ radius, x, y, angle }: Pick<MovingBall, 'radius' | 'x' | 'y' | 'angle'>) {
     this.radius = radius;
     this.x = x;
     this.y = y;
 
-    this.direction = angle;
+    this.angle = angle;
   }
 
   /**

@@ -9,6 +9,7 @@ import * as Constants from '../src/constants';
 import * as Plot from "@observablehq/plot";
 import Stats from 'stats.js';
 import { BallEngineMotionEquationDelta, BallEngineMotionEquationAbsolute } from "../src/ball-engine-motion-equation";
+import { makeCannonBall } from "../src/ball";
 
 const grid = selectElement('#grid');
 const plotContainer = selectElement('#plot-container');
@@ -269,13 +270,11 @@ addTouchOrClickEvent(grid, (evt) => {
   currentPlotElement = document.createElement('div');
   plotContainer.insertBefore(currentPlotElement, plotContainer.firstChild);
 
-  const angle = cannon.getAngle();
-  const x = 0.5 + Math.cos(cannon.getAngle()) * Constants.CANNON_LENGTH;
-  const y = Constants.CANNON_Y_POSITION + Constants.CANNON_BASE_HEIGHT + Math.sin(cannon.getAngle()) * Constants.CANNON_LENGTH;
+  const cannonBall = makeCannonBall({ angle: cannon.getAngle() });
 
   for (const inst of instances) {
     if (inst.state === GameState.RUNNING) {
-      inst.engine.fire({radius: Constants.DEFAULT_BALL_RADIUS, angle, x, y});
+      inst.engine.fire(cannonBall);
     }
   }
 });

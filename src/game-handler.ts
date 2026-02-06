@@ -1,7 +1,7 @@
 import { BallEngine } from "./ball-engine";
+import { makeCannonBall } from "./ball";
 import { MovingCannon as Cannon } from "./cannon";
 import { CollisionHandler, DefaultCollisionHandler } from "./collision-handler";
-import * as Constants from './constants';
 import { Observable } from "./observable";
 
 export class GameHandler {
@@ -117,12 +117,7 @@ export class GameHandler {
 
     this.score -= this.activeCollisionHandler.cost ?? 0;
 
-    this.#ballEngine.fire({
-      radius: Constants.DEFAULT_BALL_RADIUS,
-      angle: this.#cannon.getAngle(),
-      x: 0.5 + Math.cos(this.#cannon.getAngle()) * Constants.CANNON_LENGTH,
-      y: Constants.CANNON_Y_POSITION + Constants.CANNON_BASE_HEIGHT + Math.sin(this.#cannon.getAngle()) * Constants.CANNON_LENGTH,
-    });
+    this.#ballEngine.fire(makeCannonBall({ angle: this.#cannon.getAngle() }));
   }
 
   #takeSnapshot() {
