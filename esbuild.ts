@@ -42,6 +42,7 @@ program.action(async ({ watch, serve, liveReload }: { watch: boolean; serve: boo
       { in: 'dev/wall-collision.ts', out: 'dev/wall-collision' },
       { in: 'dev/ball-collision.ts', out: 'dev/ball-collision' },
       { in: 'dev/debug.ts', out: 'dev/debug' },
+      { in: 'src/bot.ts', out: 'www/bot' },
     ],
     loader: {
       '.html': 'text'

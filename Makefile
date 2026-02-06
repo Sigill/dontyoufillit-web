@@ -158,6 +158,7 @@ ESBUILD_SOURCE_FILES = \
 	src/ball-engine-temporal-discretization.ts \
 	src/ball-engine.ts \
 	src/bouncing-ball.ts \
+	src/bot.ts \
 	src/cannon.ts \
 	src/collision-handler.ts \
 	src/collision-solver.ts \
