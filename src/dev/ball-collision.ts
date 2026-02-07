@@ -1,6 +1,6 @@
 import { type Tab } from 'bootstrap';
 import * as Constants from "../core/constants";
-import { computeCollisionWithBall } from "../core/collision-solver";
+import { computeCollisionWithBall } from "../core/collision-solver/ball-ball-collision-solver";
 import { selectElement } from '../core/utils';
 
 declare function getTab(element: string | Element): Tab;

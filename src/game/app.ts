@@ -22,13 +22,13 @@ function makeBallEngine() {
   const engineName = queryParams.get('ball-engine') ?? 'math';
   switch (engineName) {
     case 'math':
-      return new BallEngineMath();
+      return new BallEngineMath({verbose: true});
     case 'rk4':
-      return new BallEngineRK4();
+      return new BallEngineRK4({verbose: true});
     case 'motion-equation-delta':
-      return new BallEngineMotionEquationDelta();
+      return new BallEngineMotionEquationDelta({verbose: true});
     case 'motion-equation-absolute':
-      return new BallEngineMotionEquationAbsolute();
+      return new BallEngineMotionEquationAbsolute({verbose: true});
     default:
       throw new Error(`Unknown ball engine: ${engineName}.`);
   }

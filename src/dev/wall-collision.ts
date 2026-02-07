@@ -1,46 +1,40 @@
 import { type Tab } from 'bootstrap';
 import * as Constants from "../core/constants";
-import { Wall } from "../core/collision-solver";
-import { computeCollisionsWithWalls } from "../core/collision-solver";
+import { WallSide } from "../core/collision-solver/ball-wall-collision-solver";
+import { computeCollisionsWithWalls } from "../core/collision-solver/ball-wall-collision-solver";
 import { selectElement } from '../core/utils';
+import { GameWalls } from '../core/ball-engine/walls';
 
 declare function getTab(element: string | Element): Tab;
 
 const tabs = selectElement('#v-pills-tab')!;
 
-const squareWalls: Array<Wall> = [
-  {x0: 0, y0: 1, x1: 1, y1: 1}, // top
-  {x0: 1, y0: 1, x1: 1, y1: 0}, // right
-  {x0: 1, y0: 0, x1: 0, y1: 0}, // bottom
-  {x0: 0, y0: 0, x1: 0, y1: 1}, // left
-];
-
-const cases: Array<[string, { position: { x: number; y: number; }; direction: { x: number; y: number; }; walls: Array<Wall>; }]> = [
-  ['90 top', {position: {x: 0.5, y: 0.5}, direction: {x: 0.5, y: 1}, walls: [squareWalls[0]]} ],
-  ['90 right', {position: {x: 0.5, y: 0.5}, direction: {x: 0.5, y: 1}, walls: [squareWalls[1]]} ],
-  ['90 bottom', {position: {x: 0.5, y: 0.5}, direction: {x: 0.5, y: 1}, walls: [squareWalls[2]]} ],
-  ['90 left', {position: {x: 0.5, y: 0.5}, direction: {x: 0.5, y: 1}, walls: [squareWalls[3]]} ],
-  ['45 top', {position: {x: 0.5, y: 0.5}, direction: {x: 0, y: 1}, walls: [squareWalls[0]]} ],
-  ['45 right', {position: {x: 0.5, y: 0.5}, direction: {x: 0, y: 1}, walls: [squareWalls[1]]} ],
-  ['45 bottom', {position: {x: 0.5, y: 0.5}, direction: {x: 0, y: 1}, walls: [squareWalls[2]]} ],
-  ['45 left', {position: {x: 0.5, y: 0.5}, direction: {x: 0, y: 1}, walls: [squareWalls[3]]} ],
-  ['45 all', {position: {x: 0.5, y: 0.5}, direction: {x: 0, y: 1}, walls: squareWalls} ],
+const cases: Array<[string, { position: { x: number; y: number; }; direction: { x: number; y: number; }; walls: Array<WallSide>; }]> = [
+  ['90 top', {position: {x: 0.5, y: 0.5}, direction: {x: 0.5, y: 1}, walls: [GameWalls.top]} ],
+  ['90 right', {position: {x: 0.5, y: 0.5}, direction: {x: 0.5, y: 1}, walls: [GameWalls.right]} ],
+  ['90 bottom', {position: {x: 0.5, y: 0.5}, direction: {x: 0.5, y: 1}, walls: [GameWalls.bottom]} ],
+  ['90 left', {position: {x: 0.5, y: 0.5}, direction: {x: 0.5, y: 1}, walls: [GameWalls.left]} ],
+  ['45 top', {position: {x: 0.5, y: 0.5}, direction: {x: 0, y: 1}, walls: [GameWalls.top]} ],
+  ['45 right', {position: {x: 0.5, y: 0.5}, direction: {x: 0, y: 1}, walls: [GameWalls.right]} ],
+  ['45 bottom', {position: {x: 0.5, y: 0.5}, direction: {x: 0, y: 1}, walls: [GameWalls.bottom]} ],
+  ['45 left', {position: {x: 0.5, y: 0.5}, direction: {x: 0, y: 1}, walls: [GameWalls.left]} ],
+  ['45 all', {position: {x: 0.5, y: 0.5}, direction: {x: 0, y: 1}, walls: Object.values(GameWalls)} ],
   ['45 1', {
     position: {x: 0.5, y: 0},
     direction: {x: 0.5, y: 1},
-    walls: [{x0: 0.5, y0: 1, x1: 0, y1: 0}]
+    walls: [{x0: 0.5, y0: 1, x1: 0, y1: 0, sigma: 1}]
   }],
   ['45 2', {
     position: {x: 0.5, y: 0},
     direction: {x: 0.5, y: 1},
-    walls: [{x0: 0.5, y0: 1, x1: 1, y1: 0}]
+    walls: [{x0: 0.5, y0: 1, x1: 1, y1: 0, sigma: 1}]
   }],
   ['45 all', {
     position: {x: 0.5, y: 0},
     direction: {x: 0.5, y: 1},
     walls: [
-      {x0: 0.5, y0: 1, x1: 0, y1: 0},
-      {x0: 0.5, y0: 1, x1: 1, y1: 0},
+      {x0: 0.5, y0: 1, x1: 0, y1: 0, sigma: 1},
+      {x0: 0.5, y0: 1, x1: 1, y1: 0, sigma: 1},
     ]
   }],
 ];
@@ -118,11 +112,11 @@ for (const [title, config] of cases) {
         ballState.radius,
       );
 
-      const { wall, sigma } = collision.obstacle.value;
+      const wall = collision.obstacle.value;
       const wallAngle = Math.atan2(wall.y1 - wall.y0, wall.x1 - wall.x0);
       const q = {
-        x: c.x + sigma * ballState.radius * -Math.sin(wallAngle),
-        y: c.y + sigma * ballState.radius * Math.cos(wallAngle)
+        x: c.x + wall.sigma * ballState.radius * -Math.sin(wallAngle),
+        y: c.y + wall.sigma * ballState.radius * Math.cos(wallAngle)
       };
       circle(q.x, q.y, 1/100);
     }

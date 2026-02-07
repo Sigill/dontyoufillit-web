@@ -1,16 +1,18 @@
 import { BallEngine } from "../ball-engine";
 import {
-  BallObstacle,
-  Collision,
   computeCollisionsWithBalls,
-  computeCollisionsWithWalls,
-  findImminentCollisions,
-  Wall,
-  WallObstacle,
-} from "../collision-solver";
+} from "../collision-solver/ball-ball-collision-solver";
+import { computeCollisionsWithWalls } from "../collision-solver/ball-wall-collision-solver";
+import { findImminentCollisions } from "../collision-solver/collision-utils";
+import {
+  BallObstacle,
+  Collision, WallObstacle
+} from "../collision-solver/collision-utils";
+import { WallSide } from "../collision-solver/ball-wall-collision-solver";
 import { computeExpandedRadius } from "../static-ball";
 import { BallGeometry, BallState, MovingBall, StaticBall } from "../ball";
 import { directionalArrow, normalizeRadian, ppAngle } from "../utils";
+import { GameWalls } from "./walls";
 
 type Obstacle = WallObstacle | BallObstacle<StaticBall>;
 
@@ -20,8 +22,8 @@ type Obstacle = WallObstacle | BallObstacle<StaticBall>;
  * @param params The wall and sigma value.
  * @returns A string representation of the wall obstacle.
  */
-function ppWallObstacle({ wall: w, sigma }: { wall: Wall; sigma: number }) {
-  return `wall x0:${w.x0.toFixed(3)} y0:${w.y0.toFixed(3)} x1:${w.x1.toFixed(3)} y1:${w.y1.toFixed(3)} sigma:${sigma}`;
+function ppWallObstacle({ x0, y0, x1, y1, sigma}: WallSide) {
+  return `wall x0:${x0.toFixed(3)} y0:${y0.toFixed(3)} x1:${x1.toFixed(3)} y1:${y1.toFixed(3)} sigma:${sigma}`;
 }
 
 /**
@@ -45,13 +47,6 @@ export function ppObstacle(o: Obstacle) {
     ? ppWallObstacle(o.value)
     : ppBallObstacle(o.value);
 }
-
-const GameWalls = {
-  top: {x0: 0, y0: 1, x1: 1, y1: 1}, // top
-  right: {x0: 1, y0: 1, x1: 1, y1: 0}, // right
-  bottom: {x0: 1, y0: 0, x1: 0, y1: 0}, // bottom
-  left: {x0: 0, y0: 0, x1: 0, y1: 1}, // left
-};
 
 class MathBall implements BallGeometry {
   radius: number;
@@ -79,7 +74,7 @@ function computeCollisionsWithGameWalls(
   { epsilon = 1e-5 }: { epsilon?: number } = {}
 ): Array<Collision<WallObstacle>> {
   // TODO IO: depending on direction of movement, only check the walls in that direction.
-  const candidateWalls: Array<Wall> = [GameWalls.top, GameWalls.right, GameWalls.left];
+  const candidateWalls = [GameWalls.top, GameWalls.right, GameWalls.left];
 
   // Only consider the bottom border if above it.
   if (ball.y > ball.radius) {
@@ -158,7 +153,7 @@ export function* computeFixedPoints(
 
     if (collision !== undefined) {
       if (collision.obstacle.type === 'wall') {
-        const { wall } = collision.obstacle.value;
+        const wall = collision.obstacle.value;
         const wallAngle = Math.atan2(wall.y1 - wall.y0, wall.x1 - wall.x0);
 
         angle = 2 * wallAngle - angle;
@@ -193,7 +188,7 @@ export function* computeFixedPoints(
       collision === undefined
       ||
       // The ball has collided with the bottom wall.
-      (collision.obstacle.type === 'wall' && collision.obstacle.value.wall === GameWalls.bottom)
+      (collision.obstacle.type === 'wall' && collision.obstacle.value === GameWalls.bottom)
       ||
       // The ball has hit a ball while touching with the bottom wall.
       (collision.obstacle.type === 'ball' && y < ball.radius && Math.sin(angle) < 0)
@@ -304,7 +299,7 @@ export class BallEngineMath extends BallEngine {
       }
 
       let hasHitBottomWall = fp.obstacles.some(({type, value}) => {
-        return type === 'wall' && value.wall === GameWalls.bottom;
+        return type === 'wall' && value === GameWalls.bottom;
       });
 
       // The last of the past fixed points is the one that will be used to compute the new position of the ball.

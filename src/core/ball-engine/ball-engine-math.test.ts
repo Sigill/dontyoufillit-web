@@ -86,8 +86,8 @@ describe('computeFixedPoints()', () => {
         obstacles: [{
           type: "wall",
           value: {
+            x0: 0, x1: 0, y0: 0, y1: 1,
             sigma: 1,
-            wall: { x0: 0, x1: 0, y0: 0, y1: 1 }
           }
         }],
       },
@@ -121,8 +121,8 @@ describe('computeFixedPoints()', () => {
         obstacles: [{
           type: "wall",
           value: {
+            x0: 0, x1: 0, y0: 0, y1: 1,
             sigma: 1,
-            wall: { x0: 0, x1: 0, y0: 0, y1: 1 }
           }
         }],
       },
