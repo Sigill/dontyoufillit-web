@@ -68,7 +68,7 @@ export class AimingBotLookAhead implements Bot {
     this.#simulationCount += 1;
 
     const ball = makeCannonBall({ angle });
-    const { score, gameover, staticBalls: nextStaticBalls } = computeFixedPoints(ball, staticBalls);
+    const { score, gameover, staticBalls: nextStaticBalls } = computeFixedPoints(ball, staticBalls, { epsilon: 1e-10 });
 
     return {
       score,

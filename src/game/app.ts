@@ -22,7 +22,7 @@ function makeBallEngine() {
   const engineName = queryParams.get('ball-engine') ?? 'math';
   switch (engineName) {
     case 'math':
-      return new BallEngineMath({verbose: true});
+      return new BallEngineMath({verbose: true, epsilon: 1e-10});
     case 'rk4':
       return new BallEngineRK4({verbose: true});
     case 'motion-equation-delta':
