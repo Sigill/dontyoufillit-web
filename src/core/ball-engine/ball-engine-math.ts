@@ -230,13 +230,30 @@ export class BallEngineMath extends BallEngine {
   staticBalls: Array<StaticBall> = [];
   currentBall: MathBall | null = null;
 
+  #epsilon: number;
+
+  constructor(
+    {
+      withSnapshots,
+      verbose,
+      epsilon = 1e-5,
+    }: {
+      withSnapshots?: boolean;
+      verbose?: boolean;
+      epsilon?: number;
+    } = {}
+  ) {
+    super({ withSnapshots, verbose });
+    this.#epsilon = epsilon;
+  }
+
   /**
    * Fires the ball and pre-computes all its future collisions and path.
    *
    * @param ball The initial state of the ball being fired
    */
   internalFire(ball: MovingBall): void {
-    const { fixedPoints } = computeFixedPoints(ball, this.staticBalls);
+    const { fixedPoints } = computeFixedPoints(ball, this.staticBalls, { epsilon: this.#epsilon });
 
     if (this.verbose) {
       console.group('Fixed points');
