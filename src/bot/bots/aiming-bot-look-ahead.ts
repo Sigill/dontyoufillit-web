@@ -18,12 +18,15 @@ export class AimingBotLookAhead implements Bot {
   name = "AimingBotLookAhead";
   depth: number;
   #simulationCount: number = 0;
+  optimize: string;
 
-  constructor({depth = 2}: {depth?: number} = {}) {
+  constructor({depth = 2, criteria = 'score' }: {depth?: number; criteria?: 'score' | 'hits'} = {}) {
     this.depth = depth;
+    this.optimize = criteria;
   }
 
   act(staticBalls: Array<StaticBall>, cannon: ManualCannon): void {
+    this.#simulationCount = 0;
     const { angle: bestAngle } = this.findBestMove(staticBalls, this.depth);
     console.log(`${this.name}: ${this.#simulationCount} simulations`);
     cannon.angle = bestAngle;
@@ -39,13 +42,14 @@ export class AimingBotLookAhead implements Bot {
     // const step = 0.1;
 
     for (let angle = 0.1; angle < Math.PI - 0.1; angle += step) {
-      const { score, gameover, staticBalls: nextStaticBalls } = this.simulateFire(staticBalls, angle);
+      const { score, hits, gameover, staticBalls: nextStaticBalls } = this.simulateFire(staticBalls, angle);
 
       let currentTotalScore = 0;
       if (gameover) {
         currentTotalScore = -1000000; // Heavy penalty for gameover
       } else {
-        currentTotalScore = score;
+        const criteria = this.optimize === 'hits' ? hits : score;
+        currentTotalScore = criteria;
         if (depth > 1 && nextStaticBalls) {
           const result = this.findBestMove(nextStaticBalls, depth - 1);
           currentTotalScore += result.score;
@@ -64,14 +68,15 @@ export class AimingBotLookAhead implements Bot {
   private simulateFire(
     staticBalls: Array<StaticBall>,
     angle: number,
-  ): { score: number; gameover: boolean; staticBalls: Array<StaticBall> | null } {
+  ): { score: number; hits: number; gameover: boolean; staticBalls: Array<StaticBall> | null } {
     this.#simulationCount += 1;
 
     const ball = makeCannonBall({ angle });
-    const { score, gameover, staticBalls: nextStaticBalls } = computeFixedPoints(ball, staticBalls, { epsilon: 1e-10 });
+    const { score, hits, gameover, staticBalls: nextStaticBalls } = computeFixedPoints(ball, staticBalls, { epsilon: 1e-10 });
 
     return {
       score,
+      hits,
       gameover,
       staticBalls: gameover ? null : nextStaticBalls
     };

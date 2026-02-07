@@ -17,10 +17,11 @@ enum GameState {
 
 const queryParams = new URLSearchParams(window.location.search);
 const depth = parseInt(queryParams.get('depth') || '2', 10);
+const optimize = queryParams.get('optimize') || 'score';
 
 const BOTS: Record<string, Bot> = {
   [AimingBot.name]: new AimingBot(),
-  [AimingBotLookAhead.name]: new AimingBotLookAhead({depth}),
+  [AimingBotLookAhead.name]: new AimingBotLookAhead({depth, criteria: optimize as 'hits' | 'score'}),
 };
 
 export class ManualCannon implements Cannon {
