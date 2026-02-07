@@ -88,51 +88,49 @@ function computeCollisionsWithGameWalls(
  * Computes the key points in the ball's trajectory (collisions, start, end).
  *
  * @param ball The initial state of the ball.
- * @param balls The list of static balls (obstacles) in the game.
+ * @param staticBalls The list of static balls (obstacles) in the game.
  * @param options Configuration options.
  * @param options.epsilon The precision for collision detection.
  * @returns A generator that yields the state of the ball at each significant event (collision or stop).
  */
 export function computeFixedPoints(
   ball: MovingBall,
-  balls: Array<StaticBall>,
+  staticBalls: Array<StaticBall>,
   { epsilon = 1e-5 }: { epsilon?: number } = {},
-): Array<BallState & { obstacles: Array<Obstacle>; }> {
+): {
+  fixedPoints: Array<BallState & { obstacles: Array<Obstacle>; }>;
+  hits: number;
+  score: number;
+  gameover: boolean;
+  staticBalls: Array<StaticBall>;
+} {
   let { x, y, velocity, angle} = ball;
 
   let t0 = 0;
   const tMax = -ball.velocity / ball.acceleration;
 
   const fixedPoints = [];
+  let hits = 0;
+  let score = 0;
+  let gameover = false;
 
   fixedPoints.push({ t: t0, x, y, velocity, angle, acceleration: ball.acceleration, obstacles: [] });
 
-  const fixedBalls = balls.map<StaticBall & { sourceBall: StaticBall }>(b => {
-    let originalCounter = b.counter;
-    return {
-      ...b,
-      get counter() {
-        return originalCounter;
-      },
-      set counter(value: number) {
-        originalCounter = value;
-      },
-      sourceBall: b,
-    };
-  });
+  const shadowStaticBalls = staticBalls.map<StaticBall & { sourceBall: StaticBall }>(
+    b => ({ ...b, sourceBall: b })
+  );
 
   while (true) {
     const ballState = { x, y, angle, velocity, acceleration: ball.acceleration, radius: ball.radius };
     const wallCollisions = computeCollisionsWithGameWalls(ballState, { epsilon });
-    const ballCollisions = fixedBalls.length === 0 ? [] : computeCollisionsWithBalls(ballState, fixedBalls, { epsilon });
+    const ballCollisions = shadowStaticBalls.length === 0 ? [] : computeCollisionsWithBalls(ballState, shadowStaticBalls, { epsilon });
     const collisions = findImminentCollisions<WallObstacle | BallObstacle<StaticBall & { sourceBall: StaticBall; }>>(
       [ ...wallCollisions, ...ballCollisions ],
       {epsilon}
     );
 
     if (collisions.length > 1) { // TODO handle collision against multiple objects.
-      console.log('ball', ball);
-      console.log('fixedBalls', fixedBalls);
+      console.error("Collision against multiple objects", { ball, staticBalls });
       throw new Error('Collision against multiple objects');
     }
 
@@ -165,8 +163,10 @@ export function computeFixedPoints(
         const ball = collision.obstacle.value;
 
         ball.counter -= 1;
+        hits += 1;
         if (ball.counter === 0) {
-          fixedBalls.splice(fixedBalls.indexOf(ball), 1);
+          shadowStaticBalls.splice(shadowStaticBalls.indexOf(ball), 1);
+          score += 1;
         }
 
         const theta = Math.atan2(y - ball.y, x - ball.x);
@@ -195,13 +195,28 @@ export function computeFixedPoints(
       // The ball has hit a ball while touching with the bottom wall.
       (collision.obstacle.type === 'ball' && y < ball.radius && Math.sin(angle) < 0)
     ) {
+      gameover = collision !== undefined;
       break;
     }
 
     t0 = t1;
   }
 
-  return fixedPoints;
+  return {
+    fixedPoints,
+    hits,
+    score,
+    gameover,
+    staticBalls: [
+      ...shadowStaticBalls.map(({x, y, radius, counter}) => ({x, y, radius, counter})),
+      {
+        counter: 3,
+        radius: computeExpandedRadius({x, y}, shadowStaticBalls),
+        x,
+        y,
+      }
+    ]
+  };
 }
 
 /**
@@ -221,7 +236,7 @@ export class BallEngineMath extends BallEngine {
    * @param ball The initial state of the ball being fired
    */
   internalFire(ball: MovingBall): void {
-    const fixedPoints = computeFixedPoints(ball, this.staticBalls);
+    const { fixedPoints } = computeFixedPoints(ball, this.staticBalls);
 
     if (this.verbose) {
       console.group('Fixed points');

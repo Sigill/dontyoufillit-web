@@ -44,7 +44,31 @@ for (const w of Object.values(GameWalls)) {
 }
 
 const { ball, staticBalls } = makeBalls({
-  ball: {},
+  ball: {
+    radius: 0.025,
+    angle: 0.9000000000000002,
+    x: 0.5414406645513776,
+    y: -0.04777820602483442,
+    velocity: 1,
+    acceleration: -0.4
+  },
+  staticBalls: [
+    { x: 0.13991118238393296, y: 0.03144733191832394, radius: 0.03144733191832394, counter: 1 },
+    { x: 0.06552516789681753, y: 0.9518441423635728, radius: 0.04815585763642716, counter: 2 },
+    { x: 0.8813627595963455, y: 0.6004773628628752, radius: 0.03276362664525044, counter: 1 },
+    { x: 0.8019828185989984, y: 0.9708228034109408, radius: 0.02917719658905915, counter: 2 },
+    { x: 0.06462744767686635, y: 0.8148068267418627, radius: 0.06462744767686635, counter: 3 },
+    { x: 0.16736054342094986, y: 0.7955323636080318, radius: 0.0398981180487514, counter: 2 },
+    { x: 0.11415295418546924, y: 0.7262204588442293, radius: 0.03686304632246605, counter: 2 },
+    { x: 0.6172290496208201, y: 0.9306109848516088, radius: 0.03288436423201754, counter: 3 },
+    { x: 0.3426760354151431, y: 0.9559593497125043, radius: 0.04404065028749571, counter: 3 },
+    { x: 0.2918324975217727, y: 0.7521707210874774, radius: 0.09191045299182132, counter: 2 },
+    { x: 0.04950693530416406, y: 0.040500729413881595, radius: 0.040500729413881595, counter: 3 },
+    { x: 0.4645580695948107, y: 0.5764709039943464, radius: 0.030900230719331928, counter: 3 },
+    { x: 0.7458560144588637, y: 0.5038590055346757, radius: 0.13366108591437542, counter: 2 },
+    { x: 0.430770782120473, y: 0.3039451524834007, radius: 0.23949337577614815, counter: 2 },
+    { x: 0.8659649643578391, y: 0.13898558543077127, counter: 3, radius: 0.1340350356421609 }
+  ]
 });
 
 ctx.fillStyle = 'white';
@@ -65,14 +89,14 @@ function* pairwise<T>(items: Array<T>) {
   }
 }
 
-const fixedPointsGenerator = computeFixedPoints(
+const { fixedPoints } = computeFixedPoints(
   { ...ball, velocity: Constants.DEFAULT_BALL_VELOCITY, acceleration: Constants.DEFAULT_BALL_ACCELERATION },
   staticBalls
 );
 
 // --------------------------------------
 
-for (const [a, b] of pairwise(fixedPointsGenerator)) {
+for (const [a, b] of pairwise(fixedPoints)) {
   line(a.x, a.y, b.x, b.y);
 
   const {t, x, y, angle, velocity, obstacles: obstacles} = b;

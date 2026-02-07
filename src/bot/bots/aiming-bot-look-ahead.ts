@@ -1,5 +1,5 @@
 import { makeCannonBall, StaticBall } from "../../core/ball";
-import { BallEngineMath } from "../../core/ball-engine/ball-engine-math";
+import { computeFixedPoints } from "../../core/ball-engine/ball-engine-math";
 import { ManualCannon } from "../bot";
 import { Bot } from "../bot-type";
 
@@ -67,19 +67,13 @@ export class AimingBotLookAhead implements Bot {
   ): { score: number; gameover: boolean; staticBalls: Array<StaticBall> | null } {
     this.#simulationCount += 1;
 
-    const simulationEngine = new BallEngineMath({ verbose: false, withSnapshots: false });
-    simulationEngine.staticBalls = staticBalls.map(b => ({ ...b }));
-
     const ball = makeCannonBall({ angle });
-    simulationEngine.fire(ball);
-
-    // update(3, 0) is enough to simulate the whole trajectory in BallEngineMath
-    const { score, gameover } = simulationEngine.update(10, 0);
+    const { score, gameover, staticBalls: nextStaticBalls } = computeFixedPoints(ball, staticBalls);
 
     return {
       score,
       gameover,
-      staticBalls: gameover ? null : simulationEngine.staticBalls
+      staticBalls: gameover ? null : nextStaticBalls
     };
   }
 }

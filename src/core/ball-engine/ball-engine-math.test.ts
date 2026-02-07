@@ -35,7 +35,7 @@ describe('computeFixedPoints()', () => {
         { x: 0.8 + Math.cos(Math.PI / 4) * 0.025 * 2 - 0.001, y: 0.025 },
       ]
     });
-    const fixedPoints = [...computeFixedPoints(ball, staticBalls, { epsilon: 1e-5 })];
+    const { fixedPoints } = computeFixedPoints(ball, staticBalls, { epsilon: 1e-5 });
     assert.sameDeepOrderedMembers(fixedPoints, [
       { t: 0, x: ball.x, y: ball.y, angle: ball.angle, velocity: DEFAULT_BALL_VELOCITY, acceleration: DEFAULT_BALL_ACCELERATION, obstacles: [] },
       {
@@ -61,7 +61,7 @@ describe('computeFixedPoints()', () => {
         { x: 0.8 + Math.cos(Math.PI / 4) * 0.025 * 2 + 0.001, y: 0.025 },
       ]
     });
-    const fixedPoints = [...computeFixedPoints(ball, staticBalls, { epsilon: 1e-5 })];
+    const { fixedPoints } = computeFixedPoints(ball, staticBalls, { epsilon: 1e-5 });
     assert.sameDeepOrderedMembers(fixedPoints, [
       { t: 0, x: ball.x, y: ball.y, angle: ball.angle, velocity: DEFAULT_BALL_VELOCITY, acceleration: DEFAULT_BALL_ACCELERATION, obstacles: [] },
       {
@@ -108,7 +108,7 @@ describe('computeFixedPoints()', () => {
       ball: { angle: Math.PI, x: 0.8, y: -0.1 },
       staticBalls: [],
     });
-    const fixedPoints = [...computeFixedPoints(ball, staticBalls, { epsilon: 1e-5 })];
+    const { fixedPoints } = computeFixedPoints(ball, staticBalls, { epsilon: 1e-5 });
     assert.sameDeepOrderedMembers(fixedPoints, [
       { t: 0, x: ball.x, y: ball.y, angle: ball.angle, velocity: DEFAULT_BALL_VELOCITY, acceleration: DEFAULT_BALL_ACCELERATION, obstacles: [] },
       {
@@ -138,33 +138,37 @@ describe('computeFixedPoints()', () => {
     ]);
   });
 
-  it.skip('should handle collisions against multiple items', () => {
+  it('should handle collisions against multiple items', () => {
     const {ball, staticBalls } = {
       ball: {
-        x: 0.23399345554114218,
-        y: 0.48123490353105125,
-        angle: 6.187556830015434,
-        velocity: 0.7361812181941172,
-        acceleration: -0.4,
-        radius: 0.025
+        radius: 0.025,
+        angle: 0.9000000000000002,
+        x: 0.5414406645513776,
+        y: -0.04777820602483442,
+        velocity: 1,
+        acceleration: -0.4
       },
       staticBalls: [
-        { counter: 2, radius: 0.04815585763642716, x: 0.06552516789681753, y: 0.9518441423635728 },
-        { counter: 2, radius: 0.028768599108706994, x: 0.971231400891293, y: 0.8942042089706272 },
-        { counter: 3, radius: 0.0334954314350257, x: 0.544792723192836, y: 0.40879123677352514 },
-        { counter: 1, radius: 0.029375579159975657, x: 0.9286287368420137, y: 0.8546345427799125 },
-        { counter: 2, radius: 0.10722632274854998, x: 0.8457377871100562, y: 0.7460565981614931 },
-        { counter: 2, radius: 0.09505950908996685, x: 0.4028914939688297, y: 0.9049404909100331 },
-        { counter: 1, radius: 0.051923338724174053, x: 0.11520512323991172, y: 0.8649663685586926 },
-        { counter: 3, radius: 0.10192333872417449, x: 0.23190922144927126, y: 0.7647218992696772 },
-        { counter: 3, radius: 0.08566071606327268, x: 0.08566071606327268, y: 0.3077564492193579 },
-        { counter: 3, radius: 0.166197095640364, x: 0.6022486025072077, y: 0.6216645457428636 },
-        { counter: 3, radius: 0.11772088997781084, x: 0.11772088997781084, y: 0.5639992855645035 }
+        { x: 0.13991118238393296, y: 0.03144733191832394, radius: 0.03144733191832394, counter: 1 },
+        { x: 0.06552516789681753, y: 0.9518441423635728, radius: 0.04815585763642716, counter: 2 },
+        { x: 0.8813627595963455, y: 0.6004773628628752, radius: 0.03276362664525044, counter: 1 },
+        { x: 0.8019828185989984, y: 0.9708228034109408, radius: 0.02917719658905915, counter: 2 },
+        { x: 0.06462744767686635, y: 0.8148068267418627, radius: 0.06462744767686635, counter: 3 },
+        { x: 0.16736054342094986, y: 0.7955323636080318, radius: 0.0398981180487514, counter: 2 },
+        { x: 0.11415295418546924, y: 0.7262204588442293, radius: 0.03686304632246605, counter: 2 },
+        { x: 0.6172290496208201, y: 0.9306109848516088, radius: 0.03288436423201754, counter: 3 },
+        { x: 0.3426760354151431, y: 0.9559593497125043, radius: 0.04404065028749571, counter: 3 },
+        { x: 0.2918324975217727, y: 0.7521707210874774, radius: 0.09191045299182132, counter: 2 },
+        { x: 0.04950693530416406, y: 0.040500729413881595, radius: 0.040500729413881595, counter: 3 },
+        { x: 0.4645580695948107, y: 0.5764709039943464, radius: 0.030900230719331928, counter: 3 },
+        { x: 0.7458560144588637, y: 0.5038590055346757, radius: 0.13366108591437542, counter: 2 },
+        { x: 0.430770782120473, y: 0.3039451524834007, radius: 0.23949337577614815, counter: 2 },
+        { x: 0.8659649643578391, y: 0.13898558543077127, radius: 0.1340350356421609, counter: 3 }
       ]
     };
 
     assert.throws(() => {
-      return [...computeFixedPoints(ball, staticBalls, { epsilon: 1e-5 })];
+      return computeFixedPoints(ball, staticBalls, { epsilon: 1e-5 }).fixedPoints;
     }, "Collision against multiple objects");
   });
 });
