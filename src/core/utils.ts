@@ -2,6 +2,10 @@ export function vectorLength(x: number, y: number) {
   return Math.sqrt(x * x + y * y);
 }
 
+export function squaredVectorLength(x: number, y: number) {
+  return x * x + y * y;
+}
+
 export function normalizeRadian(angle: number) {
   return ((angle % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
 }

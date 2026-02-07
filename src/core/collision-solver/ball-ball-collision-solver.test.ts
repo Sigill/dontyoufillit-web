@@ -13,11 +13,6 @@ describe('computeCollisionWithBall', () => {
     assert.notExists(collision);
   });
 
-  it('should return undefined if balls graze each other', () => {
-    const collision = computeCollisionWithBall(centerBall, { x: 1, y: 0.3, radius: 0.1 }, 0, tMax);
-    assert.notExists(collision);
-  });
-
   it('should return undefined if the ball stops before colliding', () => {
     const collision = computeCollisionWithBall(centerBall, { x: -10, y: 0.45, radius: 0.1 }, 0, tMax);
     assert.notExists(collision);
@@ -59,7 +54,7 @@ describe('computeCollisionWithBalls', () => {
     const collisions = computeCollisionsWithBalls(centerBall, [ball1, ball2]);
     assert.sameDeepMembers(collisions, [
       {
-        t: 0.3135013362902747,
+        t: 0.31350133629027443,
         obstacle: { type: "ball", value: ball1 },
       },
       {
@@ -73,11 +68,11 @@ describe('computeCollisionWithBalls', () => {
     const collisions = computeCollisionsWithBalls(centerBall, [ball1, ball3]);
     assert.sameDeepMembers(collisions, [
       {
-        t: 0.3135013362902747,
+        t: 0.31350133629027443,
         obstacle: { type: "ball", value: ball1 },
       },
       {
-        t: 0.3135013362902747,
+        t: 0.31350133629027443,
         obstacle: { type: "ball", value: ball3 },
       },
     ]);

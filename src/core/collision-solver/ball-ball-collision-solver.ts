@@ -1,5 +1,5 @@
 import { BallGeometry, MovingBall } from "../ball";
-import { solveQuadratic } from "../utils";
+import { solveQuadratic, squaredVectorLength } from "../utils";
 import { Collision, BallObstacle } from "./collision-utils";
 
 
@@ -10,7 +10,7 @@ export function computeCollisionWithBall(
   { epsilon = 1e-5 }: { epsilon?: number } = {}
 ): number | undefined {
   const k = (ball.x - otherBall.x) * Math.cos(ball.angle) + (ball.y - otherBall.y) * Math.sin(ball.angle);
-  const roots1 = solveQuadratic(1, 2 * k, Math.hypot(ball.x - otherBall.x, ball.y - otherBall.y) ** 2 - (ball.radius + otherBall.radius) ** 2);
+  const roots1 = solveQuadratic(1, 2 * k, squaredVectorLength(ball.x - otherBall.x, ball.y - otherBall.y) - (ball.radius + otherBall.radius) ** 2);
 
   const collisions = [];
   for (const root1 of roots1) {
