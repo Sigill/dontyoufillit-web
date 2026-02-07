@@ -55,16 +55,13 @@ for (const b of staticBalls) {
 ctx.fillStyle = 'black';
 circle(ball.x, ball.y, ball.radius);
 
-function* pairwise<T>(gen: Generator<T>) {
-  const it = gen.next();
-  if (it.done) {
-    throw new Error("Empty generator");
+function* pairwise<T>(items: Array<T>) {
+  if (items.length < 2) {
+    throw new Error("Not enough items");
   }
 
-  let prev = it.value;
-  for (const next of gen) {
-    yield [prev, next];
-    prev = next;
+  for (let i = 1; i < items.length; i += 1) {
+    yield [items[i - 1], items[i]];
   }
 }
 

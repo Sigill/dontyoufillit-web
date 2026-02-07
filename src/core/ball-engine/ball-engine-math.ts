@@ -93,17 +93,19 @@ function computeCollisionsWithGameWalls(
  * @param options.epsilon The precision for collision detection.
  * @returns A generator that yields the state of the ball at each significant event (collision or stop).
  */
-export function* computeFixedPoints(
+export function computeFixedPoints(
   ball: MovingBall,
   balls: Array<StaticBall>,
   { epsilon = 1e-5 }: { epsilon?: number } = {},
-): Generator<BallState & { obstacles: Array<Obstacle>; }> {
+): Array<BallState & { obstacles: Array<Obstacle>; }> {
   let { x, y, velocity, angle} = ball;
 
   let t0 = 0;
   const tMax = -ball.velocity / ball.acceleration;
 
-  yield { t: t0, x, y, velocity, angle, acceleration: ball.acceleration, obstacles: [] };
+  const fixedPoints = [];
+
+  fixedPoints.push({ t: t0, x, y, velocity, angle, acceleration: ball.acceleration, obstacles: [] });
 
   const fixedBalls = balls.map<StaticBall & { sourceBall: StaticBall }>(b => {
     let originalCounter = b.counter;
@@ -180,7 +182,7 @@ export function* computeFixedPoints(
       angle = normalizeRadian(angle);
     }
 
-    yield { t: t1, x, y, angle, velocity, acceleration: ball.acceleration, obstacles };
+    fixedPoints.push({ t: t1, x, y, angle, velocity, acceleration: ball.acceleration, obstacles });
 
     // Stop if:
     if (
@@ -198,6 +200,8 @@ export function* computeFixedPoints(
 
     t0 = t1;
   }
+
+  return fixedPoints;
 }
 
 /**
@@ -217,7 +221,7 @@ export class BallEngineMath extends BallEngine {
    * @param ball The initial state of the ball being fired
    */
   internalFire(ball: MovingBall): void {
-    const fixedPoints = [...computeFixedPoints(ball, this.staticBalls)];
+    const fixedPoints = computeFixedPoints(ball, this.staticBalls);
 
     if (this.verbose) {
       console.group('Fixed points');

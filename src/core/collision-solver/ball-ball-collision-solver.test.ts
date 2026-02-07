@@ -57,13 +57,16 @@ describe('computeCollisionWithBalls', () => {
     assert.isBelow(collision1, collision2);
 
     const collisions = computeCollisionsWithBalls(centerBall, [ball1, ball2]);
-    assert.sameDeepMembers(collisions, [{
-      t: 0.3135013362902747,
-      obstacle: {
-        type: "ball",
-        value: ball1,
+    assert.sameDeepMembers(collisions, [
+      {
+        t: 0.3135013362902747,
+        obstacle: { type: "ball", value: ball1 },
       },
-    }]);
+      {
+        t: 0.32055052822966335,
+        obstacle: { type: "ball", value: ball2 },
+      }
+    ]);
   });
 
   it("should return all the balls it collides with in case of multiple collisions", () => {
@@ -71,17 +74,11 @@ describe('computeCollisionWithBalls', () => {
     assert.sameDeepMembers(collisions, [
       {
         t: 0.3135013362902747,
-        obstacle: {
-          type: "ball",
-          value: ball1,
-        },
+        obstacle: { type: "ball", value: ball1 },
       },
       {
         t: 0.3135013362902747,
-        obstacle: {
-          type: "ball",
-          value: ball3,
-        },
+        obstacle: { type: "ball", value: ball3 },
       },
     ]);
   });

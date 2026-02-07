@@ -30,15 +30,9 @@ export function computeCollisionWithWallSide(
   const Delta = Math.sin(alpha - beta);
   const c0 = (x - x0) * Math.sin(alpha) - (y - y0) * Math.cos(alpha);
 
-  function* gen() {
-    for (const t of solveQuadratic(1 / 2 * acceleration * Delta, velocity * Delta, c0 - sigma * radius, epsilon)) {
-      if (t >= t0 && t <= tMax) {
-        yield t;
-      }
-    }
-  }
+  const collisions = solveQuadratic(1 / 2 * acceleration * Delta, velocity * Delta, c0 - sigma * radius, epsilon)
+    .filter(t => t >= t0 && t <= tMax);
 
-  const collisions = [...gen()];
   if (collisions.length > 0) {
     return Math.min(...collisions);
   }
@@ -61,36 +55,35 @@ export function computeCollisionWithWall(
   const Delta = Math.sin(alpha - beta);
   const c0 = (x - x0) * Math.sin(alpha) - (y - y0) * Math.cos(alpha);
 
-  function* gen() {
-    for (const sigma of [-1, 1] as const) {
-      for (const t of solveQuadratic(1 / 2 * acceleration * Delta, velocity * Delta, c0 - sigma * radius, epsilon)) {
-        if (t >= t0 && t <= tMax) {
-          yield { t, sigma };
-        }
+  const collisions: Array<{ t: number; sigma: 1 | -1; }> = [];
+  for (const sigma of [-1, 1] as const) {
+    for (const t of solveQuadratic(1 / 2 * acceleration * Delta, velocity * Delta, c0 - sigma * radius, epsilon)) {
+      if (t >= t0 && t <= tMax) {
+        collisions.push({ t, sigma });
       }
     }
   }
 
-  const collisions = [...gen()];
   if (collisions.length > 0) {
     return collisions.reduce((a, b) => a.t < b.t ? a : b);
   }
-}export function computeCollisionsWithWalls<W extends WallSide>(
+}
+
+export function computeCollisionsWithWalls<W extends WallSide>(
   ball: MovingBall,
   walls: Array<W>,
   { epsilon = 1e-5 }: { epsilon?: number; } = {}
 ): Array<Collision<WallObstacle<W>>> {
-  function* gen() {
-    const tMax = -ball.velocity / ball.acceleration;
+  const tMax = -ball.velocity / ball.acceleration;
 
-    for (const wall of walls) {
-      const collision = computeCollisionWithWallSide(ball, wall, epsilon, tMax, { epsilon });
+  const collisions: Array<Collision<WallObstacle<W>>> = [];
+  for (const wall of walls) {
+    const collision = computeCollisionWithWallSide(ball, wall, epsilon, tMax, { epsilon });
 
-      if (collision !== undefined) {
-        yield { t: collision, obstacle: { type: 'wall' as const, value: wall } };
-      }
+    if (collision !== undefined) {
+      collisions.push({ t: collision, obstacle: { type: 'wall' as const, value: wall } });
     }
   }
 
-  return findImminentCollisions([...gen()], { epsilon });
+  return findImminentCollisions(collisions, { epsilon });
 }

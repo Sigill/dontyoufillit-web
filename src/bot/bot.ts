@@ -77,12 +77,17 @@ const acceleration = DEFAULT_BALL_ACCELERATION * speedup * speedup;
 activeBot.act(ballEngine.staticBalls, cannon);
 ballEngine.fire(makeCannonBall({angle: cannon.getAngle(), velocity, acceleration}));
 
+const botStats = {totalThinkingTime: 0, totalShots: 0};
+
 setInterval(() => {
   if (state === GameState.RUNNING && ballEngine.currentBall === null) {
     // bot action
-    console.time('bot thinking');
+    const start = performance.now();
     activeBot.act(ballEngine.staticBalls, cannon);
-    console.timeEnd('bot thinking');
+    const end = performance.now();
+    botStats.totalThinkingTime += end - start;
+    botStats.totalShots++;
+    console.log(`Bot thinking time: ${(end - start).toFixed(1)}ms, average: ${(botStats.totalThinkingTime / botStats.totalShots).toFixed(1)}ms`);
 
     // fire
     const angle = cannon.getAngle();
