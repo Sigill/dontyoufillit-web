@@ -39,6 +39,12 @@ function circle(x: number, y: number, r: number) {
   ctx.stroke();
 }
 
+function disk(x: number, y: number, r: number) {
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+}
+
 for (const w of Object.values(GameWalls)) {
   line(w.x0, w.y0, w.x1, w.y1);
 }
@@ -98,6 +104,10 @@ const { fixedPoints } = computeFixedPoints(
 
 for (const [a, b] of pairwise(fixedPoints)) {
   line(a.x, a.y, b.x, b.y);
+  ctx.save();
+  ctx.fillStyle = 'green';
+  disk(b.x, b.y, 0.01);
+  ctx.restore();
 
   const {t, x, y, angle, velocity, obstacles: obstacles} = b;
   for (const obstacle of obstacles) {
