@@ -1,5 +1,4 @@
 import { BallEngineMath } from "../core/ball-engine/ball-engine-math";
-import { Cannon } from "../core/cannon";
 import { CssBoard } from "../ui/css-board";
 import { HUD } from "../ui/hud";
 import { selectElement } from "../core/utils";
@@ -8,6 +7,7 @@ import { AimingBot } from "./bots/aiming-bot";
 import { AimingBotLookAhead } from "./bots/aiming-bot-look-ahead";
 import { Bot } from "./bot-type";
 import { DEFAULT_BALL_ACCELERATION, DEFAULT_BALL_VELOCITY } from "../core/constants";
+import { ManualCannon } from "../core/cannon";
 
 enum GameState {
   PAUSED = 1,
@@ -23,14 +23,6 @@ const BOTS: Record<string, Bot> = {
   [AimingBot.name]: new AimingBot(),
   [AimingBotLookAhead.name]: new AimingBotLookAhead({depth, criteria: optimize as 'hits' | 'score'}),
 };
-
-export class ManualCannon implements Cannon {
-  angle = Math.PI / 2;
-
-  getAngle(): number {
-    return this.angle;
-  }
-}
 
 const botName = queryParams.get('bot') || AimingBot.name;
 const activeBot = BOTS[botName] || BOTS[AimingBot.name];

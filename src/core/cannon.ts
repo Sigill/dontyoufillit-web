@@ -73,3 +73,11 @@ export class MovingCannon extends Cannon {
     if (this.#angle < -limit) this.#angle = -limit;
   }
 }
+
+export class ManualCannon implements Cannon {
+  angle = Math.PI / 2;
+
+  getAngle(): number {
+    return this.angle;
+  }
+}
