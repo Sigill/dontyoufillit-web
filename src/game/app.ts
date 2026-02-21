@@ -180,10 +180,14 @@ selectElement('#optionsScreenBackButton').addEventListener('click', function (ev
   popScreen();
 });
 
-selectElement('#pause-screen #continue-button').addEventListener('click', function (evt) {
-  evt.preventDefault();
+function resumeGame() {
   game.resume();
   popScreen();
+}
+
+selectElement('#pause-screen #continue-button').addEventListener('click', function (evt) {
+  evt.preventDefault();
+  resumeGame();
 });
 
 selectElement('#pause-screen #options-button').addEventListener('click', function (evt) {
@@ -227,10 +231,14 @@ selectElement('#gameover-screen #menu-button').addEventListener('click', functio
   pushScreen(startScreen);
 });
 
-selectElement('#licenseScreenBackButton').addEventListener('click', function (evt) {
-  evt.preventDefault();
+function goBackFromLicense() {
   popScreen();
   licenseScreen.querySelectorAll('details').forEach(function (details) { details.open = false; });
+}
+
+selectElement('#licenseScreenBackButton').addEventListener('click', function (evt) {
+  evt.preventDefault();
+  goBackFromLicense();
 });
 
 showFramerateCheckbox.addEventListener('change', function (this) {
@@ -292,3 +300,19 @@ function pauseGame() {
     pushScreen(pauseScreen);
   }
 }
+
+window.addEventListener('keydown', (ev: KeyboardEvent) => {
+  if (ev.key === 'Escape') {
+    const topScreen = screens.length > 0 ? screens[screens.length - 1] : null;
+
+    if (!topScreen) {
+      pauseGame();
+    } else if (topScreen === pauseScreen) {
+      resumeGame();
+    } else if (topScreen === optionsScreen) {
+      popScreen();
+    } else if (topScreen === licenseScreen) {
+      goBackFromLicense();
+    }
+  }
+});
