@@ -32,7 +32,21 @@ export class HUD extends HTMLElement {
   private readonly scoreSpan: HTMLSpanElement;
   private readonly livesSpan: HTMLSpanElement;
 
-  onPause?: (ev: MouseEvent | TouchEvent) => void;
+  onPause?: (ev: Event) => void;
+
+  connectedCallback() {
+    window.addEventListener('keydown', this.handleKeyDown);
+  }
+
+  disconnectedCallback() {
+    window.removeEventListener('keydown', this.handleKeyDown);
+  }
+
+  private readonly handleKeyDown = (ev: KeyboardEvent) => {
+    if (ev.key === 'Escape') {
+      this.onPause?.(ev);
+    }
+  };
 
   constructor() {
     super();
