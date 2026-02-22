@@ -348,6 +348,12 @@ window.addEventListener('keydown', (ev: KeyboardEvent) => {
     } else if (topScreen === licenseScreen) {
       goBackFromLicense();
     }
+  } else if (ev.key === ' ') {
+    if (!topScreen && (game.currentBall === null) && (game.state === GameHandler.RUNNING)) {
+      ev.stopPropagation();
+      ev.preventDefault();
+      game.fire();
+    }
   } else if (topScreen) {
     if (ev.key === 'ArrowDown') {
       ev.preventDefault();
