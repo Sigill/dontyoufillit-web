@@ -54,6 +54,7 @@ const showFramerateCheckbox = selectElement<HTMLInputElement>('#showFramerateChe
 const lazerBonusButton = selectElement<HTMLButtonElement>('#lazer-bonus-button');
 
 const cannon = new Cannon();
+// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 const ballEngine = (window as any).ballEngine = makeBallEngine();
 const game = new GameHandler({cannon, ballEngine});
 game.highscore = readStoredHighscore();

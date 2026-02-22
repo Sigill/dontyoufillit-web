@@ -1,12 +1,26 @@
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import stylistic from '@stylistic/eslint-plugin';
+import css from '@eslint/css';
 import { defineConfig } from 'eslint/config';
 
 export default defineConfig(
-  eslint.configs.recommended,
-  tseslint.configs.recommended,
   {
+    files: ["**/*.{js,mjs,cjs,ts,tsx}"],
+    ignores: ["src/service-worker.js"],
+    plugins: {
+      "@typescript-eslint": tseslint.plugin,
+      "@stylistic": stylistic,
+    },
+    extends: [
+      eslint.configs.recommended,
+      tseslint.configs.recommendedTypeChecked,
+    ],
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+      },
+    },
     rules: {
       "linebreak-style": ["error", "unix"],
       "semi": ["error", "always"],
@@ -19,14 +33,7 @@ export default defineConfig(
         {
           allowShortCircuit: true, // Allows verbose && console.log().
         }
-      ]
-    },
-  },
-  {
-    plugins: {
-      "@stylistic": stylistic,
-    },
-    rules: {
+      ],
       "@stylistic/quote-props": [ "error", "consistent-as-needed" ],
       "@stylistic/indent": ["error", 2, {
         VariableDeclarator: "first",
@@ -49,12 +56,30 @@ export default defineConfig(
         MemberExpression: 1,
         SwitchCase: 1,
       }],
-    }
+    },
   },
   {
     files: ["**/*.test.ts"],
+    plugins: {
+      "@typescript-eslint": tseslint.plugin,
+    },
     rules: {
       "@typescript-eslint/no-unused-expressions": "off", // Otherwise expect(something).to.exist is considered as an unused expression.
     }
-  }
+  },
+  {
+    files: ["**/*.css"],
+    language: "css/css",
+    plugins: { css },
+    extends: ["css/recommended"],
+    rules: {
+      "css/use-baseline": [
+        "error",
+        {
+          allowSelectors: ["nesting", "has"],
+          allowProperties: ["user-select"]
+        }
+      ]
+    }
+  },
 );

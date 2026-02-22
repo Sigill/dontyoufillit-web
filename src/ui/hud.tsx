@@ -4,10 +4,10 @@ import {
   lazyAssign,
   selectElement,
 } from "../core/utils";
-/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 import { h, Fragment } from "./jsx";
 
 export function makeHudDom() {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return (
     <>
       <div className="left-col">

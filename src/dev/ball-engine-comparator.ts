@@ -217,7 +217,7 @@ function renderPlot(currentPlotElement: HTMLElement, currentPlotData: Point[], h
         x: "x",
         y: "y",
         stroke: "name",
-        strokeWidth: d => highlightedEngineName === null ? 1 : d.name === highlightedEngineName ? 2 : 0,
+        strokeWidth: (d: Point) => highlightedEngineName === null ? 1 : d.name === highlightedEngineName ? 2 : 0,
         // strokeOpacity: d => d.name === highlightedEngineName ? 1 : 0.5,
         strokeLinecap: "round",
         strokeLinejoin: "round",
@@ -279,4 +279,5 @@ addTouchOrClickEvent(grid, (evt) => {
   }
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 (window as any).instances = instances;

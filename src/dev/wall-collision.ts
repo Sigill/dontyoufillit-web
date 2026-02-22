@@ -7,7 +7,7 @@ import { GameWalls } from '../core/ball-engine/walls';
 
 declare function getTab(element: string | Element): Tab;
 
-const tabs = selectElement('#v-pills-tab')!;
+const tabs = selectElement('#v-pills-tab');
 
 const cases: Array<[string, { position: { x: number; y: number; }; direction: { x: number; y: number; }; walls: Array<WallSide>; }]> = [
   ['90 top', {position: {x: 0.5, y: 0.5}, direction: {x: 0.5, y: 1}, walls: [GameWalls.top]} ],

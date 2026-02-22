@@ -28,6 +28,7 @@ const botName = queryParams.get('bot') || AimingBot.name;
 const activeBot = BOTS[botName] || BOTS[AimingBot.name];
 
 const cannon = new ManualCannon();
+// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 const ballEngine = (window as any).ballEngine = new BallEngineMath({withSnapshots: false});
 
 const hud = new HUD();

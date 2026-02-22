@@ -5,7 +5,7 @@ import { selectElement } from '../core/utils';
 
 declare function getTab(element: string | Element): Tab;
 
-const tabs = selectElement('#v-pills-tab')!;
+const tabs = selectElement('#v-pills-tab');
 
 interface Ball {
   radius: number;

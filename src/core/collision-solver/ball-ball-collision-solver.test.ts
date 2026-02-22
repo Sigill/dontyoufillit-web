@@ -28,7 +28,7 @@ describe('computeCollisionWithBall', () => {
     assert.exists(collision);
     assert.closeTo(collision, 0.3135013362902747, 1e-5);
 
-    const xc = 1 / 2 * -0.4 * collision! ** 2 + 1 * collision! + 0.5; // x location of ball at collision.
+    const xc = 1 / 2 * -0.4 * collision ** 2 + 1 * collision + 0.5; // x location of ball at collision.
     // Balls radiuses are 0.1 and 0.11, at collision time the distance between balls centers shall therefore be 0.21.
     assert.closeTo(Math.hypot(1 - xc, 0.5 - 0.46), 0.21, 1e-5);
   });

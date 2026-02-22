@@ -2,11 +2,11 @@ import { BallGeometry, StaticBall } from "../core/ball";
 import { BallEngine } from "../core/ball-engine";
 import { Cannon } from "../core/cannon";
 import { getOrInsert, selectElement } from "../core/utils";
-/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 import { h, Fragment } from "./jsx";
 import * as Constants from '../core/constants';
 
 export function makeBallDom(): HTMLDivElement {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return (
     <div className="ball">
       <div className="disk"></div>
@@ -18,6 +18,7 @@ export function makeBallDom(): HTMLDivElement {
 }
 
 export function makeCssBoardDom() {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return (
     <>
       <div id="StaticBallLayer"></div>
