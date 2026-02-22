@@ -302,8 +302,9 @@ game.observable.addEventListener('gameover', function () {
   selectElement('#gameover-screen #highscore-message').style.display = (newHighscore ? 'inline' : 'none');
   selectElement('#gameover-screen #score').innerText = score.toString();
 
-  selectElement('#gameover-screen #retry-button #remaining-lives').innerText = `${game.lives} ${game.lives > 1 ? 'lives' : 'life'}`;
-  selectElement('#gameover-screen #retry-button').style.display = game.canUseLife() ? 'block' : 'none';
+  const retryButton = selectElement<HTMLButtonElement>('#gameover-screen #retry-button');
+  selectElement('#remaining-lives', retryButton).innerText = `${game.lives} ${game.lives > 1 ? 'lives' : 'life'}`;
+  retryButton.disabled = !game.canUseLife();
 
   selectElement('#gameover-screen #play-again-button').style.display = !game.canUseLife() ? 'block' : 'none';
 
