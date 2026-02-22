@@ -291,11 +291,17 @@ dontyoufillit-css-board {
   overflow-y: auto;
 }
 
-.selected-item,
-input.selected-item + .slider {
-  outline: 3px solid #2196F3 !important;
+button:focus,
+.bonus-info-trigger:focus {
+  outline: 2px solid #4d90fe;
   outline-offset: 2px;
-  box-shadow: 0 0 8px #2196F3;
+  box-shadow: 0 0 8px rgba(77, 144, 254, 0.6);
+}
+
+input:focus + .slider {
+  outline: 2px solid #4d90fe;
+  outline-offset: 4px;
+  box-shadow: 0 0 8px rgba(77, 144, 254, 0.6);
 }
 
 #licenseScreen * {
@@ -388,7 +394,7 @@ button {
       .on-inactive { display: none; }
     }
 
-    &.disabled {
+    &:disabled {
       opacity: 0.65;
       cursor: not-allowed;
 
@@ -449,6 +455,8 @@ button {
 }
 
 .bonus-info-trigger {
+  all: unset;
+  box-sizing: border-box;
   font-size: 60%;
   color: #888;
   cursor: pointer;
@@ -526,7 +534,12 @@ table.centered tr td p {
   height: 34px;
 }
 
-.switch input {display:none;}
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
 
 .slider {
   position: absolute;
@@ -554,10 +567,6 @@ table.centered tr td p {
 
 input:checked + .slider {
   background-color: #2196F3;
-}
-
-input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
 }
 
 input:checked + .slider:before {

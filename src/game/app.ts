@@ -51,7 +51,7 @@ const gameoverScreen = selectElement('#gameover-screen');
 const licenseScreen = selectElement('#licenseScreen');
 const startWithThreeLivesButton = selectElement<HTMLInputElement>('#checkbox-start-three-lives');
 const showFramerateCheckbox = selectElement<HTMLInputElement>('#showFramerateCheckbox');
-const lazerBonusButton = selectElement<HTMLElement>('#lazer-bonus-button');
+const lazerBonusButton = selectElement<HTMLButtonElement>('#lazer-bonus-button');
 
 const cannon = new Cannon();
 const ballEngine = (window as any).ballEngine = makeBallEngine();
@@ -105,7 +105,7 @@ function updateLazerButtonState() {
   const canEnable = game.canEnableCollisionHandler(LazerCollisionHandler);
 
   lazerBonusButton.classList.toggle('active', isLazerActive);
-  lazerBonusButton.classList.toggle('disabled', !isLazerActive && !canEnable);
+  lazerBonusButton.disabled = !isLazerActive && !canEnable;
 }
 
 addTouchOrClickEvent(selectElement<HTMLElement>('.fullscreen-container'), (evt) => {
@@ -120,74 +120,45 @@ addTouchOrClickEvent(selectElement<HTMLElement>('.fullscreen-container'), (evt) 
 });
 
 class MenuNavigator {
-  private selectedIndex: number = -1;
   private focusableElements: HTMLElement[] = [];
 
-  constructor() {}
-
   public refresh(screen: HTMLElement) {
-    this.clearSelection();
-    this.focusableElements = Array.from(screen.querySelectorAll('button, input[type="checkbox"], .bonus-info-trigger'));
+    this.focusableElements = Array.from(screen.querySelectorAll<HTMLElement>('button, input[type="checkbox"]'))
+      .filter(el => {
+        if (el instanceof HTMLButtonElement || el instanceof HTMLInputElement) {
+          return !el.disabled;
+        }
+        return true;
+      });
 
-    // Attach click listeners to sync selection
-    this.focusableElements.forEach((el) => {
-      if (!(el as any).__menuListenerAttached) {
-        el.addEventListener('click', () => {
-          // Re-find index since focusableElements might have changed
-          const currentIndex = this.focusableElements.indexOf(el);
-          if (currentIndex !== -1) {
-            this.setSelection(currentIndex);
-          }
-        }, { passive: true });
-        (el as any).__menuListenerAttached = true;
-      }
-    });
-
-    this.selectedIndex = this.focusableElements.findIndex(el => el.classList.contains('selected-item'));
-    if (this.selectedIndex === -1 && this.focusableElements.length > 0) {
-      this.setSelection(0);
+    // Select first element if nothing focused or if focus is outside the current screen
+    const currentFocus = document.activeElement;
+    if (!currentFocus || !screen.contains(currentFocus)) {
+      this.focusableElements[0]?.focus();
     }
   }
 
   public clear() {
-    this.clearSelection();
     this.focusableElements = [];
-    this.selectedIndex = -1;
-  }
-
-  private clearSelection() {
-    if (this.selectedIndex !== -1 && this.focusableElements[this.selectedIndex]) {
-      this.focusableElements[this.selectedIndex].classList.remove('selected-item');
-    }
-  }
-
-  private setSelection(index: number) {
-    this.clearSelection();
-    this.selectedIndex = (index + this.focusableElements.length) % this.focusableElements.length;
-    const el = this.focusableElements[this.selectedIndex];
-    if (el) {
-      el.classList.add('selected-item');
-      el.scrollIntoView({ block: 'nearest' });
-    }
   }
 
   public next() {
-    if (this.focusableElements.length > 0) {
-      this.setSelection(this.selectedIndex + 1);
-    }
+    this.moveFocus(1);
   }
 
   public previous() {
-    if (this.focusableElements.length > 0) {
-      this.setSelection(this.selectedIndex - 1);
-    }
+    this.moveFocus(-1);
   }
 
-  public activate() {
-    if (this.selectedIndex !== -1 && this.focusableElements[this.selectedIndex]) {
-      const el = this.focusableElements[this.selectedIndex];
-      el.click();
+  private moveFocus(direction: number) {
+    const currentIndex = this.focusableElements.indexOf(document.activeElement as HTMLElement);
+    if (currentIndex === -1) {
+      this.focusableElements[0]?.focus();
+      return;
     }
+
+    const nextIndex = (currentIndex + direction + this.focusableElements.length) % this.focusableElements.length;
+    this.focusableElements[nextIndex]?.focus();
   }
 }
 
@@ -401,9 +372,6 @@ window.addEventListener('keydown', (ev: KeyboardEvent) => {
     } else if (ev.key === 'ArrowUp') {
       ev.preventDefault();
       menuNavigator.previous();
-    } else if (ev.key === 'Enter' || ev.key === ' ') {
-      ev.preventDefault();
-      menuNavigator.activate();
     }
   }
 });
