@@ -345,6 +345,7 @@ button {
   margin: 1.2em 0;
   text-align: center;
   display: block;
+  position: relative;
 
   background-color: white;
   color: black;
@@ -364,12 +365,9 @@ button {
     font-size: 150%;
     margin-top: 0.8em;
     margin-bottom: 0.8em;
-    padding: 0.2em;
   }
 
   &.badge-button {
-    position: relative;
-    display: inline-block;
 
     .badge {
       display: block;
@@ -421,85 +419,18 @@ button {
   text-align: center;
 }
 
-.description {
-  min-height: 0;
-  opacity: 0;
-  transition: opacity 0.2s ease-in-out;
-  font-size: 100%;
-  margin: 0.4em auto;
-  text-align: center;
-  color: #aaa;
-  font-style: italic;
-  max-width: 90%;
-}
-
-.expanded .description {
-  opacity: 1;
-  transition: opacity 0.3s ease-in-out 0.1s;
-}
-
-.bonus-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-
-.bonus-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 0.5em;
-  width: 100%;
-}
-
 .bonus-title {
-  font-size: 133%; /* Match relative size */
+  font-size: 133%;
   font-weight: bold;
   text-transform: uppercase;
   color: #ccc;
   letter-spacing: 0.1em;
-  margin-right: 0.5ex;
-  display: inline-block;
-}
-
-.bonus-info-trigger {
-  box-sizing: border-box;
-  font-size: 60%;
-  color: #888;
-  cursor: pointer;
-  display: inline-flex;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  &:hover {
-    color: white;
-    .bonus-title { color: white; }
-  }
-}
-
-.info-link {
-  all: unset;
-  text-decoration: underline;
-  cursor: pointer;
-  margin-left: 0.5ex; /* Add some space between title and link if needed, though they were adjacent */
-}
-
-.bonus-description-container {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.3s ease-in-out;
-  width: 100%;
-}
-
-.expanded .bonus-description-container {
-  grid-template-rows: 1fr;
-}
-
-.bonus-description-wrapper {
-  overflow: hidden;
-  width: 100%;
+  gap: 0.5ex;
 }
 
 a {
