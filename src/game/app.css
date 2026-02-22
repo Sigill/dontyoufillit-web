@@ -292,7 +292,7 @@ dontyoufillit-css-board {
 }
 
 button:focus,
-.bonus-info-trigger:focus {
+.info-link:focus {
   outline: 2px solid #4d90fe;
   outline-offset: 2px;
   box-shadow: 0 0 8px rgba(77, 144, 254, 0.6);
@@ -455,7 +455,6 @@ button {
 }
 
 .bonus-info-trigger {
-  all: unset;
   box-sizing: border-box;
   font-size: 60%;
   color: #888;
@@ -471,7 +470,10 @@ button {
 }
 
 .info-link {
+  all: unset;
   text-decoration: underline;
+  cursor: pointer;
+  margin-left: 0.5ex; /* Add some space between title and link if needed, though they were adjacent */
 }
 
 .bonus-description-container {
