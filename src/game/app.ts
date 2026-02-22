@@ -104,8 +104,8 @@ function updateLazerButtonState() {
   const isLazerActive = game.activeCollisionHandler === LazerCollisionHandler;
   const canEnable = game.canEnableCollisionHandler(LazerCollisionHandler);
 
-  lazerBonusButton.parentElement!.classList.toggle('active', isLazerActive);
-  lazerBonusButton.parentElement!.classList.toggle('disabled', !isLazerActive && !canEnable);
+  lazerBonusButton.classList.toggle('active', isLazerActive);
+  lazerBonusButton.classList.toggle('disabled', !isLazerActive && !canEnable);
 }
 
 addTouchOrClickEvent(selectElement<HTMLElement>('.fullscreen-container'), (evt) => {
@@ -127,7 +127,7 @@ class MenuNavigator {
 
   public refresh(screen: HTMLElement) {
     this.clearSelection();
-    this.focusableElements = Array.from(screen.querySelectorAll('.button span:not(.badge), input[type="checkbox"], .bonus-info-trigger'));
+    this.focusableElements = Array.from(screen.querySelectorAll('button, input[type="checkbox"], .bonus-info-trigger'));
 
     // Attach click listeners to sync selection
     this.focusableElements.forEach((el) => {
@@ -186,11 +186,7 @@ class MenuNavigator {
   public activate() {
     if (this.selectedIndex !== -1 && this.focusableElements[this.selectedIndex]) {
       const el = this.focusableElements[this.selectedIndex];
-      if (el instanceof HTMLInputElement) {
-        el.click();
-      } else {
-        el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
-      }
+      el.click();
     }
   }
 }
@@ -342,9 +338,9 @@ game.observable.addEventListener('gameover', function () {
   selectElement('#gameover-screen #score').innerText = score.toString();
 
   selectElement('#gameover-screen #retry-button #remaining-lives').innerText = `${game.lives} ${game.lives > 1 ? 'lives' : 'life'}`;
-  selectElement('#gameover-screen #retry-button').parentElement!.style.display = game.canUseLife() ? 'block' : 'none';
+  selectElement('#gameover-screen #retry-button').style.display = game.canUseLife() ? 'block' : 'none';
 
-  selectElement('#gameover-screen #play-again-button').parentElement!.style.display = !game.canUseLife() ? 'block' : 'none';
+  selectElement('#gameover-screen #play-again-button').style.display = !game.canUseLife() ? 'block' : 'none';
 
   pushScreen(gameoverScreen);
 });

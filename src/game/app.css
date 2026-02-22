@@ -322,29 +322,32 @@ input.selected-item + .slider {
   font-size: 100%;
   margin: 0.8em 0;
 }
-.screen .button {
+button {
+  all: unset;
+  box-sizing: border-box;
   font-size: 250%;
   margin: 1.2em auto;
   text-align: center;
+  display: block;
 
-  > span {
-    background-color: white;
-    color: black;
-    border-radius: 0.25em;
-    padding: 0 0.1em;
-    font-weight: bold;
-    cursor: pointer;
-    line-height: 1.5;
-    display: inline-block;
+  background-color: white;
+  color: black;
+  border-radius: 0.25em;
+  padding: 0 0.1em;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 1.5;
+  width: fit-content;
+  min-width: 4em;
+
+  &:active {
+    opacity: 0.8;
   }
 
   &.secondary {
     font-size: 150%;
     margin: 0.8em auto;
-
-    > span {
-      padding: 0.2em;
-    }
+    padding: 0.2em;
   }
 
   &.badge-button {
@@ -367,23 +370,19 @@ input.selected-item + .slider {
   }
 
   &.toggle-button {
-    > span {
-      background-color: transparent;
-      border: 1px solid white;
-      color: white;
-      padding: 0.2em;
-      cursor: pointer;
-      border-radius: 0.25em;
-    }
+    background-color: transparent;
+    border: 1px solid white;
+    color: white;
+    padding: 0.2em;
+    cursor: pointer;
+    border-radius: 0.25em;
 
     .on-active { display: none; }
     .on-inactive { display: block; }
 
     &.active {
-      > span {
-        background-color: white;
-        color: black;
-      }
+      background-color: white;
+      color: black;
 
       .on-active { display: block; }
       .on-inactive { display: none; }
@@ -391,13 +390,10 @@ input.selected-item + .slider {
 
     &.disabled {
       opacity: 0.65;
+      cursor: not-allowed;
 
-      > span {
-        cursor: not-allowed;
-
-        &:active {
-          pointer-events: none; /* Needs to be in :active otherwise it will block the cursor rule above. */
-        }
+      &:active {
+        pointer-events: none;
       }
     }
   }
