@@ -119,6 +119,84 @@ addTouchOrClickEvent(selectElement<HTMLElement>('.fullscreen-container'), (evt) 
   }
 });
 
+class MenuNavigator {
+  private selectedIndex: number = -1;
+  private focusableElements: HTMLElement[] = [];
+
+  constructor() {}
+
+  public refresh(screen: HTMLElement) {
+    this.clearSelection();
+    this.focusableElements = Array.from(screen.querySelectorAll('.button span:not(.badge), input[type="checkbox"], .bonus-info-trigger'));
+
+    // Attach click listeners to sync selection
+    this.focusableElements.forEach((el) => {
+      if (!(el as any).__menuListenerAttached) {
+        el.addEventListener('click', () => {
+          // Re-find index since focusableElements might have changed
+          const currentIndex = this.focusableElements.indexOf(el);
+          if (currentIndex !== -1) {
+            this.setSelection(currentIndex);
+          }
+        }, { passive: true });
+        (el as any).__menuListenerAttached = true;
+      }
+    });
+
+    this.selectedIndex = this.focusableElements.findIndex(el => el.classList.contains('selected-item'));
+    if (this.selectedIndex === -1 && this.focusableElements.length > 0) {
+      this.setSelection(0);
+    }
+  }
+
+  public clear() {
+    this.clearSelection();
+    this.focusableElements = [];
+    this.selectedIndex = -1;
+  }
+
+  private clearSelection() {
+    if (this.selectedIndex !== -1 && this.focusableElements[this.selectedIndex]) {
+      this.focusableElements[this.selectedIndex].classList.remove('selected-item');
+    }
+  }
+
+  private setSelection(index: number) {
+    this.clearSelection();
+    this.selectedIndex = (index + this.focusableElements.length) % this.focusableElements.length;
+    const el = this.focusableElements[this.selectedIndex];
+    if (el) {
+      el.classList.add('selected-item');
+      el.scrollIntoView({ block: 'nearest' });
+    }
+  }
+
+  public next() {
+    if (this.focusableElements.length > 0) {
+      this.setSelection(this.selectedIndex + 1);
+    }
+  }
+
+  public previous() {
+    if (this.focusableElements.length > 0) {
+      this.setSelection(this.selectedIndex - 1);
+    }
+  }
+
+  public activate() {
+    if (this.selectedIndex !== -1 && this.focusableElements[this.selectedIndex]) {
+      const el = this.focusableElements[this.selectedIndex];
+      if (el instanceof HTMLInputElement) {
+        el.click();
+      } else {
+        el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+      }
+    }
+  }
+}
+
+const menuNavigator = new MenuNavigator();
+
 const screens = new Array<HTMLElement>;
 
 function pushScreen(screen: HTMLElement) {
@@ -136,6 +214,8 @@ function pushScreen(screen: HTMLElement) {
 
   screenContainer.style.display = 'block';
   screenContainer.style.backgroundColor = (screen === pauseScreen) ? 'rgba(0, 0, 0, 0.85)' : 'black';
+
+  menuNavigator.refresh(screen);
 }
 
 function popScreen() {
@@ -144,8 +224,11 @@ function popScreen() {
 
     if (screens.length === 0) {
       screenContainer.style.display = 'none';
+      menuNavigator.clear();
     } else {
-      screens[screens.length - 1].style.display = 'block';
+      const topScreen = screens[screens.length - 1];
+      topScreen.style.display = 'block';
+      menuNavigator.refresh(topScreen);
     }
   }
 }
@@ -156,6 +239,7 @@ function popAllScreens() {
   }
 
   screenContainer.style.display = 'none';
+  menuNavigator.clear();
 }
 
 selectElement('#start-screen #play-button').addEventListener('click', function (evt) {
@@ -302,9 +386,9 @@ function pauseGame() {
 }
 
 window.addEventListener('keydown', (ev: KeyboardEvent) => {
-  if (ev.key === 'Escape') {
-    const topScreen = screens.length > 0 ? screens[screens.length - 1] : null;
+  const topScreen = screens.length > 0 ? screens[screens.length - 1] : null;
 
+  if (ev.key === 'Escape') {
     if (!topScreen) {
       pauseGame();
     } else if (topScreen === pauseScreen) {
@@ -313,6 +397,17 @@ window.addEventListener('keydown', (ev: KeyboardEvent) => {
       popScreen();
     } else if (topScreen === licenseScreen) {
       goBackFromLicense();
+    }
+  } else if (topScreen) {
+    if (ev.key === 'ArrowDown') {
+      ev.preventDefault();
+      menuNavigator.next();
+    } else if (ev.key === 'ArrowUp') {
+      ev.preventDefault();
+      menuNavigator.previous();
+    } else if (ev.key === 'Enter' || ev.key === ' ') {
+      ev.preventDefault();
+      menuNavigator.activate();
     }
   }
 });

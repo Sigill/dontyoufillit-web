@@ -291,6 +291,13 @@ dontyoufillit-css-board {
   overflow-y: auto;
 }
 
+.selected-item,
+input.selected-item + .slider {
+  outline: 3px solid #2196F3 !important;
+  outline-offset: 2px;
+  box-shadow: 0 0 8px #2196F3;
+}
+
 #licenseScreen * {
   margin: 0.5em 0;
 }
