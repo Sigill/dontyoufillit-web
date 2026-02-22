@@ -131,12 +131,6 @@ class MenuNavigator {
         }
         return true;
       });
-
-    // Select first element if nothing focused or if focus is outside the current screen
-    const currentFocus = document.activeElement;
-    if (!currentFocus || !screen.contains(currentFocus)) {
-      this.focusableElements[0]?.focus();
-    }
   }
 
   public clear() {
