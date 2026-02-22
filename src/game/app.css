@@ -517,14 +517,17 @@ a.plain, a.plain:hover, a.plain:focus {
   font-family: monospace;
 }
 
-table.centered {
-  margin: 0 auto;
-  border-collapse: separate;
-  border-spacing: 1em;
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1em;
+  justify-content: center;
+  align-items: center;
+  margin: 1em auto;
+  width: fit-content;
 }
 
-table.centered tr td p {
-  margin: 0 1em;
+.options-grid .option {
   text-align: right;
 }
 
