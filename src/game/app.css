@@ -251,6 +251,7 @@ dontyoufillit-css-board {
 
 #screenContainer {
   display: none;
+  background-color: black;
 }
 
 #screenWrapper {
@@ -291,6 +292,11 @@ dontyoufillit-css-board {
   overflow-y: auto;
 }
 
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 button:focus,
 .info-link:focus {
   outline: 2px solid #4d90fe;
@@ -305,11 +311,13 @@ input:focus + .slider {
 }
 
 #licenseScreen * {
-  margin: 0.5em 0;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
 }
 
 .screen .title {
-  margin: 0.8em auto;
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
   font-size: 300%;
   font-weight: bold;
   text-align: center;
@@ -328,11 +336,12 @@ input:focus + .slider {
   font-size: 100%;
   margin: 0.8em 0;
 }
+
 button {
   all: unset;
   box-sizing: border-box;
   font-size: 250%;
-  margin: 1.2em auto;
+  margin: 1.2em 0;
   text-align: center;
   display: block;
 
@@ -352,7 +361,8 @@ button {
 
   &.secondary {
     font-size: 150%;
-    margin: 0.8em auto;
+    margin-top: 0.8em;
+    margin-bottom: 0.8em;
     padding: 0.2em;
   }
 
@@ -428,7 +438,6 @@ button {
 }
 
 .bonus-section {
-  margin: 0.5em auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -490,13 +499,6 @@ button {
 .bonus-description-wrapper {
   overflow: hidden;
   width: 100%;
-}
-
-.pause-divider {
-  border: 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  margin: 1em auto;
-  width: 80%;
 }
 
 a {

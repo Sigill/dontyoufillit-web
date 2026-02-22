@@ -181,7 +181,6 @@ function pushScreen(screen: HTMLElement) {
   screen.style.visibility = 'visible';
 
   screenContainer.style.display = 'block';
-  screenContainer.style.backgroundColor = (screen === pauseScreen) ? 'rgba(0, 0, 0, 0.85)' : 'black';
 
   menuNavigator.refresh(screen);
 }
