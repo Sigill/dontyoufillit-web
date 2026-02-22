@@ -131,6 +131,10 @@ class MenuNavigator {
         }
         return true;
       });
+
+    // select the first of the focusable elements with data-autofocus attribute
+    const autofocusElement = this.focusableElements.find(el => el.hasAttribute('data-autofocus'));
+    autofocusElement?.focus();
   }
 
   public clear() {

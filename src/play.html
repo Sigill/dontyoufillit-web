@@ -42,7 +42,7 @@
       <div class="fullscreen vcentered">
         <div class="vcentered-inner">
           <h1>DontYouFillIt</h1>
-          <button id="play-button" class="mx-auto">Play</button>
+          <button id="play-button" class="mx-auto" data-autofocus>Play</button>
           <div class="options-grid">
             <label class="option" for="checkbox-start-three-lives">Start with three lives</label>
             <label class="switch"><input type="checkbox" id="checkbox-start-three-lives" checked /><span class="slider"></span></label>
@@ -61,7 +61,7 @@
             <label class="option" for="showFramerateCheckbox">Show framerate</label>
             <label class="switch"><input type="checkbox" id="showFramerateCheckbox"><span class="slider"></span></label>
           </div>
-          <button id="optionsScreenBackButton" class="mx-auto">Back</button>
+          <button id="optionsScreenBackButton" class="mx-auto" data-autofocus>Back</button>
         </div>
       </div>
     </div>
@@ -79,7 +79,7 @@
 
           <hr style="width: 80%; margin: 2em auto; opacity: 0.5;">
 
-          <button id="continue-button" class="mx-auto">Continue</button>
+          <button id="continue-button" class="mx-auto" data-autofocus>Continue</button>
           <button id="options-button" class="mx-auto">Options</button>
           <button id="menu-button" class="mx-auto">Menu</button>
         </div>
@@ -91,8 +91,8 @@
         <div class="vcentered-inner">
           <h1>Game Over</h1>
           <p class="score"><span id="score-message">Your score</span><span id="highscore-message">New highscore</span>: <span id="score"></span></p>
-          <button id="retry-button" class="mx-auto display-none-when-disabled">Retry (<span id="remaining-lives"></span> left)</button>
-          <button id="play-again-button" class="mx-auto">Play again</button>
+          <button id="retry-button" class="mx-auto display-none-when-disabled" data-autofocus>Retry (<span id="remaining-lives"></span> left)</button>
+          <button id="play-again-button" class="mx-auto" data-autofocus>Play again</button>
           <button id="menu-button" class="mx-auto">Menu</button>
         </div>
       </div>
