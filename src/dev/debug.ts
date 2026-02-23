@@ -1,7 +1,8 @@
-import { BallEngineMath, computeFixedPoints, ppObstacle } from '../core/ball-engine/ball-engine-math';
+import { BallEngineMath, ppObstacle } from '../core/ball-engine/ball-engine-math';
 import { makeBalls } from '../core/ball';
 import * as Constants from '../core/constants';
 import { directionalArrow, ppAngle } from '../core/utils';
+import { computeFixedPoints } from '../core/collision-solver/fixed-points';
 
 const GameWalls = {
   top: {x0: 0, y0: 1, x1: 1, y1: 1}, // top

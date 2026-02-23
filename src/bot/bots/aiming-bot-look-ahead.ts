@@ -1,6 +1,6 @@
 import { makeCannonBall, StaticBall } from "../../core/ball";
-import { computeFixedPoints } from "../../core/ball-engine/ball-engine-math";
 import { ManualCannon } from "../../core/cannon";
+import { computeFixedPoints } from "../../core/collision-solver/fixed-points";
 import { Bot } from "../bot-type";
 
 /**
