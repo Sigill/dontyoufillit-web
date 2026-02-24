@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { computeFixedPoints } from './ball-engine-math';
+import { computeFixedPoints } from "../collision-solver/fixed-points";
 import { makeBalls } from '../ball';
 import { DEFAULT_BALL_RADIUS, DEFAULT_BALL_VELOCITY, DEFAULT_BALL_ACCELERATION } from '../constants';
 

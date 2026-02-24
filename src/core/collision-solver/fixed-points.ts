@@ -48,6 +48,7 @@ export function computeFixedPoints(
   hits: number;
   score: number;
   gameover: boolean;
+  out: boolean;
   staticBalls: Array<StaticBall>;
 } {
   let { x, y, velocity, angle} = ball;
@@ -55,12 +56,13 @@ export function computeFixedPoints(
   let t0 = 0;
   const tMax = -ball.velocity / ball.acceleration;
 
-  const fixedPoints = [];
+  const fixedPoints: Array<BallState & { obstacles: Array<Obstacle>; }> = [
+    { t: t0, x, y, velocity, angle, acceleration: ball.acceleration, obstacles: [] }
+  ];
   let hits = 0;
   let score = 0;
   let gameover = false;
-
-  fixedPoints.push({ t: t0, x, y, velocity, angle, acceleration: ball.acceleration, obstacles: [] });
+  let out = false;
 
   const shadowStaticBalls = staticBalls.map<StaticBall & { sourceBall: StaticBall }>(
     b => ({ ...b, sourceBall: b })
@@ -142,25 +144,29 @@ export function computeFixedPoints(
       (collision.obstacle.type === 'ball' && y < ball.radius && Math.sin(angle) < 0)
     ) {
       gameover = collision !== undefined;
+      out = collision === undefined && y < ball.radius;
       break;
     }
 
     t0 = t1;
   }
 
+  const nextStaticBalls = shadowStaticBalls.map(({ x, y, radius, counter }) => ({ x, y, radius, counter }));
+
+  if (!out) {
+    nextStaticBalls.push({
+      counter: 3,
+      radius: computeExpandedRadius({ x, y }, shadowStaticBalls),
+      x, y,
+    });
+  }
+
   return {
     fixedPoints,
     hits,
-    score,
+    score: score,
     gameover,
-    staticBalls: [
-      ...shadowStaticBalls.map(({x, y, radius, counter}) => ({x, y, radius, counter})),
-      {
-        counter: 3,
-        radius: computeExpandedRadius({x, y}, shadowStaticBalls),
-        x,
-        y,
-      }
-    ]
+    out,
+    staticBalls: nextStaticBalls,
   };
 }
