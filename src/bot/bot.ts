@@ -4,7 +4,6 @@ import { HUD } from "../ui/hud";
 import { selectElement } from "../core/utils";
 import { makeCannonBall } from "../core/ball";
 import { AimingBot } from "./bots/aiming-bot";
-import { AimingBotLookAhead } from "./bots/aiming-bot-look-ahead";
 import { Bot } from "./bot-type";
 import { DEFAULT_BALL_ACCELERATION, DEFAULT_BALL_VELOCITY } from "../core/constants";
 import { ManualCannon } from "../core/cannon";
@@ -17,11 +16,10 @@ enum GameState {
 
 const queryParams = new URLSearchParams(window.location.search);
 const depth = parseInt(queryParams.get('depth') || '2', 10);
-const optimize = queryParams.get('optimize') || 'score';
+const criteria = (queryParams.get('criteria') || 'hits') as 'hits' | 'score';
 
 const BOTS: Record<string, Bot> = {
-  [AimingBot.name]: new AimingBot(),
-  [AimingBotLookAhead.name]: new AimingBotLookAhead({depth, criteria: optimize as 'hits' | 'score'}),
+  [AimingBot.name]: new AimingBot({steps: Array.from({ length: depth }, () => 120), criteria}),
 };
 
 const botName = queryParams.get('bot') || AimingBot.name;
