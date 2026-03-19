@@ -13,6 +13,7 @@ import { HUD } from "../ui/hud";
 import { CssBoard } from "../ui/css-board";
 import { evaluateMoves } from "../core/evaluate-move";
 import { normalizeRewards, computeRewardPath } from "../core/reward";
+import { LAZER_BONUS_COST, ORACLE_BONUS_COST } from "../core/constants";
 
 function readStoredHighscore(): number {
   return parseInt(localStorage.getItem('highscore') || '0', 10);
@@ -55,6 +56,9 @@ const startWithThreeLivesButton = selectElement<HTMLInputElement>('#checkbox-sta
 const showFramerateCheckbox = selectElement<HTMLInputElement>('#showFramerateCheckbox');
 const lazerBonusButton = selectElement<HTMLButtonElement>('#lazer-bonus-button');
 const oracleBonusButton = selectElement<HTMLButtonElement>('#oracle-bonus-button');
+
+selectElement('#cost', lazerBonusButton).textContent = `-${LAZER_BONUS_COST}`;
+selectElement('#cost', oracleBonusButton).textContent = `-${ORACLE_BONUS_COST}`;
 
 const cannon = new Cannon();
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -120,7 +124,7 @@ function updateLazerButtonState() {
 }
 
 function updateOracleButtonState() {
-  const canEnable = game.score >= 5;
+  const canEnable = game.score >= ORACLE_BONUS_COST;
   oracleBonusButton.classList.toggle('active', game.oracleActive);
   oracleBonusButton.disabled = !game.oracleActive && !canEnable;
 }

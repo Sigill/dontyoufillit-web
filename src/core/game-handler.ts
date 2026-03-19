@@ -3,6 +3,7 @@ import { makeCannonBall } from "./ball";
 import { MovingCannon as Cannon } from "./cannon";
 import { CollisionHandler, DefaultCollisionHandler } from "./collision-handler";
 import { Observable } from "./observable";
+import { ORACLE_BONUS_COST } from "./constants";
 
 export class GameHandler {
   static readonly PAUSED = 1;
@@ -170,9 +171,8 @@ export class GameHandler {
    * Applies the Oracle bonus.
    */
   applyOracleBonus() {
-    const cost = 5;
-    if (this.score >= cost) {
-      this.score -= cost;
+    if (this.score >= ORACLE_BONUS_COST) {
+      this.score -= ORACLE_BONUS_COST;
       this.oracleActive = true;
       // Exclusivity: Disable Lazer bonus if active
       this.#ballEngine.collisionHandler = DefaultCollisionHandler;

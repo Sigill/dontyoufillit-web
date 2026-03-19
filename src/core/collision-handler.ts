@@ -1,4 +1,5 @@
 import { StaticBall } from "./ball";
+import { LAZER_BONUS_COST } from "./constants";
 
 /**
  * Defines the result of a ball-to-ball collision.
@@ -47,7 +48,7 @@ export const DefaultCollisionHandler: CollisionHandler = {
  * Lazer mode collision handler: destroy hit ball instantly, stop current ball, no growth.
  */
 export const LazerCollisionHandler: CollisionHandler = {
-  cost: 5,
+  cost: LAZER_BONUS_COST,
 
   onBallCollision(): CollisionResult {
     return {
