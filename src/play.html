@@ -33,7 +33,11 @@
   <div class="fullscreen-container">
     <div class="centered-container">
       <div class="hud"></div>
-      <div class="game"></div>
+      <div class="game">
+        <svg id="RewardPathLayer" viewBox="0 0 1 1.1667" preserveAspectRatio="none">
+          <path id="RewardPath" fill="rgba(56, 189, 248, 0.2)" stroke="#38bdf8" stroke-width="0.002" />
+        </svg>
+      </div>
     </div>
   </div>
 
@@ -73,6 +77,11 @@
           <h2 class="bonus-title">Bonuses</h2>
           <button id="lazer-bonus-button" class="secondary badge-button toggle-button mx-auto">
             Lazer
+            <span class="badge on-inactive" style="background-color: #ff4d4d;">-5</span>
+            <span class="badge on-active" style="background-color: rgb(110, 255, 77);">✓</span>
+          </button>
+          <button id="oracle-bonus-button" class="secondary badge-button toggle-button mx-auto">
+            Oracle
             <span class="badge on-inactive" style="background-color: #ff4d4d;">-5</span>
             <span class="badge on-active" style="background-color: rgb(110, 255, 77);">✓</span>
           </button>

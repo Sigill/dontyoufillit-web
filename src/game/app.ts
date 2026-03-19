@@ -11,6 +11,8 @@ import { GameHandler } from "../core/game-handler";
 import { addTouchOrClickEvent, asBool, selectElement } from "../core/utils";
 import { HUD } from "../ui/hud";
 import { CssBoard } from "../ui/css-board";
+import { evaluateMoves } from "../core/evaluate-move";
+import { normalizeRewards, computeRewardPath } from "../core/reward";
 
 function readStoredHighscore(): number {
   return parseInt(localStorage.getItem('highscore') || '0', 10);
@@ -52,6 +54,7 @@ const licenseScreen = selectElement('#licenseScreen');
 const startWithThreeLivesButton = selectElement<HTMLInputElement>('#checkbox-start-three-lives');
 const showFramerateCheckbox = selectElement<HTMLInputElement>('#showFramerateCheckbox');
 const lazerBonusButton = selectElement<HTMLButtonElement>('#lazer-bonus-button');
+const oracleBonusButton = selectElement<HTMLButtonElement>('#oracle-bonus-button');
 
 const cannon = new Cannon();
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -96,9 +99,16 @@ game.observable.addEventListener('endStep', () => {
   }
 
   // Visual feedback for lazer mode.
-  selectElement<HTMLElement>('.game').classList.toggle('lazer-mode', game.activeCollisionHandler === LazerCollisionHandler);
+  const gameEl = selectElement<HTMLElement>('.game');
+  gameEl.classList.toggle('lazer-mode', game.activeCollisionHandler === LazerCollisionHandler);
+  gameEl.classList.toggle('oracle-active', game.oracleActive);
+
+  if (!game.oracleActive) {
+    selectElement('#RewardPath').setAttribute('d', '');
+  }
 
   updateLazerButtonState();
+  updateOracleButtonState();
 });
 
 function updateLazerButtonState() {
@@ -107,6 +117,12 @@ function updateLazerButtonState() {
 
   lazerBonusButton.classList.toggle('active', isLazerActive);
   lazerBonusButton.disabled = !isLazerActive && !canEnable;
+}
+
+function updateOracleButtonState() {
+  const canEnable = game.score >= 5;
+  oracleBonusButton.classList.toggle('active', game.oracleActive);
+  oracleBonusButton.disabled = !game.oracleActive && !canEnable;
 }
 
 addTouchOrClickEvent(selectElement<HTMLElement>('.fullscreen-container'), (evt) => {
@@ -259,6 +275,24 @@ selectElement('#pause-screen #menu-button').addEventListener('click', function (
   evt.preventDefault();
   popScreen();
   pushScreen(startScreen);
+});
+
+oracleBonusButton.addEventListener('click', function (evt) {
+  evt.preventDefault();
+  if (game.score >= 0) {
+    game.applyOracleBonus();
+
+    const moves = evaluateMoves(game.staticBalls, { steps: [181], criteria: 'hits' });
+    const targets = normalizeRewards(moves);
+    const d = computeRewardPath(targets);
+    selectElement('#RewardPath').setAttribute('d', d);
+
+    updateLazerButtonState();
+    updateOracleButtonState();
+
+    game.resume();
+    popScreen();
+  }
 });
 
 selectElement('#retry-button').addEventListener('click', function (evt) {

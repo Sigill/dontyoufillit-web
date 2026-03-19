@@ -24,6 +24,7 @@ export class GameHandler {
   highscore = 0;
   score = 0;
   lives = 0;
+  oracleActive = false;
 
   #cannon: Cannon;
   #ballEngine: BallEngine;
@@ -109,6 +110,7 @@ export class GameHandler {
     this.#ballEngine.reset();
     this.#cannon.reset();
     this.score = 0;
+    this.oracleActive = false;
     this.resume();
   }
 
@@ -116,6 +118,7 @@ export class GameHandler {
     this.#takeSnapshot();
 
     this.score -= this.activeCollisionHandler.cost ?? 0;
+    this.oracleActive = false;
 
     this.#ballEngine.fire(makeCannonBall({ angle: this.#cannon.getAngle() }));
   }
@@ -139,6 +142,7 @@ export class GameHandler {
     }
 
     this.restoreSnapshot();
+    this.oracleActive = false;
 
     this.resume();
   }
@@ -159,6 +163,19 @@ export class GameHandler {
       this.#ballEngine.collisionHandler = DefaultCollisionHandler;
     } else {
       this.#ballEngine.collisionHandler = handler;
+    }
+  }
+
+  /**
+   * Applies the Oracle bonus.
+   */
+  applyOracleBonus() {
+    const cost = 5;
+    if (this.score >= cost) {
+      this.score -= cost;
+      this.oracleActive = true;
+      // Exclusivity: Disable Lazer bonus if active
+      this.#ballEngine.collisionHandler = DefaultCollisionHandler;
     }
   }
 
