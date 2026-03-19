@@ -1,5 +1,3 @@
-
-
 dontyoufillit-css-board {
   display: block;
   width: 100%;
@@ -142,24 +140,5 @@ dontyoufillit-css-board {
     .Cannon .Turret {
       background: red;
     }
-  }
-}
-
-.game {
-  position: relative;
-
-  #RewardPathLayer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 10;
-    display: none;
-  }
-
-  &.oracle-active #RewardPathLayer {
-    display: block;
   }
 }

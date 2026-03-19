@@ -152,6 +152,9 @@ export class GameHandler {
    * Returns true if the player can afford to enable the specified collision handler.
    */
   canEnableCollisionHandler(handler: CollisionHandler) {
+    if (this.oracleActive) {
+      return false;
+    }
     return handler.cost === undefined || this.score >= handler.cost;
   }
 

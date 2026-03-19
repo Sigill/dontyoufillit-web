@@ -70,7 +70,7 @@ const hud = new HUD();
 selectElement<HTMLDivElement>('.hud').appendChild(hud);
 
 const renderer = new CssBoard();
-selectElement<HTMLDivElement>('.game').appendChild(renderer);
+selectElement<HTMLDivElement>('.game').prepend(renderer);
 
 Object.assign(window, {cannon, ballEngine, game, hud, renderer}); // For debug.
 
@@ -126,7 +126,7 @@ function updateLazerButtonState() {
 function updateOracleButtonState() {
   const canEnable = game.score >= ORACLE_BONUS_COST;
   oracleBonusButton.classList.toggle('active', game.oracleActive);
-  oracleBonusButton.disabled = !game.oracleActive && !canEnable;
+  oracleBonusButton.disabled = !canEnable || game.oracleActive;
 }
 
 addTouchOrClickEvent(selectElement<HTMLElement>('.fullscreen-container'), (evt) => {
@@ -269,16 +269,10 @@ lazerBonusButton.addEventListener('click', function (evt) {
   if (game.canEnableCollisionHandler(LazerCollisionHandler) || game.activeCollisionHandler === LazerCollisionHandler) {
     game.toggleCollisionHandler(LazerCollisionHandler);
     updateLazerButtonState();
+
+    game.resume();
+    popScreen();
   }
-
-  game.resume();
-  popScreen();
-});
-
-selectElement('#pause-screen #menu-button').addEventListener('click', function (evt) {
-  evt.preventDefault();
-  popScreen();
-  pushScreen(startScreen);
 });
 
 oracleBonusButton.addEventListener('click', function (evt) {
@@ -286,7 +280,7 @@ oracleBonusButton.addEventListener('click', function (evt) {
   if (game.score >= 0) {
     game.applyOracleBonus();
 
-    const moves = evaluateMoves(game.staticBalls, { steps: [181], criteria: 'hits' });
+    const moves = evaluateMoves(game.staticBalls, { steps: [181, 91], criteria: 'hits' });
     const targets = normalizeRewards(moves);
     const d = computeRewardPath(targets);
     selectElement('#RewardPath').setAttribute('d', d);
@@ -297,6 +291,12 @@ oracleBonusButton.addEventListener('click', function (evt) {
     game.resume();
     popScreen();
   }
+});
+
+selectElement('#pause-screen #menu-button').addEventListener('click', function (evt) {
+  evt.preventDefault();
+  popScreen();
+  pushScreen(startScreen);
 });
 
 selectElement('#retry-button').addEventListener('click', function (evt) {
