@@ -1,4 +1,4 @@
-import * as Constants from './constants';
+import { CANNON_BASE_HEIGHT, CANNON_Y_POSITION } from './constants';
 
 /**
  * Normalizes rewards between 0 and 1.
@@ -75,7 +75,7 @@ export function normalizeRewards(moves: { reward: number }[]): Float32Array {
  */
 export function computeRewardPath(targets: Float32Array | number[]): string {
   const centerX = 0.5;
-  const centerY = 1 - (Constants.CANNON_Y_POSITION + Constants.CANNON_BASE_HEIGHT);
+  const centerY = 1 - (CANNON_Y_POSITION + CANNON_BASE_HEIGHT);
   const baseRadius = 0.05;
   const maxRadius = 0.3;
 
