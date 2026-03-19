@@ -10,6 +10,7 @@ const root = appRootDir.get();
 
 const logRebuildPlugin: esbuild.Plugin = {
   name: 'rebuild-log',
+  // eslint-disable-next-line @typescript-eslint/unbound-method
   setup({ onStart, onEnd }) {
     let t: number;
     onStart(() => {
@@ -67,7 +68,7 @@ program.action(async ({ watch, serve, liveReload }: { watch: boolean; serve: boo
     console.log('Starting watch');
     await ctx.watch();
   } else {
-    ctx.rebuild();
+    await ctx.rebuild();
   }
 
   if (serve) {
