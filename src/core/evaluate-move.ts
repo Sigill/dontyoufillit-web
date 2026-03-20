@@ -31,8 +31,8 @@ export function evaluateMove(
   } else if (out) {
     reward -= 1000000; // Heavy penalty for out
   } else {
-    if (steps.length > 1) {
-      const result = findBestMove(nextStaticBalls, { steps: steps.slice(1), criteria, stats });
+    if (steps.length > 0) {
+      const result = findBestMove(nextStaticBalls, { steps, criteria, stats });
       reward += result.reward;
     }
   }
