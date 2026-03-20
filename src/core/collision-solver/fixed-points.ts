@@ -8,6 +8,9 @@ import { BallObstacle, Collision, findImminentCollisions, WallObstacle } from ".
 
 export type Obstacle = WallObstacle | BallObstacle<StaticBall>;
 
+const CANDIDATE_WALLS_DEFAULT = [GameWalls.top, GameWalls.right, GameWalls.left];
+const CANDIDATE_WALLS_WITH_BOTTOM = [GameWalls.top, GameWalls.right, GameWalls.left, GameWalls.bottom];
+
 function computeCollisionsWithGameWalls(
   ball: {
     radius: number;
@@ -19,13 +22,8 @@ function computeCollisionsWithGameWalls(
   },
   { epsilon = 1e-5 }: { epsilon?: number } = {}
 ): Array<Collision<WallObstacle>> {
-  // TODO IO: depending on direction of movement, only check the walls in that direction.
-  const candidateWalls = [GameWalls.top, GameWalls.right, GameWalls.left];
-
   // Only consider the bottom border if above it.
-  if (ball.y > ball.radius) {
-    candidateWalls.push(GameWalls.bottom);
-  }
+  const candidateWalls = ball.y > ball.radius ? CANDIDATE_WALLS_WITH_BOTTOM : CANDIDATE_WALLS_DEFAULT;
 
   return computeCollisionsWithWalls(ball, candidateWalls, { epsilon });
 }
@@ -42,13 +40,21 @@ function computeCollisionsWithGameWalls(
 export function computeFixedPoints(
   ball: MovingBall,
   staticBalls: Array<StaticBall>,
-  { epsilon = 1e-5 }: { epsilon?: number } = {},
+  {
+    epsilon = 1e-5,
+    includeFixedPoints = true,
+  }: {
+    epsilon?: number;
+    includeFixedPoints?: boolean;
+  } = {},
 ): {
-  fixedPoints: Array<BallState & { obstacles: Array<Obstacle>; }>;
+  fixedPoints?: Array<BallState & { obstacles: Array<Obstacle>; }>;
   hits: number;
   score: number;
   gameover: boolean;
   out: boolean;
+  finalX: number;
+  finalY: number;
   staticBalls: Array<StaticBall>;
 } {
   let { x, y, velocity, angle} = ball;
@@ -56,9 +62,9 @@ export function computeFixedPoints(
   let t0 = 0;
   const tMax = -ball.velocity / ball.acceleration;
 
-  const fixedPoints: Array<BallState & { obstacles: Array<Obstacle>; }> = [
-    { t: t0, x, y, velocity, angle, acceleration: ball.acceleration, obstacles: [] }
-  ];
+  const fixedPoints: Array<BallState & { obstacles: Array<Obstacle>; }> | undefined = includeFixedPoints
+    ? [{ t: t0, x, y, velocity, angle, acceleration: ball.acceleration, obstacles: [] }]
+    : undefined;
   let hits = 0;
   let score = 0;
   let gameover = false;
@@ -130,7 +136,7 @@ export function computeFixedPoints(
       angle = normalizeRadian(angle);
     }
 
-    fixedPoints.push({ t: t1, x, y, angle, velocity, acceleration: ball.acceleration, obstacles });
+    fixedPoints?.push({ t: t1, x, y, angle, velocity, acceleration: ball.acceleration, obstacles });
 
     // Stop if:
     if (
@@ -151,22 +157,34 @@ export function computeFixedPoints(
     t0 = t1;
   }
 
-  const nextStaticBalls = shadowStaticBalls.map(({ x, y, radius, counter }) => ({ x, y, radius, counter }));
-
-  if (!out) {
-    nextStaticBalls.push({
-      counter: 3,
-      radius: computeExpandedRadius({ x, y }, shadowStaticBalls),
-      x, y,
-    });
-  }
-
   return {
     fixedPoints,
     hits,
     score: score,
     gameover,
     out,
-    staticBalls: nextStaticBalls,
+    finalX: x,
+    finalY: y,
+    staticBalls: shadowStaticBalls,
   };
+}
+
+/**
+ * Computes the next state of the static balls after a move.
+ */
+export function computeNextStaticBalls(
+  { x, y, out }: { x: number; y: number; out: boolean },
+  staticBalls: Array<StaticBall>,
+): Array<StaticBall> {
+  const nextStaticBalls = staticBalls.map(({ x, y, radius, counter }) => ({ x, y, radius, counter }));
+
+  if (!out) {
+    nextStaticBalls.push({
+      counter: 3,
+      radius: computeExpandedRadius({ x, y }, staticBalls),
+      x, y,
+    });
+  }
+
+  return nextStaticBalls;
 }

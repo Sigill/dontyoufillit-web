@@ -36,7 +36,7 @@ describe('computeFixedPoints()', () => {
       ]
     });
     const { fixedPoints } = computeFixedPoints(ball, staticBalls, { epsilon: 1e-5 });
-    assert.sameDeepOrderedMembers(fixedPoints, [
+    assert.sameDeepOrderedMembers(fixedPoints!, [
       { t: 0, x: ball.x, y: ball.y, angle: ball.angle, velocity: DEFAULT_BALL_VELOCITY, acceleration: DEFAULT_BALL_ACCELERATION, obstacles: [] },
       {
         t: 0.09030310788927243,
@@ -62,7 +62,7 @@ describe('computeFixedPoints()', () => {
       ]
     });
     const { fixedPoints } = computeFixedPoints(ball, staticBalls, { epsilon: 1e-5 });
-    assert.sameDeepOrderedMembers(fixedPoints, [
+    assert.sameDeepOrderedMembers(fixedPoints!, [
       { t: 0, x: ball.x, y: ball.y, angle: ball.angle, velocity: DEFAULT_BALL_VELOCITY, acceleration: DEFAULT_BALL_ACCELERATION, obstacles: [] },
       {
         t: 0.09238061650009927,
@@ -109,7 +109,7 @@ describe('computeFixedPoints()', () => {
       staticBalls: [],
     });
     const { fixedPoints } = computeFixedPoints(ball, staticBalls, { epsilon: 1e-5 });
-    assert.sameDeepOrderedMembers(fixedPoints, [
+    assert.sameDeepOrderedMembers(fixedPoints!, [
       { t: 0, x: ball.x, y: ball.y, angle: ball.angle, velocity: DEFAULT_BALL_VELOCITY, acceleration: DEFAULT_BALL_ACCELERATION, obstacles: [] },
       {
         t: 0.9588964992577561,

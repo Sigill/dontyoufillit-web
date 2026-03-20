@@ -1,5 +1,5 @@
 import { StaticBall, makeCannonBall } from "./ball";
-import { computeFixedPoints } from "./collision-solver/fixed-points";
+import { computeFixedPoints, computeNextStaticBalls } from "./collision-solver/fixed-points";
 import { maxBy } from "./utils";
 
 /**
@@ -21,8 +21,16 @@ export function evaluateMove(
   if (stats) stats.value += 1;
 
   const ball = makeCannonBall({ angle });
-  const { score, hits, gameover, out, staticBalls: nextStaticBalls }
-    = computeFixedPoints(ball, staticBalls, { epsilon: 1e-10 });
+  const { score, hits, gameover, out, finalX, finalY, staticBalls: remainingBalls }
+    = computeFixedPoints(ball, staticBalls, {
+      epsilon: 1e-10,
+      includeFixedPoints: false,
+    });
+
+  let nextStaticBalls: Array<StaticBall> | undefined = undefined;
+  if (steps.length > 0 && !gameover && !out) {
+    nextStaticBalls = computeNextStaticBalls({ x: finalX, y: finalY, out }, remainingBalls);
+  }
 
   let reward = criteria === 'hits' ? hits : score;
 
@@ -31,7 +39,7 @@ export function evaluateMove(
   } else if (out) {
     reward -= 1000000; // Heavy penalty for out
   } else {
-    if (steps.length > 0) {
+    if (steps.length > 0 && nextStaticBalls) {
       const result = findBestMove(nextStaticBalls, { steps, criteria, stats });
       reward += result.reward;
     }
@@ -54,8 +62,8 @@ export function evaluateMoves(
     criteria?: 'score' | 'hits';
     stats?: { value: number };
   } = {}
-): Array<{ angle: number; reward: number; staticBalls: Array<StaticBall> }> {
-  const moves: Array<{ angle: number; reward: number; staticBalls: Array<StaticBall> }> = [];
+): Array<{ angle: number; reward: number; staticBalls?: Array<StaticBall> }> {
+  const moves: Array<{ angle: number; reward: number; staticBalls?: Array<StaticBall> }> = [];
 
   // Scan angles from 0 to PI
   const numSteps = steps[0];
@@ -90,5 +98,14 @@ export function findBestMove(
   const moves = evaluateMoves(staticBalls, { steps, criteria, stats });
 
   const best = maxBy(moves, m => m.reward);
-  return best.item;
+  const bestMove = best.item;
+
+  if (bestMove.staticBalls === undefined) {
+    // Re-compute static balls for the best move if it was skipped during search.
+    const ball = makeCannonBall({ angle: bestMove.angle });
+    const { finalX, finalY, out, staticBalls: remainingBalls } = computeFixedPoints(ball, staticBalls, { epsilon: 1e-10, includeFixedPoints: false });
+    bestMove.staticBalls = computeNextStaticBalls({ x: finalX, y: finalY, out }, remainingBalls);
+  }
+
+  return bestMove as { angle: number; reward: number; staticBalls: Array<StaticBall> };
 }

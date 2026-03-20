@@ -90,7 +90,7 @@ export class BallEngineMath extends BallEngine {
 
     if (this.verbose) {
       console.group('Fixed points');
-      for (const {t, x, y, angle, velocity, obstacles: obstacles} of fixedPoints) {
+      for (const {t, x, y, angle, velocity, obstacles: obstacles} of fixedPoints!) {
         for (const obstacle of obstacles) {
           console.debug(`Collision with ${ppObstacle(obstacle)}`);
         }
@@ -102,7 +102,7 @@ export class BallEngineMath extends BallEngine {
     this.currentBall = new MathBall(
       ball.radius,
       ball.x, ball.y,
-      fixedPoints,
+      fixedPoints!,
     );
   }
 

@@ -103,7 +103,7 @@ const { fixedPoints } = computeFixedPoints(
 
 // --------------------------------------
 
-for (const [a, b] of pairwise(fixedPoints)) {
+for (const [a, b] of pairwise(fixedPoints!)) {
   line(a.x, a.y, b.x, b.y);
   ctx.save();
   ctx.fillStyle = 'green';
