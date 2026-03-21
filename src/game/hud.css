@@ -1,0 +1,54 @@
+dontyoufillit-hud {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  justify-content: space-between;
+
+  overflow: hidden;
+
+  .left-col {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: min-content;
+    gap: 0 1ex;
+    align-items: baseline;
+    justify-content: start;
+
+    line-height: 80%;
+    padding-top: 0.15em;
+  }
+
+  .right-col {
+    display: grid;
+    grid-template-columns: auto auto;
+
+    .lives {
+      &[data-counter="3"]:before {
+        content: "♥♥♥";
+      }
+      &[data-counter="2"]:before {
+        content: "♥♥";
+      }
+      &[data-counter="1"]:before {
+        content: "♥";
+      }
+    }
+
+    /*
+    * Header is 2em tall.
+    * Pause bar is 80% tall, 30% wide.
+    */
+    .pause {
+      display: flex;
+      gap: 0.4em;
+      justify-content: center;
+      align-items: center;
+      padding: 0.2em;
+
+      .pause-bar {
+        background: white;
+        width: 0.6em;
+        height: 1.6em;
+      }
+    }
+  }
+}
