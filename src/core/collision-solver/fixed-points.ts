@@ -144,7 +144,7 @@ export function computeFixedPoints(
       (collision.obstacle.type === 'ball' && y < ball.radius && Math.sin(angle) < 0)
     ) {
       gameover = collision !== undefined;
-      out = collision === undefined && y < ball.radius;
+      out = collision === undefined && y <= 0;
       break;
     }
 
