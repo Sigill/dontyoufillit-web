@@ -58,7 +58,7 @@ export function computeFixedPoints(
     includeFixedPoints?: boolean;
   } = {},
 ): FixedPoints {
-  let { x, y, velocity, angle} = ball;
+  let { x, y, velocity, angle } = ball;
 
   let t0 = 0;
   const tMax = -ball.velocity / ball.acceleration;
@@ -98,8 +98,8 @@ export function computeFixedPoints(
     const t1 = collision?.t ?? tMax;
     const deltaT = t1 - t0;
 
-    x += 1/2 * Math.cos(angle) * ball.acceleration * deltaT**2 + Math.cos(angle) * velocity * deltaT;
-    y += 1/2 * Math.sin(angle) * ball.acceleration * deltaT**2 + Math.sin(angle) * velocity * deltaT;
+    x += 0.5 * Math.cos(angle) * ball.acceleration * deltaT**2 + Math.cos(angle) * velocity * deltaT;
+    y += 0.5 * Math.sin(angle) * ball.acceleration * deltaT**2 + Math.sin(angle) * velocity * deltaT;
     velocity = collision === undefined
       ? 0 // Avoid rounding errors.
       : velocity + ball.acceleration * deltaT;
@@ -161,7 +161,7 @@ export function computeFixedPoints(
   return {
     fixedPoints,
     hits,
-    score: score,
+    score,
     gameover,
     out,
     finalX: x,

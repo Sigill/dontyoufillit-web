@@ -19,7 +19,9 @@ export function computeCollisionWithWallSide(
   t0: number, tMax: number,
   { epsilon = 1e-5 }: { epsilon?: number; } = {}
 ): number | undefined {
-  const alpha = Math.atan2(y1 - y0, x1 - x0);
+  const dx = x1 - x0;
+  const dy = y1 - y0;
+  const alpha = Math.atan2(dy, dx);
 
   if (Math.abs(Math.sin(alpha - beta)) <= epsilon) {
     // Parallel lines.
@@ -30,7 +32,7 @@ export function computeCollisionWithWallSide(
   const Delta = Math.sin(alpha - beta);
   const c0 = (x - x0) * Math.sin(alpha) - (y - y0) * Math.cos(alpha);
 
-  const collisions = solveQuadratic(1 / 2 * acceleration * Delta, velocity * Delta, c0 - sigma * radius, epsilon)
+  const collisions = solveQuadratic(0.5 * acceleration * Delta, velocity * Delta, c0 - sigma * radius, epsilon)
     .filter(t => t >= t0 && t <= tMax);
 
   if (collisions.length > 0) {
@@ -44,7 +46,9 @@ export function computeCollisionWithWall(
   t0: number, tMax: number,
   { epsilon = 1e-5 }: { epsilon?: number; } = {}
 ): { t: number; sigma: 1 | -1; } | undefined {
-  const alpha = Math.atan2(y1 - y0, x1 - x0);
+  const dx = x1 - x0;
+  const dy = y1 - y0;
+  const alpha = Math.atan2(dy, dx);
 
   if (Math.abs(Math.sin(alpha - beta)) <= epsilon) {
     // Parallel lines.
@@ -57,7 +61,7 @@ export function computeCollisionWithWall(
 
   const collisions: Array<{ t: number; sigma: 1 | -1; }> = [];
   for (const sigma of [-1, 1] as const) {
-    for (const t of solveQuadratic(1 / 2 * acceleration * Delta, velocity * Delta, c0 - sigma * radius, epsilon)) {
+    for (const t of solveQuadratic(0.5 * acceleration * Delta, velocity * Delta, c0 - sigma * radius, epsilon)) {
       if (t >= t0 && t <= tMax) {
         collisions.push({ t, sigma });
       }
