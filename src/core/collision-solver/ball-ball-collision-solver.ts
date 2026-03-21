@@ -15,21 +15,21 @@ export function computeCollisionWithBall(
 
   const roots1 = solveQuadratic(1, 2 * k, dx * dx + dy * dy - (ball.radius + otherBall.radius) ** 2);
 
-  const collisions = [];
+  let minT = undefined;
   for (let i = 0; i < roots1.length; i++) {
     const root1 = roots1[i];
     const roots2 = solveQuadratic(0.5 * ball.acceleration, ball.velocity, -root1, epsilon);
     for (let j = 0; j < roots2.length; j++) {
       const t = roots2[j];
       if (t >= t0 && t <= tMax) {
-        collisions.push(t);
+        if (minT === undefined || t < minT) {
+          minT = t;
+        }
       }
     }
   }
 
-  if (collisions.length > 0) {
-    return Math.min(...collisions);
-  }
+  return minT;
 }
 
 export function computeCollisionsWithBalls<B extends BallGeometry>(

@@ -32,12 +32,18 @@ export function computeCollisionWithWallSide(
   const Delta = Math.sin(alpha - beta);
   const c0 = (x - x0) * Math.sin(alpha) - (y - y0) * Math.cos(alpha);
 
-  const collisions = solveQuadratic(0.5 * acceleration * Delta, velocity * Delta, c0 - sigma * radius, epsilon)
-    .filter(t => t >= t0 && t <= tMax);
+  const collisions = solveQuadratic(0.5 * acceleration * Delta, velocity * Delta, c0 - sigma * radius, epsilon);
 
-  if (collisions.length > 0) {
-    return Math.min(...collisions);
+  let minT = undefined;
+  for (let i = 0; i < collisions.length; i++) {
+    const t = collisions[i];
+    if (t >= t0 && t <= tMax) {
+      if (minT === undefined || t < minT) {
+        minT = t;
+      }
+    }
   }
+  return minT;
 }
 
 export function computeCollisionWithWall(
@@ -59,19 +65,24 @@ export function computeCollisionWithWall(
   const Delta = Math.sin(alpha - beta);
   const c0 = (x - x0) * Math.sin(alpha) - (y - y0) * Math.cos(alpha);
 
-  const collisions: Array<{ t: number; sigma: 1 | -1; }> = [];
+  let minT = undefined;
+  let minSigma: 1 | -1 = 1;
+
   for (const sigma of [-1, 1] as const) {
     const roots = solveQuadratic(0.5 * acceleration * Delta, velocity * Delta, c0 - sigma * radius, epsilon);
     for (let i = 0; i < roots.length; i++) {
       const t = roots[i];
       if (t >= t0 && t <= tMax) {
-        collisions.push({ t, sigma });
+        if (minT === undefined || t < minT) {
+          minT = t;
+          minSigma = sigma;
+        }
       }
     }
   }
 
-  if (collisions.length > 0) {
-    return collisions.reduce((a, b) => a.t < b.t ? a : b);
+  if (minT !== undefined) {
+    return { t: minT, sigma: minSigma };
   }
 }
 
