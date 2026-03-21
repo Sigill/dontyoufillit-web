@@ -84,14 +84,14 @@ export function evaluateMoves(
   const numSteps = steps[0];
   const stepAngle = Math.PI / (numSteps - 1);
 
+  const params = { steps: steps.slice(1), criteria, stats };
+
   for (let i = 0; i < numSteps; ++i) {
     const angle = i * stepAngle;
-    const result = {
+    moves.push({
       angle,
-      ...evaluateMove(staticBalls, angle, { steps: steps.slice(1), criteria, stats }),
-    };
-
-    moves.push(result);
+      ...evaluateMove(staticBalls, angle, params),
+    });
   }
 
   return moves;
