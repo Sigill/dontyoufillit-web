@@ -1,6 +1,5 @@
 import { MovingBall, StaticBall, BallState } from "../ball";
 import { GameWalls } from "../ball-engine/walls";
-import { computeExpandedRadius } from "../static-ball";
 import { normalizeRadian, Simplify } from "../utils";
 import { computeCollisionsWithBalls } from "./ball-ball-collision-solver";
 import { computeCollisionsWithWalls } from "./ball-wall-collision-solver";
@@ -167,26 +166,8 @@ export function computeFixedPoints(
     out,
     finalX: x,
     finalY: y,
+    // This let the sourceBalls property  exposed.
+    // It would be nice not to expose it, but setting it to undefined or event deleting it from the object seems very slow.
     staticBalls: shadowStaticBalls,
   };
-}
-
-/**
- * Computes the next state of the static balls after a move.
- */
-export function computeNextStaticBalls(
-  { x, y, out }: { x: number; y: number; out: boolean },
-  staticBalls: Array<StaticBall>,
-): Array<StaticBall> {
-  const nextStaticBalls = staticBalls.map(({ x, y, radius, counter }) => ({ x, y, radius, counter }));
-
-  if (!out) {
-    nextStaticBalls.push({
-      counter: 3,
-      radius: computeExpandedRadius({ x, y }, staticBalls),
-      x, y,
-    });
-  }
-
-  return nextStaticBalls;
 }

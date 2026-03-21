@@ -1,5 +1,6 @@
 import { StaticBall, makeCannonBall } from "./ball";
-import { computeFixedPoints, computeNextStaticBalls } from "./collision-solver/fixed-points";
+import { computeFixedPoints } from "./collision-solver/fixed-points";
+import { computeExpandedRadius } from "./static-ball";
 import { maxBy, Simplify } from "./utils";
 
 export interface EvaluatedMove {
@@ -45,7 +46,12 @@ export function evaluateMove(
     reward -= 1000000; // Heavy penalty for out
   } else {
     if (steps.length > 0) {
-      nextStaticBalls = computeNextStaticBalls({ x: finalX, y: finalY, out }, remainingBalls);
+      nextStaticBalls = remainingBalls;
+      nextStaticBalls.push({
+        counter: 3,
+        radius: computeExpandedRadius({ x: finalX, y: finalY }, remainingBalls),
+        x: finalX, y: finalY,
+      });
 
       const result = findBestMove(nextStaticBalls, { steps, criteria, stats });
       reward += result.reward;
