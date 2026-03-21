@@ -1,7 +1,7 @@
 import { StaticBall } from "../../core/ball";
 import { ManualCannon } from "../../core/cannon";
+import { findBestMove } from "../../core/evaluate-move";
 import { Bot } from "../bot-type";
-import { findBestMove } from "../simulation";
 
 /**
  * A bot that uses recursive simulation to look multiple turns ahead.
