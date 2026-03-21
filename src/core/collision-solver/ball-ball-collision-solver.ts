@@ -16,9 +16,11 @@ export function computeCollisionWithBall(
   const roots1 = solveQuadratic(1, 2 * k, dx * dx + dy * dy - (ball.radius + otherBall.radius) ** 2);
 
   const collisions = [];
-  for (const root1 of roots1) {
+  for (let i = 0; i < roots1.length; i++) {
+    const root1 = roots1[i];
     const roots2 = solveQuadratic(0.5 * ball.acceleration, ball.velocity, -root1, epsilon);
-    for (const t of roots2) {
+    for (let j = 0; j < roots2.length; j++) {
+      const t = roots2[j];
       if (t >= t0 && t <= tMax) {
         collisions.push(t);
       }
@@ -38,7 +40,8 @@ export function computeCollisionsWithBalls<B extends BallGeometry>(
   const tMax = -ball.velocity / ball.acceleration;
 
   const collisions = [];
-  for (const otherBall of otherBalls) {
+  for (let i = 0; i < otherBalls.length; i++) {
+    const otherBall = otherBalls[i];
     const t = computeCollisionWithBall(ball, otherBall, epsilon, tMax, { epsilon });
     if (t !== undefined) {
       collisions.push({ t, obstacle: { type: 'ball' as const, value: otherBall } });

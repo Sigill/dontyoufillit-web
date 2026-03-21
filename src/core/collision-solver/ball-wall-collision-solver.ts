@@ -61,7 +61,9 @@ export function computeCollisionWithWall(
 
   const collisions: Array<{ t: number; sigma: 1 | -1; }> = [];
   for (const sigma of [-1, 1] as const) {
-    for (const t of solveQuadratic(0.5 * acceleration * Delta, velocity * Delta, c0 - sigma * radius, epsilon)) {
+    const roots = solveQuadratic(0.5 * acceleration * Delta, velocity * Delta, c0 - sigma * radius, epsilon);
+    for (let i = 0; i < roots.length; i++) {
+      const t = roots[i];
       if (t >= t0 && t <= tMax) {
         collisions.push({ t, sigma });
       }
@@ -81,7 +83,8 @@ export function computeCollisionsWithWalls<W extends WallSide>(
   const tMax = -ball.velocity / ball.acceleration;
 
   const collisions: Array<Collision<WallObstacle<W>>> = [];
-  for (const wall of walls) {
+  for (let i = 0; i < walls.length; i++) {
+    const wall = walls[i];
     const collision = computeCollisionWithWallSide(ball, wall, epsilon, tMax, { epsilon });
 
     if (collision !== undefined) {
