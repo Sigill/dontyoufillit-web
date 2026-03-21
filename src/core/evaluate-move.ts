@@ -1,6 +1,14 @@
 import { StaticBall, makeCannonBall } from "./ball";
 import { computeFixedPoints, computeNextStaticBalls } from "./collision-solver/fixed-points";
-import { maxBy } from "./utils";
+import { maxBy, Simplify } from "./utils";
+
+export interface EvaluatedMove {
+  reward: number;
+  finalX: number;
+  finalY: number;
+  remainingBalls: StaticBall[];
+  nextStaticBalls?: StaticBall[];
+}
 
 /**
  * Evaluates a single move at a given angle.
@@ -17,7 +25,7 @@ export function evaluateMove(
     criteria?: 'score' | 'hits';
     stats?: { value: number };
   } = {}
-) {
+): EvaluatedMove {
   if (stats) stats.value += 1;
 
   const ball = makeCannonBall({ angle });
@@ -28,9 +36,6 @@ export function evaluateMove(
     });
 
   let nextStaticBalls: Array<StaticBall> | undefined = undefined;
-  if (steps.length > 0 && !gameover && !out) {
-    nextStaticBalls = computeNextStaticBalls({ x: finalX, y: finalY, out }, remainingBalls);
-  }
 
   let reward = criteria === 'hits' ? hits : score;
 
@@ -39,14 +44,18 @@ export function evaluateMove(
   } else if (out) {
     reward -= 1000000; // Heavy penalty for out
   } else {
-    if (steps.length > 0 && nextStaticBalls) {
+    if (steps.length > 0) {
+      nextStaticBalls = computeNextStaticBalls({ x: finalX, y: finalY, out }, remainingBalls);
+
       const result = findBestMove(nextStaticBalls, { steps, criteria, stats });
       reward += result.reward;
     }
   }
 
-  return { reward, staticBalls: nextStaticBalls };
+  return { reward, finalX, finalY, remainingBalls, nextStaticBalls };
 }
+
+export type EvaluatedMoveWithAngle = Simplify<{ angle: number; } & EvaluatedMove>;
 
 /**
  * Evaluates all possible moves for a given board state.
@@ -62,8 +71,8 @@ export function evaluateMoves(
     criteria?: 'score' | 'hits';
     stats?: { value: number };
   } = {}
-): Array<{ angle: number; reward: number; staticBalls?: Array<StaticBall> }> {
-  const moves: Array<{ angle: number; reward: number; staticBalls?: Array<StaticBall> }> = [];
+): Array<EvaluatedMoveWithAngle> {
+  const moves: Array<EvaluatedMoveWithAngle> = [];
 
   // Scan angles from 0 to PI
   const numSteps = steps[0];
@@ -71,10 +80,12 @@ export function evaluateMoves(
 
   for (let i = 0; i < numSteps; ++i) {
     const angle = i * stepAngle;
-    const { reward, staticBalls: nextStaticBalls } =
-      evaluateMove(staticBalls, angle, { steps: steps.slice(1), criteria, stats });
+    const result = {
+      angle,
+      ...evaluateMove(staticBalls, angle, { steps: steps.slice(1), criteria, stats }),
+    };
 
-    moves.push({ angle, reward, staticBalls: nextStaticBalls });
+    moves.push(result);
   }
 
   return moves;
@@ -94,18 +105,9 @@ export function findBestMove(
     criteria?: 'score' | 'hits';
     stats?: { value: number };
   } = {}
-): { angle: number; reward: number; staticBalls: Array<StaticBall> } {
+): EvaluatedMoveWithAngle {
   const moves = evaluateMoves(staticBalls, { steps, criteria, stats });
 
   const best = maxBy(moves, m => m.reward);
-  const bestMove = best.item;
-
-  if (bestMove.staticBalls === undefined) {
-    // Re-compute static balls for the best move if it was skipped during search.
-    const ball = makeCannonBall({ angle: bestMove.angle });
-    const { finalX, finalY, out, staticBalls: remainingBalls } = computeFixedPoints(ball, staticBalls, { epsilon: 1e-10, includeFixedPoints: false });
-    bestMove.staticBalls = computeNextStaticBalls({ x: finalX, y: finalY, out }, remainingBalls);
-  }
-
-  return bestMove as { angle: number; reward: number; staticBalls: Array<StaticBall> };
+  return best.item;
 }

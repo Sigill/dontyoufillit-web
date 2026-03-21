@@ -109,18 +109,25 @@ export function ppAngle(a: number) {
   return `${a.toFixed(2)}rad/${toDeg(a).toFixed(1)}°`;
 }
 
-export function maxBy<T>(items: T[], pred: (item: T) => number) {
-  let maxItem = items[0];
-  let maxValue = pred(maxItem);
-  let maxIndex = 0;
+export function maxBy<T>(items: ArrayLike<T>, pred: (item: T) => number): { item: T, index: number, value: number } {
+  const result = {
+    item: items[0],
+    value: pred(items[0]),
+    index: 0,
+  };
+
   for (let i = 1; i < items.length; i++) {
     const item = items[i];
     const value = pred(item);
-    if (value > maxValue) {
-      maxItem = item;
-      maxValue = value;
-      maxIndex = i;
+    if (value > result.value) {
+      result.item = item;
+      result.value = value;
+      result.index = i;
     }
   }
-  return { item: maxItem, index: maxIndex, value: maxValue };
+
+  return result;
 }
+
+// https://alexitaylor.com/codebytes/simplify-ts/
+export type Simplify<T> = { [KeyType in keyof T]: T[KeyType] } & {};

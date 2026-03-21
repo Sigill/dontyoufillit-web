@@ -1,7 +1,7 @@
 import { MovingBall, StaticBall, BallState } from "../ball";
 import { GameWalls } from "../ball-engine/walls";
 import { computeExpandedRadius } from "../static-ball";
-import { normalizeRadian } from "../utils";
+import { normalizeRadian, Simplify } from "../utils";
 import { computeCollisionsWithBalls } from "./ball-ball-collision-solver";
 import { computeCollisionsWithWalls } from "./ball-wall-collision-solver";
 import { BallObstacle, Collision, findImminentCollisions, WallObstacle } from "./collision-utils";
@@ -28,6 +28,17 @@ function computeCollisionsWithGameWalls(
   return computeCollisionsWithWalls(ball, candidateWalls, { epsilon });
 }
 
+export interface FixedPoints {
+  fixedPoints?: Array<Simplify<BallState & { obstacles: Array<Obstacle>; }>>;
+  hits: number;
+  score: number;
+  gameover: boolean;
+  out: boolean;
+  finalX: number;
+  finalY: number;
+  staticBalls: Array<StaticBall>;
+}
+
 /**
  * Computes the key points in the ball's trajectory (collisions, start, end).
  *
@@ -47,22 +58,13 @@ export function computeFixedPoints(
     epsilon?: number;
     includeFixedPoints?: boolean;
   } = {},
-): {
-  fixedPoints?: Array<BallState & { obstacles: Array<Obstacle>; }>;
-  hits: number;
-  score: number;
-  gameover: boolean;
-  out: boolean;
-  finalX: number;
-  finalY: number;
-  staticBalls: Array<StaticBall>;
-} {
+): FixedPoints {
   let { x, y, velocity, angle} = ball;
 
   let t0 = 0;
   const tMax = -ball.velocity / ball.acceleration;
 
-  const fixedPoints: Array<BallState & { obstacles: Array<Obstacle>; }> | undefined = includeFixedPoints
+  const fixedPoints: FixedPoints['fixedPoints'] = includeFixedPoints
     ? [{ t: t0, x, y, velocity, angle, acceleration: ball.acceleration, obstacles: [] }]
     : undefined;
   let hits = 0;
