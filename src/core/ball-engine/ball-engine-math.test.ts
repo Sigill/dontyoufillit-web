@@ -112,11 +112,11 @@ describe('computeFixedPoints()', () => {
     assert.sameDeepOrderedMembers(fixedPoints!, [
       { t: 0, x: ball.x, y: ball.y, angle: ball.angle, velocity: DEFAULT_BALL_VELOCITY, acceleration: DEFAULT_BALL_ACCELERATION, obstacles: [] },
       {
-        t: 0.9588964992577561,
+        t: 0.9588964992577562,
         x: 0.02499999999999991,
         y: -0.09999999999999991,
         angle: 0,
-        velocity: 0.6164414002968975,
+        velocity: 0.6164414002968974,
         acceleration: -0.4,
         obstacles: [{
           type: "wall",
@@ -128,7 +128,7 @@ describe('computeFixedPoints()', () => {
       },
       {
         t: 2.5,
-        x: 0.49999999999999967,
+        x: 0.49999999999999944,
         y: -0.09999999999999991,
         angle: 0,
         velocity: 0,
