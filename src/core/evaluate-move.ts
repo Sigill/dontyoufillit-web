@@ -1,7 +1,7 @@
 import { StaticBall, makeCannonBall } from "./ball";
 import { computeFixedPoints } from "./collision-solver/fixed-points";
 import { computeExpandedRadius } from "./static-ball";
-import { maxBy, Simplify } from "./utils";
+import { Simplify } from "./utils";
 
 export interface EvaluatedMove {
   reward: number;
@@ -112,8 +112,22 @@ export function findBestMove(
     stats?: { value: number };
   } = {}
 ): EvaluatedMoveWithAngle {
-  const moves = evaluateMoves(staticBalls, { steps, criteria, stats });
+  // Scan angles from 0 to PI
+  const numSteps = steps[0];
+  const stepAngle = Math.PI / (numSteps - 1);
 
-  const best = maxBy(moves, m => m.reward);
-  return best.item;
+  const params = { steps: steps.slice(1), criteria, stats };
+
+  let best: EvaluatedMoveWithAngle | undefined = undefined;
+
+  for (let i = 0; i < numSteps; ++i) {
+    const angle = i * stepAngle;
+    const result = evaluateMove(staticBalls, angle, params);
+
+    if (best === undefined || result.reward > best.reward) {
+      best = { angle, ...result };
+    }
+  }
+
+  return best!;
 }
