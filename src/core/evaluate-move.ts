@@ -23,10 +23,12 @@ export function evaluateMove(
     steps = [180],
     criteria = 'hits',
     stats,
+    includeState,
   }: {
     steps?: Array<number>,
     criteria?: 'score' | 'hits';
     stats?: { value: number };
+    includeState?: boolean;
   } = {}
 ): EvaluatedMove {
   if (stats) stats.value += 1;
@@ -35,7 +37,7 @@ export function evaluateMove(
   const result = computeFixedPoints(ball, staticBalls, {
     epsilon: 1e-10,
     includeFixedPoints: false,
-    includeState: steps.length > 0,
+    includeState: includeState || steps.length > 0,
   });
 
   const { score, hits, gameover, out, state } = result;
@@ -49,8 +51,8 @@ export function evaluateMove(
   } else if (out) {
     reward -= 1000000; // Heavy penalty for out
   } else {
-    if (state !== undefined) {
-      const { finalX, finalY, remainingStaticBalls } = state;
+    if (steps.length > 0) {
+      const { finalX, finalY, remainingStaticBalls } = state!;
       nextStaticBalls = remainingStaticBalls;
       nextStaticBalls.push({
         counter: 3,
@@ -114,17 +116,19 @@ export function findBestMove(
     steps = [180],
     criteria = 'hits',
     stats,
+    includeState,
   }: {
     steps?: Array<number>,
     criteria?: 'score' | 'hits';
     stats?: { value: number };
+    includeState?: boolean;
   } = {}
 ): { angle: number; move: EvaluatedMove } {
   // Scan angles from 0 to PI
   const numSteps = steps[0];
   const stepAngle = Math.PI / (numSteps - 1);
 
-  const params = { steps: steps.slice(1), criteria, stats };
+  const params = { steps: steps.slice(1), criteria, stats, includeState };
 
   let best: { angle: number; move: EvaluatedMove } | undefined = undefined;
 
