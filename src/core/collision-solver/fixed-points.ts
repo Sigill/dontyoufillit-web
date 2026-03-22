@@ -10,6 +10,11 @@ export type Obstacle = WallObstacle | BallObstacle<StaticBall>;
 const CANDIDATE_WALLS_DEFAULT = [GameWalls.top, GameWalls.right, GameWalls.left];
 const CANDIDATE_WALLS_WITH_BOTTOM = [GameWalls.top, GameWalls.right, GameWalls.left, GameWalls.bottom];
 
+export interface FixedPointsOptions {
+  epsilon?: number;
+  includeFixedPoints?: boolean;
+}
+
 export interface FixedPoints {
   fixedPoints?: Array<Simplify<BallState & { obstacles: Array<Obstacle>; }>>;
   hits: number;
@@ -20,6 +25,8 @@ export interface FixedPoints {
   finalY: number;
   staticBalls: Array<StaticBall>;
 }
+
+export type FixedPointsWithoutStaticBalls = Omit<FixedPoints, 'staticBalls'> & { staticBalls?: never };
 
 /**
  * Computes the key points in the ball's trajectory (collisions, start, end).
@@ -33,14 +40,22 @@ export interface FixedPoints {
 export function computeFixedPoints(
   ball: MovingBall,
   staticBalls: Array<StaticBall>,
+  options: FixedPointsOptions & { includeStaticBalls: false }
+): FixedPointsWithoutStaticBalls;
+export function computeFixedPoints(
+  ball: MovingBall,
+  staticBalls: Array<StaticBall>,
+  options?: FixedPointsOptions & { includeStaticBalls?: true }
+): FixedPoints;
+export function computeFixedPoints(
+  ball: MovingBall,
+  staticBalls: Array<StaticBall>,
   {
     epsilon = 1e-5,
     includeFixedPoints = true,
-  }: {
-    epsilon?: number;
-    includeFixedPoints?: boolean;
-  } = {},
-): FixedPoints {
+    includeStaticBalls = true,
+  }: FixedPointsOptions & { includeStaticBalls?: boolean } = {},
+): FixedPoints | FixedPointsWithoutStaticBalls {
   let { x, y, velocity, angle } = ball;
 
   let t0 = 0;
@@ -164,14 +179,7 @@ export function computeFixedPoints(
     t0 = t1;
   }
 
-  const finalStaticBalls: StaticBall[] = [];
-  for (let i = 0; i < staticBalls.length; i++) {
-    if (counters[i] > 0) {
-      finalStaticBalls.push({ ...staticBalls[i], counter: counters[i] });
-    }
-  }
-
-  return {
+  const result = {
     fixedPoints,
     hits,
     score,
@@ -179,6 +187,20 @@ export function computeFixedPoints(
     out,
     finalX: x,
     finalY: y,
-    staticBalls: finalStaticBalls,
   };
+
+  if (includeStaticBalls) {
+    const finalStaticBalls: StaticBall[] = [];
+    for (let i = 0; i < staticBalls.length; i++) {
+      if (counters[i] > 0) {
+        finalStaticBalls.push({ ...staticBalls[i], counter: counters[i] });
+      }
+    }
+    return {
+      ...result,
+      staticBalls: finalStaticBalls,
+    } as FixedPoints;
+  }
+
+  return result as FixedPointsWithoutStaticBalls;
 }

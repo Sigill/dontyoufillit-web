@@ -1,5 +1,5 @@
 import { StaticBall, makeCannonBall } from "./ball";
-import { computeFixedPoints } from "./collision-solver/fixed-points";
+import { computeFixedPoints, FixedPoints } from "./collision-solver/fixed-points";
 import { computeExpandedRadius } from "./static-ball";
 import { Simplify } from "./utils";
 
@@ -7,7 +7,7 @@ export interface EvaluatedMove {
   reward: number;
   finalX: number;
   finalY: number;
-  remainingBalls: StaticBall[];
+  remainingBalls?: StaticBall[];
   nextStaticBalls?: StaticBall[];
 }
 
@@ -30,11 +30,21 @@ export function evaluateMove(
   if (stats) stats.value += 1;
 
   const ball = makeCannonBall({ angle });
-  const { score, hits, gameover, out, finalX, finalY, staticBalls: remainingBalls }
-    = computeFixedPoints(ball, staticBalls, {
+  const includeStaticBalls = steps.length > 0;
+  const result = includeStaticBalls
+    ? computeFixedPoints(ball, staticBalls, {
       epsilon: 1e-10,
       includeFixedPoints: false,
+      includeStaticBalls: true,
+    })
+    : computeFixedPoints(ball, staticBalls, {
+      epsilon: 1e-10,
+      includeFixedPoints: false,
+      includeStaticBalls: false,
     });
+
+  const { score, hits, gameover, out, finalX, finalY } = result;
+  const remainingBalls = includeStaticBalls ? (result as FixedPoints).staticBalls : undefined;
 
   let nextStaticBalls: Array<StaticBall> | undefined = undefined;
 
@@ -46,14 +56,15 @@ export function evaluateMove(
     reward -= 1000000; // Heavy penalty for out
   } else {
     if (steps.length > 0) {
-      nextStaticBalls = remainingBalls;
+      const remaining = remainingBalls!;
+      nextStaticBalls = remaining;
       nextStaticBalls.push({
         counter: 3,
-        radius: computeExpandedRadius({ x: finalX, y: finalY }, remainingBalls),
+        radius: computeExpandedRadius({ x: finalX, y: finalY }, remaining),
         x: finalX, y: finalY,
       });
 
-      const result = findBestMove(nextStaticBalls, { steps, criteria, stats });
+      const result = findBestMove(remaining, { steps, criteria, stats });
       reward += result.reward;
     }
   }
