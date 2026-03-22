@@ -105,6 +105,26 @@ export function solveQuadratic(a: number, b: number, c: number, epsilon = 0): nu
   return [-b / (2 * a)];
 }
 
+export function solveQuadraticInPlace(a: number, b: number, c: number, roots: number[] | Float64Array, epsilon = 0): number {
+  if (Math.abs(a) <= epsilon) {
+    if (Math.abs(b) <= epsilon) return 0;
+    roots[0] = -c / b;
+    return 1;
+  }
+
+  const delta = b ** 2 - 4 * a * c;
+  if (delta < -epsilon) return 0;
+  if (delta > epsilon) {
+    const sqrtDelta = Math.sqrt(delta);
+    const denom = 0.5 / a;
+    roots[0] = (-b + sqrtDelta) * denom;
+    roots[1] = (-b - sqrtDelta) * denom;
+    return 2;
+  }
+  roots[0] = -b / (2 * a);
+  return 1;
+}
+
 export function toDeg(rad: number) {
   return rad * 180 / Math.PI;
 }

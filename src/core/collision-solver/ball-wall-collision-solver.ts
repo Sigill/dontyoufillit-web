@@ -1,5 +1,5 @@
 import { MovingBall } from "../ball";
-import { solveQuadratic } from "../utils";
+import { solveQuadraticInPlace } from "../utils";
 import { Collision, WallObstacle, findImminentCollisions } from "./collision-utils";
 
 export interface Wall {
@@ -12,6 +12,8 @@ export interface Wall {
 export interface WallSide extends Wall {
   sigma: 1 | -1;
 }
+
+const ROOTS = new Float64Array(2);
 
 export function computeCollisionWithWallSide(
   { x, y, angle, velocity, acceleration, radius }: MovingBall,
@@ -39,11 +41,11 @@ export function computeCollisionWithWallSide(
 
   const c0 = (x - x0) * sinAlpha - (y - y0) * cosAlpha;
 
-  const collisions = solveQuadratic(0.5 * acceleration * sinAlphaBeta, velocity * sinAlphaBeta, c0 - sigma * radius, epsilon);
+  const count = solveQuadraticInPlace(0.5 * acceleration * sinAlphaBeta, velocity * sinAlphaBeta, c0 - sigma * radius, ROOTS, epsilon);
 
   let minT = undefined;
-  for (let i = 0; i < collisions.length; i++) {
-    const t = collisions[i];
+  for (let i = 0; i < count; i++) {
+    const t = ROOTS[i];
     if (t >= t0 && t <= tMax) {
       if (minT === undefined || t < minT) {
         minT = t;
@@ -78,9 +80,9 @@ export function computeCollisionWithWall(
   let minSigma: 1 | -1 = 1;
 
   for (const sigma of [-1, 1] as const) {
-    const roots = solveQuadratic(0.5 * acceleration * sinAlphaBeta, velocity * sinAlphaBeta, c0 - sigma * radius, epsilon);
-    for (let i = 0; i < roots.length; i++) {
-      const t = roots[i];
+    const count = solveQuadraticInPlace(0.5 * acceleration * sinAlphaBeta, velocity * sinAlphaBeta, c0 - sigma * radius, ROOTS, epsilon);
+    for (let i = 0; i < count; i++) {
+      const t = ROOTS[i];
       if (t >= t0 && t <= tMax) {
         if (minT === undefined || t < minT) {
           minT = t;

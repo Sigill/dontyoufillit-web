@@ -1,7 +1,10 @@
 import { BallGeometry, MovingBall } from "../ball";
-import { solveQuadratic } from "../utils";
+import { solveQuadraticInPlace } from "../utils";
 import { Collision, BallObstacle } from "./collision-utils";
 
+
+const ROOTS1 = new Float64Array(2);
+const ROOTS2 = new Float64Array(2);
 
 export function computeCollisionWithBall(
   ball: MovingBall,
@@ -17,14 +20,14 @@ export function computeCollisionWithBall(
   const dy = ball.y - otherBall.y;
   const k = dx * cosAngle + dy * sinAngle;
 
-  const roots1 = solveQuadratic(1, 2 * k, dx * dx + dy * dy - (ball.radius + otherBall.radius) ** 2);
+  const count1 = solveQuadraticInPlace(1, 2 * k, (dx * dx + dy * dy) - (ball.radius + otherBall.radius) ** 2, ROOTS1, epsilon);
 
   let minT = undefined;
-  for (let i = 0; i < roots1.length; i++) {
-    const root1 = roots1[i];
-    const roots2 = solveQuadratic(0.5 * ball.acceleration, ball.velocity, -root1, epsilon);
-    for (let j = 0; j < roots2.length; j++) {
-      const t = roots2[j];
+  for (let i = 0; i < count1; i++) {
+    const root1 = ROOTS1[i];
+    const count2 = solveQuadraticInPlace(0.5 * ball.acceleration, ball.velocity, -root1, ROOTS2, epsilon);
+    for (let j = 0; j < count2; j++) {
+      const t = ROOTS2[j];
       if (t >= t0 && t <= tMax) {
         if (minT === undefined || t < minT) {
           minT = t;
