@@ -19,12 +19,16 @@ function computeCollisionsWithGameWalls(
     velocity: number;
     acceleration: number;
   },
-  { epsilon = 1e-5 }: { epsilon?: number } = {}
+  {
+    cosAngle = Math.cos(ball.angle),
+    sinAngle = Math.sin(ball.angle),
+    epsilon = 1e-5
+  }: { cosAngle?: number, sinAngle?: number, epsilon?: number } = {}
 ): Array<Collision<WallObstacle>> {
   // Only consider the bottom border if above it.
   const candidateWalls = ball.y > ball.radius ? CANDIDATE_WALLS_WITH_BOTTOM : CANDIDATE_WALLS_DEFAULT;
 
-  return computeCollisionsWithWalls(ball, candidateWalls, { epsilon });
+  return computeCollisionsWithWalls(ball, candidateWalls, { cosAngle, sinAngle, epsilon });
 }
 
 export interface FixedPoints {
@@ -76,8 +80,11 @@ export function computeFixedPoints(
   );
 
   while (true) {
+    const cosAngle = Math.cos(angle);
+    const sinAngle = Math.sin(angle);
+
     const ballState = { x, y, angle, velocity, acceleration: ball.acceleration, radius: ball.radius };
-    const wallCollisions = computeCollisionsWithGameWalls(ballState, { epsilon });
+    const wallCollisions = computeCollisionsWithGameWalls(ballState, { cosAngle, sinAngle, epsilon });
     const ballCollisions = shadowStaticBalls.length === 0 ? [] : computeCollisionsWithBalls(ballState, shadowStaticBalls, { epsilon });
     const collisions = findImminentCollisions<WallObstacle | BallObstacle<StaticBall & { sourceBall: StaticBall; }>>(
       [ ...wallCollisions, ...ballCollisions ],
@@ -98,8 +105,9 @@ export function computeFixedPoints(
     const t1 = collision?.t ?? tMax;
     const deltaT = t1 - t0;
 
-    x += 0.5 * Math.cos(angle) * ball.acceleration * deltaT**2 + Math.cos(angle) * velocity * deltaT;
-    y += 0.5 * Math.sin(angle) * ball.acceleration * deltaT**2 + Math.sin(angle) * velocity * deltaT;
+    const movement = 0.5 * ball.acceleration * deltaT ** 2 + velocity * deltaT;
+    x += cosAngle * movement;
+    y += sinAngle * movement;
     velocity = collision === undefined
       ? 0 // Avoid rounding errors.
       : velocity + ball.acceleration * deltaT;
