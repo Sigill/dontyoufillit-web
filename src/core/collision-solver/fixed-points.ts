@@ -72,12 +72,13 @@ export function computeFixedPoints(
     let winnerWall: WallSide | undefined = undefined;
     let winnerBallIndex: number = -1;
     let tie = false;
+    const computeParams = { cosAngle, sinAngle, epsilon };
 
     // Walls
     const candidateWalls = y > ballRadius ? CANDIDATE_WALLS_WITH_BOTTOM : CANDIDATE_WALLS_DEFAULT;
     for (let i = 0; i < candidateWalls.length; i++) {
       const wall = candidateWalls[i];
-      const t = computeCollisionWithWallSide(ballState, wall, epsilon, minT + epsilon, { cosAngle, sinAngle, epsilon });
+      const t = computeCollisionWithWallSide(ballState, wall, epsilon, minT + epsilon, computeParams);
       if (t !== undefined) {
         if (t < minT - epsilon) {
           minT = t;
@@ -93,7 +94,7 @@ export function computeFixedPoints(
     for (let i = 0; i < staticBalls.length; i++) {
       if (counters[i] <= 0) continue;
       const b = staticBalls[i];
-      const t = computeCollisionWithBall(ballState, b, epsilon, minT + epsilon, { cosAngle, sinAngle, epsilon });
+      const t = computeCollisionWithBall(ballState, b, epsilon, minT + epsilon, computeParams);
       if (t !== undefined) {
         if (t < minT - epsilon) {
           minT = t;
