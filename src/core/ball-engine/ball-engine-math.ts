@@ -86,7 +86,7 @@ export class BallEngineMath extends BallEngine {
    * @param ball The initial state of the ball being fired
    */
   internalFire(ball: MovingBall): void {
-    const { fixedPoints } = computeFixedPoints(ball, this.staticBalls, { epsilon: this.#epsilon });
+    const { fixedPoints } = computeFixedPoints(ball, this.staticBalls, { epsilon: this.#epsilon, includeFixedPoints: true });
 
     if (this.verbose) {
       console.group('Fixed points');

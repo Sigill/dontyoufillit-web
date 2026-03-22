@@ -3,28 +3,28 @@ import { CANNON_BASE_HEIGHT, CANNON_Y_POSITION } from './constants';
 /**
  * Normalizes rewards between 0 and 1.
  */
-export function normalizeRewards(moves: { reward: number }[]): Float32Array {
-  const scores = new Float32Array(moves.length);
+export function normalizeRewards(rewards: Array<number>): Float32Array {
+  const scores = new Float32Array(rewards.length);
 
   // First, mark explicit out-moves (very bad) as zero and collect valid rewards
-  const rewards: number[] = [];
+  const normalizedRewards: number[] = [];
   const indices: number[] = [];
-  for (let i = 0; i < moves.length; i++) {
-    const r = moves[i].reward;
+  for (let i = 0; i < rewards.length; i++) {
+    const r = rewards[i];
     if (r < -100000) {
       scores[i] = 0; // out moves
     } else {
-      rewards.push(r);
+      normalizedRewards.push(r);
       indices.push(i);
     }
   }
 
-  if (rewards.length === 0) return scores;
+  if (normalizedRewards.length === 0) return scores;
 
   // Determine sign composition of the remaining rewards
   let hasNonNegative = false;
   let hasNegative = false;
-  for (const r of rewards) {
+  for (const r of normalizedRewards) {
     if (r < 0) hasNegative = true;
     else hasNonNegative = true; // includes zero
   }
@@ -37,11 +37,11 @@ export function normalizeRewards(moves: { reward: number }[]): Float32Array {
 
   // Case A: all values have the same sign (all non-negative or all negative)
   if ((hasNonNegative && !hasNegative) || (hasNegative && !hasNonNegative)) {
-    const minR = Math.min(...rewards);
-    const maxR = Math.max(...rewards);
-    for (let k = 0; k < rewards.length; k++) {
+    const minR = Math.min(...normalizedRewards);
+    const maxR = Math.max(...normalizedRewards);
+    for (let k = 0; k < normalizedRewards.length; k++) {
       const idx = indices[k];
-      const r = rewards[k];
+      const r = normalizedRewards[k];
       scores[idx] = mapRange(r, minR, maxR);
     }
     return scores;
@@ -50,16 +50,16 @@ export function normalizeRewards(moves: { reward: number }[]): Float32Array {
   // Case B: mixed signs -> negatives are zero, non-negative values normalized to [0.2,1]
   let minPos = Infinity;
   let maxPos = -Infinity;
-  for (const r of rewards) {
+  for (const r of normalizedRewards) {
     if (r >= 0) {
       if (r < minPos) minPos = r;
       if (r > maxPos) maxPos = r;
     }
   }
 
-  for (let k = 0; k < rewards.length; k++) {
+  for (let k = 0; k < normalizedRewards.length; k++) {
     const idx = indices[k];
-    const r = rewards[k];
+    const r = normalizedRewards[k];
     if (r < 0) {
       scores[idx] = 0;
     } else {

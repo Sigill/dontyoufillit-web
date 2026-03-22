@@ -35,7 +35,7 @@ describe('computeFixedPoints()', () => {
         { x: 0.8 + Math.cos(Math.PI / 4) * 0.025 * 2 - 0.001, y: 0.025 },
       ]
     });
-    const { fixedPoints } = computeFixedPoints(ball, staticBalls, { epsilon: 1e-5 });
+    const { fixedPoints } = computeFixedPoints(ball, staticBalls, { epsilon: 1e-5, includeFixedPoints: true });
     assert.sameDeepOrderedMembers(fixedPoints!, [
       { t: 0, x: ball.x, y: ball.y, angle: ball.angle, velocity: DEFAULT_BALL_VELOCITY, acceleration: DEFAULT_BALL_ACCELERATION, obstacles: [] },
       {
@@ -61,7 +61,7 @@ describe('computeFixedPoints()', () => {
         { x: 0.8 + Math.cos(Math.PI / 4) * 0.025 * 2 + 0.001, y: 0.025 },
       ]
     });
-    const { fixedPoints } = computeFixedPoints(ball, staticBalls, { epsilon: 1e-5 });
+    const { fixedPoints } = computeFixedPoints(ball, staticBalls, { epsilon: 1e-5, includeFixedPoints: true });
     assert.sameDeepOrderedMembers(fixedPoints!, [
       { t: 0, x: ball.x, y: ball.y, angle: ball.angle, velocity: DEFAULT_BALL_VELOCITY, acceleration: DEFAULT_BALL_ACCELERATION, obstacles: [] },
       {
@@ -108,7 +108,7 @@ describe('computeFixedPoints()', () => {
       ball: { angle: Math.PI, x: 0.8, y: -0.1 },
       staticBalls: [],
     });
-    const { fixedPoints } = computeFixedPoints(ball, staticBalls, { epsilon: 1e-5 });
+    const { fixedPoints } = computeFixedPoints(ball, staticBalls, { epsilon: 1e-5, includeFixedPoints: true });
     assert.sameDeepOrderedMembers(fixedPoints!, [
       { t: 0, x: ball.x, y: ball.y, angle: ball.angle, velocity: DEFAULT_BALL_VELOCITY, acceleration: DEFAULT_BALL_ACCELERATION, obstacles: [] },
       {
@@ -168,7 +168,7 @@ describe('computeFixedPoints()', () => {
     };
 
     assert.throws(() => {
-      return computeFixedPoints(ball, staticBalls, { epsilon: 1e-5 }).fixedPoints;
+      return computeFixedPoints(ball, staticBalls, { epsilon: 1e-5, includeFixedPoints: true }).fixedPoints;
     }, "Collision against multiple objects");
   });
 });
