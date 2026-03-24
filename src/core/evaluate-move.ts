@@ -1,5 +1,6 @@
 import { StaticBall, makeCannonBall } from "./ball";
 import { computeFixedPoints } from "./collision-solver/fixed-points";
+import { CANNON_BASE_HEIGHT, CANNON_LENGTH, CANNON_Y_POSITION, DEFAULT_BALL_ACCELERATION, DEFAULT_BALL_RADIUS, DEFAULT_BALL_VELOCITY } from "./constants";
 import { computeExpandedRadius } from "./static-ball";
 
 export interface EvaluatedMove {
@@ -12,6 +13,9 @@ export interface EvaluatedMove {
     nextStaticBalls?: StaticBall[];
   };
 }
+
+const OUT_PENALITY      = -1000000; // Heavy penalty for out
+const GAMEOVER_PENALITY = -100000;  // Less heavy penalty for gameover
 
 /**
  * Evaluates a single move at a given angle.
@@ -47,9 +51,9 @@ export function evaluateMove(
   let reward = criteria === 'hits' ? hits : score;
 
   if (gameover) {
-    reward -= 100000; // Less heavy penalty for gameover
+    reward += GAMEOVER_PENALITY;
   } else if (out) {
-    reward -= 1000000; // Heavy penalty for out
+    reward += OUT_PENALITY;
   } else {
     if (steps.length > 0) {
       const { finalX, finalY, remainingStaticBalls } = state!;
@@ -75,6 +79,33 @@ export function evaluateMove(
   };
 }
 
+const TIME_OF_FLIGHT = -DEFAULT_BALL_VELOCITY / DEFAULT_BALL_ACCELERATION; // 2.5s
+const DISTANCE_TRAVELLED = 0.5 * DEFAULT_BALL_ACCELERATION * TIME_OF_FLIGHT ** 2 + DEFAULT_BALL_VELOCITY * TIME_OF_FLIGHT; // 1.25
+
+// y0 = CANNON_Y_POSITION + CANNON_BASE_HEIGHT + sin(angle) * CANNON_LENGTH
+// dy = DISTANCE_TRAVELLED * sin(angle)
+// Ball will stop at y=0 when y0 + dy = 0
+// DISTANCE_TRAVELLED * sin(angle) = - (CANNON_Y_POSITION + CANNON_BASE_HEIGHT + sin(angle) * CANNON_LENGTH)
+// DISTANCE_TRAVELLED * sin(angle) = - CANNON_Y_POSITION - CANNON_BASE_HEIGHT - sin(angle) * CANNON_LENGTH
+// DISTANCE_TRAVELLED * sin(angle) + sin(angle) * CANNON_LENGTH = - CANNON_Y_POSITION - CANNON_BASE_HEIGHT
+// sin(angle) * (DISTANCE_TRAVELLED + CANNON_LENGTH) = - (CANNON_Y_POSITION + CANNON_BASE_HEIGHT)
+// sin(angle) = - (CANNON_Y_POSITION + CANNON_BASE_HEIGHT) / (DISTANCE_TRAVELLED + CANNON_LENGTH)
+// const MIN_ANGLE = Math.asin(
+//   -(CANNON_Y_POSITION + CANNON_BASE_HEIGHT) /
+//   (CANNON_LENGTH + DISTANCE_TRAVELLED)
+// );
+
+// Ball will stop at y=DEFAULT_BALL_RADIUS when y0 + dy = -DEFAULT_BALL_RADIUS
+// DISTANCE_TRAVELLED * sin(angle) = - (CANNON_Y_POSITION + CANNON_BASE_HEIGHT + sin(angle) * CANNON_LENGTH) - DEFAULT_BALL_RADIUS
+// DISTANCE_TRAVELLED * sin(angle) = - CANNON_Y_POSITION - CANNON_BASE_HEIGHT - sin(angle) * CANNON_LENGTH - DEFAULT_BALL_RADIUS
+// DISTANCE_TRAVELLED * sin(angle) + sin(angle) * CANNON_LENGTH = - CANNON_Y_POSITION - CANNON_BASE_HEIGHT - DEFAULT_BALL_RADIUS
+// sin(angle) * (DISTANCE_TRAVELLED + CANNON_LENGTH) = - (CANNON_Y_POSITION + CANNON_BASE_HEIGHT + DEFAULT_BALL_RADIUS)
+// sin(angle) = - (CANNON_Y_POSITION + CANNON_BASE_HEIGHT + DEFAULT_BALL_RADIUS) / (DISTANCE_TRAVELLED + CANNON_LENGTH)
+const MIN_SAFE_ANGLE = Math.asin(
+  -(CANNON_Y_POSITION + CANNON_BASE_HEIGHT + DEFAULT_BALL_RADIUS) /
+  (CANNON_LENGTH + DISTANCE_TRAVELLED)
+);
+
 /**
  * Evaluates all possible moves for a given board state.
  */
@@ -92,16 +123,28 @@ export function evaluateMoves(
 ): Array<number> {
   const rewards: Array<number> = [];
 
+  const params = { steps: steps.slice(1), criteria, stats };
+
   // Scan angles from 0 to PI
   const numSteps = steps[0];
   const stepAngle = Math.PI / (numSteps - 1);
 
-  const params = { steps: steps.slice(1), criteria, stats };
+  const minSafeStep = Math.ceil(MIN_SAFE_ANGLE / stepAngle);
+  const maxSafeStep = numSteps - 1 - minSafeStep;
 
-  for (let i = 0; i < numSteps; ++i) {
+  let i = 0;
+  for (; i < minSafeStep; ++i) {
+    rewards.push(OUT_PENALITY);
+  }
+
+  for (; i <= maxSafeStep; ++i) {
     const angle = i * stepAngle;
     const move = evaluateMove(staticBalls, angle, params);
     rewards.push(move.reward);
+  }
+
+  for (; i < numSteps; ++i) {
+    rewards.push(OUT_PENALITY);
   }
 
   return rewards;
@@ -124,22 +167,27 @@ export function findBestMove(
     includeState?: boolean;
   } = {}
 ): { angle: number; move: EvaluatedMove } {
+  const params = { steps: steps.slice(1), criteria, stats, includeState };
+
+  let bestAngle = 0;
+  let bestMove = { reward: -Infinity };
+
   // Scan angles from 0 to PI
   const numSteps = steps[0];
   const stepAngle = Math.PI / (numSteps - 1);
 
-  const params = { steps: steps.slice(1), criteria, stats, includeState };
+  const minSafeStep = Math.ceil(MIN_SAFE_ANGLE / stepAngle);
+  const maxSafeStep = numSteps - 1 - minSafeStep;
 
-  let best: { angle: number; move: EvaluatedMove } | undefined = undefined;
-
-  for (let i = 0; i < numSteps; ++i) {
+  for (let i = minSafeStep; i <= maxSafeStep; ++i) {
     const angle = i * stepAngle;
     const move = evaluateMove(staticBalls, angle, params);
 
-    if (best === undefined || move.reward > best.move.reward) {
-      best = { angle, move };
+    if (move.reward > bestMove.reward) {
+      bestAngle = angle;
+      bestMove = move;
     }
   }
 
-  return best!;
+  return { angle: bestAngle, move: bestMove };
 }
