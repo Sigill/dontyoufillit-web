@@ -70,7 +70,7 @@ const hud = new HUD();
 selectElement<HTMLDivElement>('.hud').appendChild(hud);
 
 const renderer = new CssBoard();
-selectElement<HTMLDivElement>('.game').prepend(renderer);
+selectElement<HTMLDivElement>('.game').append(renderer);
 
 Object.assign(window, {cannon, ballEngine, game, hud, renderer}); // For debug.
 
