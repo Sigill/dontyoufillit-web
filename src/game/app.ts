@@ -124,7 +124,7 @@ function updateLazerButtonState() {
 }
 
 function updateOracleButtonState() {
-  const canEnable = game.score >= ORACLE_BONUS_COST;
+  const canEnable = game.currentBall === null && game.score >= ORACLE_BONUS_COST;
   oracleBonusButton.classList.toggle('active', game.oracleActive);
   oracleBonusButton.disabled = !canEnable || game.oracleActive;
 }
