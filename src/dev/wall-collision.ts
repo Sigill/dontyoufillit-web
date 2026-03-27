@@ -3,7 +3,7 @@ import * as Constants from "../core/constants";
 import { WallSide } from "../core/collision-solver/ball-wall-collision-solver";
 import { computeCollisionsWithWalls } from "../core/collision-solver/ball-wall-collision-solver";
 import { selectElement } from '../core/utils';
-import { GameWalls } from '../core/ball-engine/walls';
+import { makeWall, GameWalls } from '../core/ball-engine/walls';
 
 declare function getTab(element: string | Element): Tab;
 
@@ -22,19 +22,19 @@ const cases: Array<[string, { position: { x: number; y: number; }; direction: { 
   ['45 1', {
     position: {x: 0.5, y: 0},
     direction: {x: 0.5, y: 1},
-    walls: [{x0: 0.5, y0: 1, x1: 0, y1: 0, sigma: 1}]
+    walls: [makeWall({ x0: 0.5, y0: 1, x1: 0, y1: 0, sigma: 1 })]
   }],
   ['45 2', {
     position: {x: 0.5, y: 0},
     direction: {x: 0.5, y: 1},
-    walls: [{x0: 0.5, y0: 1, x1: 1, y1: 0, sigma: 1}]
+    walls: [makeWall({ x0: 0.5, y0: 1, x1: 1, y1: 0, sigma: 1 })]
   }],
   ['45 all', {
     position: {x: 0.5, y: 0},
     direction: {x: 0.5, y: 1},
     walls: [
-      {x0: 0.5, y0: 1, x1: 0, y1: 0, sigma: 1},
-      {x0: 0.5, y0: 1, x1: 1, y1: 0, sigma: 1},
+      makeWall({ x0: 0.5, y0: 1, x1: 0, y1: 0, sigma: 1 }),
+      makeWall({ x0: 0.5, y0: 1, x1: 1, y1: 0, sigma: 1 }),
     ]
   }],
 ];
@@ -113,10 +113,9 @@ for (const [title, config] of cases) {
       );
 
       const wall = collision.obstacle.value;
-      const wallAngle = Math.atan2(wall.y1 - wall.y0, wall.x1 - wall.x0);
       const q = {
-        x: c.x + wall.sigma * ballState.radius * -Math.sin(wallAngle),
-        y: c.y + wall.sigma * ballState.radius * Math.cos(wallAngle)
+        x: c.x + wall.sigma * ballState.radius * -wall.angle.sin,
+        y: c.y + wall.sigma * ballState.radius * wall.angle.cos
       };
       circle(q.x, q.y, 1/100);
     }

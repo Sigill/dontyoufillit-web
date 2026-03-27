@@ -6,6 +6,7 @@ import {
 import { Wall, WallSide } from "./ball-wall-collision-solver";
 import { computeCollisionsWithWalls } from "./ball-wall-collision-solver";
 import { GameWalls } from '../ball-engine/walls';
+import { normalizeRadian, precomputeAngle } from '../utils';
 
 const Walls = {
   horizontalY0: GameWalls.bottom,
@@ -18,7 +19,7 @@ const centerBall = {x: 0.5, y: 0.5, angle: 0, velocity: 1, acceleration: -0.4, r
 const tMax = 2.5;
 
 function reverseWall<W extends Wall>(wall: W): W {
-  return { ...wall, x0: wall.x1, y0: wall.y1, x1: wall.x0, y1: wall.y0};
+  return { ...wall, x0: wall.x1, y0: wall.y1, x1: wall.x0, y1: wall.y0, angle: precomputeAngle(normalizeRadian(wall.angle.value + Math.PI))};
 }
 
 describe('computeCollisionWithWallSide', () => {

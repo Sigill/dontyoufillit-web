@@ -1,5 +1,5 @@
 import { MovingBall } from "../ball";
-import { solveQuadraticInPlace } from "../utils";
+import { Angle, solveQuadraticInPlace } from "../utils";
 import { Collision, WallObstacle, findImminentCollisions } from "./collision-utils";
 
 export interface Wall {
@@ -7,6 +7,7 @@ export interface Wall {
   y0: number;
   x1: number;
   y1: number;
+  angle: Angle;
 }
 
 export interface WallSide extends Wall {
@@ -17,29 +18,18 @@ const ROOTS = new Float64Array(2);
 
 export function computeCollisionWithWallSide(
   { x, y, angle, velocity, acceleration, radius }: MovingBall,
-  { x0, y0, x1, y1, sigma }: WallSide,
+  { x0, y0, sigma, angle: alpha }: WallSide,
   t0: number, tMax: number,
-  {
-    cosAngle = Math.cos(angle),
-    sinAngle = Math.sin(angle),
-    epsilon = 1e-5
-  }: { cosAngle?: number, sinAngle?: number, epsilon?: number } = {}
+  { epsilon = 1e-5 }: { epsilon?: number } = {}
 ): number | undefined {
-  const dx = x1 - x0;
-  const dy = y1 - y0;
-  const alpha = Math.atan2(dy, dx);
-
-  const sinAlpha = Math.sin(alpha);
-  const cosAlpha = Math.cos(alpha);
-  // sin(a - b) = sin(a)cos(b) - cos(a)sin(b)
-  const sinAlphaBeta = sinAlpha * cosAngle - cosAlpha * sinAngle;
+  const sinAlphaBeta = Math.sin(alpha.value - angle);
   if (Math.abs(sinAlphaBeta) <= epsilon) {
     // Parallel lines.
     // TODO It might always collide, return t:undefined?
     return;
   }
 
-  const c0 = (x - x0) * sinAlpha - (y - y0) * cosAlpha;
+  const c0 = (x - x0) * alpha.sin - (y - y0) * alpha.cos;
 
   const count = solveQuadraticInPlace(0.5 * acceleration * sinAlphaBeta, velocity * sinAlphaBeta, c0 - sigma * radius, ROOTS, epsilon);
 
@@ -57,24 +47,18 @@ export function computeCollisionWithWallSide(
 
 export function computeCollisionWithWall(
   { x, y, angle: beta, velocity, acceleration, radius }: MovingBall,
-  { x0, y0, x1, y1 }: Wall,
+  { x0, y0, angle: alpha }: Wall,
   t0: number, tMax: number,
   { epsilon = 1e-5 }: { epsilon?: number; } = {}
 ): { t: number; sigma: 1 | -1; } | undefined {
-  const dx = x1 - x0;
-  const dy = y1 - y0;
-  const alpha = Math.atan2(dy, dx);
-
-  const sinAlphaBeta = Math.sin(alpha - beta);
+  const sinAlphaBeta = Math.sin(alpha.value - beta);
   if (Math.abs(sinAlphaBeta) <= epsilon) {
     // Parallel lines.
     // TODO It might always collide, return t:undefined?
     return;
   }
 
-  const sinAlpha = Math.sin(alpha);
-  const cosAlpha = Math.cos(alpha);
-  const c0 = (x - x0) * sinAlpha - (y - y0) * cosAlpha;
+  const c0 = (x - x0) * alpha.sin - (y - y0) * alpha.cos;
 
   let minT = undefined;
   let minSigma: 1 | -1 = 1;
@@ -100,18 +84,14 @@ export function computeCollisionWithWall(
 export function computeCollisionsWithWalls<W extends WallSide>(
   ball: MovingBall,
   walls: Array<W>,
-  {
-    cosAngle = Math.cos(ball.angle),
-    sinAngle = Math.sin(ball.angle),
-    epsilon = 1e-5
-  }: { cosAngle?: number, sinAngle?: number, epsilon?: number } = {}
+  { epsilon = 1e-5 }: { epsilon?: number } = {}
 ): Array<Collision<WallObstacle<W>>> {
   const tMax = -ball.velocity / ball.acceleration;
 
   const collisions: Array<Collision<WallObstacle<W>>> = [];
   for (let i = 0; i < walls.length; i++) {
     const wall = walls[i];
-    const collision = computeCollisionWithWallSide(ball, wall, epsilon, tMax, { cosAngle, sinAngle, epsilon });
+    const collision = computeCollisionWithWallSide(ball, wall, epsilon, tMax, { epsilon });
 
     if (collision !== undefined) {
       collisions.push({ t: collision, obstacle: { type: 'wall' as const, value: wall } });

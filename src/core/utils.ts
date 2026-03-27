@@ -155,3 +155,13 @@ export function maxBy<T>(items: ArrayLike<T>, pred: (item: T) => number): { item
 
 // https://alexitaylor.com/codebytes/simplify-ts/
 export type Simplify<T> = { [KeyType in keyof T]: T[KeyType] } & {};
+
+export interface Angle {
+  value: number;
+  cos: number;
+  sin: number;
+}
+
+export function precomputeAngle(angle: number): Angle {
+  return { value: angle, cos: Math.cos(angle), sin: Math.sin(angle) };
+}

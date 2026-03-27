@@ -89,7 +89,7 @@ export function computeFixedPoints(
     let winnerWall: WallSide | undefined = undefined;
     let winnerBallIndex: number = -1;
     let tie = false;
-    const computeParams = { cosAngle, sinAngle, epsilon };
+    const computeParams = { epsilon };
 
     // Walls
     const candidateWalls = y > ballRadius ? CANDIDATE_WALLS_WITH_BOTTOM : CANDIDATE_WALLS_DEFAULT;
@@ -141,8 +141,7 @@ export function computeFixedPoints(
 
     if (winnerWall !== undefined || winnerBallIndex !== -1) {
       if (winnerWall !== undefined) {
-        const wallAngle = Math.atan2(winnerWall.y1 - winnerWall.y0, winnerWall.x1 - winnerWall.x0);
-        angle = 2 * wallAngle - angle;
+        angle = 2 * winnerWall.angle.value - angle;
       } else if (winnerBallIndex !== -1) {
         counters[winnerBallIndex] -= 1;
         hits += 1;

@@ -2,6 +2,7 @@ import { assert } from 'chai';
 import { computeFixedPoints } from "../collision-solver/fixed-points";
 import { makeBalls } from '../ball';
 import { DEFAULT_BALL_RADIUS, DEFAULT_BALL_VELOCITY, DEFAULT_BALL_ACCELERATION } from '../constants';
+import { makeWall } from './walls';
 
 describe('computeFixedPoints()', () => {
   // it('should stops when a collision with a ball occured but the bottom wall has not been cleared', () => {
@@ -85,10 +86,7 @@ describe('computeFixedPoints()', () => {
         acceleration: -0.4,
         obstacles: [{
           type: "wall",
-          value: {
-            x0: 0, x1: 0, y0: 0, y1: 1,
-            sigma: 1,
-          }
+          value: makeWall({ x0: 0, x1: 0, y0: 0, y1: 1, sigma: 1 })
         }],
       },
       {
@@ -120,10 +118,7 @@ describe('computeFixedPoints()', () => {
         acceleration: -0.4,
         obstacles: [{
           type: "wall",
-          value: {
-            x0: 0, x1: 0, y0: 0, y1: 1,
-            sigma: 1,
-          }
+          value: makeWall({ x0: 0, x1: 0, y0: 0, y1: 1, sigma: 1 })
         }],
       },
       {
