@@ -280,7 +280,11 @@ oracleBonusButton.addEventListener('click', function (evt) {
   if (game.score >= 0) {
     game.applyOracleBonus();
 
-    const moves = evaluateMoves(game.staticBalls, { steps: [181, 91], criteria: 'hits' });
+    console.time('evaluateMoves');
+    const stats = { value: 0 };
+    const moves = evaluateMoves(game.staticBalls, { steps: [181, 191, 90], criteria: 'hits', stats });
+    console.timeEnd('evaluateMoves');
+    console.log(`evaluateMoves ${stats.value} calls`);
     const targets = normalizeRewards(moves);
     const d = computeRewardPath(targets);
     selectElement('#RewardPath').setAttribute('d', d);
