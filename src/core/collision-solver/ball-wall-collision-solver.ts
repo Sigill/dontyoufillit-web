@@ -22,7 +22,7 @@ export function computeCollisionWithWallSide(
   t0: number, tMax: number,
   { epsilon = 1e-5 }: { epsilon?: number } = {}
 ): number | undefined {
-  const sinAlphaBeta = Math.sin(alpha.value - angle);
+  const sinAlphaBeta = Math.sin(alpha.value - angle.value);
   if (Math.abs(sinAlphaBeta) <= epsilon) {
     // Parallel lines.
     // TODO It might always collide, return t:undefined?
@@ -51,7 +51,7 @@ export function computeCollisionWithWall(
   t0: number, tMax: number,
   { epsilon = 1e-5 }: { epsilon?: number; } = {}
 ): { t: number; sigma: 1 | -1; } | undefined {
-  const sinAlphaBeta = Math.sin(alpha.value - beta);
+  const sinAlphaBeta = Math.sin(alpha.value - beta.value);
   if (Math.abs(sinAlphaBeta) <= epsilon) {
     // Parallel lines.
     // TODO It might always collide, return t:undefined?

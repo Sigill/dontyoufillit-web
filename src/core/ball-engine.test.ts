@@ -4,6 +4,7 @@ import { BallEngineMotionEquationAbsolute, BallEngineMotionEquationDelta } from 
 import { BallEngineRK4 } from './ball-engine/ball-engine-rk4';
 import { makeMovingBall, makeStaticBall, MovingBall, StaticBall } from './ball';
 import { DEFAULT_BALL_RADIUS } from './constants';
+import { precomputeAngle } from './utils';
 
 [
   { name: 'BallEngineMath', builder: () => new BallEngineMath() },
@@ -22,7 +23,7 @@ import { DEFAULT_BALL_RADIUS } from './constants';
 
     it('should return { score: 0, gameover: false } when the ball never clears the bottom wall without hitting any static ball', () => {
       const update = run({
-        ball: { angle: 0, x: 0.5, y: -0.1 },
+        ball: { angle: precomputeAngle(0), x: 0.5, y: -0.1 },
       });
       assert.deepEqual(update, { score: 0, gameover: false });
 
@@ -35,7 +36,7 @@ import { DEFAULT_BALL_RADIUS } from './constants';
 
     it("should return { score: 1, gameover: true } when the ball destroys a static ball and bounces down", () => {
       const update = run({
-        ball: { angle: Math.PI / 2, x: 0.8, y: -0.1 },
+        ball: { angle: precomputeAngle(Math.PI / 2), x: 0.8, y: -0.1 },
         staticBalls: [
           // At x + cos(45) * radius * 2, the ball should bounce at 180°. Shift ball a bit to the left to make the ball bounce down.
           { counter: 1, x: 0.8 + Math.cos(Math.PI / 4) * 0.025 * 2 - 0.001, y: 0.025 },

@@ -1,6 +1,6 @@
 import { MovingBall, StaticBall, BallState } from "../ball";
 import { GameWalls } from "../ball-engine/walls";
-import { normalizeRadian, Simplify } from "../utils";
+import { Angle, normalizeRadian, Simplify, updateAngle } from "../utils";
 import { computeCollisionWithBall } from "./ball-ball-collision-solver";
 import { computeCollisionWithWallSide, WallSide } from "./ball-wall-collision-solver";
 import { BallObstacle, WallObstacle } from "./collision-utils";
@@ -58,13 +58,14 @@ export function computeFixedPoints(
     includeState = false,
   }: FixedPointsOptions & { includeState?: boolean } = {},
 ): FixedPoints {
-  let { x, y, velocity, angle } = ball;
+  let { x, y, velocity } = ball;
+  const angle: Angle = { ...ball.angle };
 
   let t0 = 0;
   const tMax = -ball.velocity / ball.acceleration;
 
   const fixedPoints: FixedPoints['fixedPoints'] = includeFixedPoints
-    ? [{ t: t0, x, y, velocity, angle, acceleration: ball.acceleration, obstacles: [] }]
+    ? [{ t: t0, x, y, velocity, angle: { ...angle }, acceleration: ball.acceleration, obstacles: [] }]
     : undefined;
   let hits = 0;
   let score = 0;
@@ -80,9 +81,6 @@ export function computeFixedPoints(
   const ballAcceleration = ball.acceleration;
 
   while (true) {
-    const cosAngle = Math.cos(angle);
-    const sinAngle = Math.sin(angle);
-
     const ballState = { x, y, angle, velocity, acceleration: ballAcceleration, radius: ballRadius };
 
     let minT = tMax - t0;
@@ -133,15 +131,15 @@ export function computeFixedPoints(
     const deltaT = t1 - t0;
 
     const movement = 0.5 * ballAcceleration * deltaT ** 2 + velocity * deltaT;
-    x += cosAngle * movement;
-    y += sinAngle * movement;
+    x += angle.cos * movement;
+    y += angle.sin * movement;
     velocity = (winnerWall === undefined && winnerBallIndex === -1)
       ? 0 // Avoid rounding errors.
       : velocity + ballAcceleration * deltaT;
 
     if (winnerWall !== undefined || winnerBallIndex !== -1) {
       if (winnerWall !== undefined) {
-        angle = 2 * winnerWall.angle.value - angle;
+        updateAngle(angle, normalizeRadian(2 * winnerWall.angle.value - angle.value));
       } else if (winnerBallIndex !== -1) {
         counters[winnerBallIndex] -= 1;
         hits += 1;
@@ -151,17 +149,15 @@ export function computeFixedPoints(
 
         const b = staticBalls[winnerBallIndex];
         const theta = Math.atan2(y - b.y, x - b.x);
-        angle = 2 * (theta + Math.PI / 2) - angle;
+        updateAngle(angle, normalizeRadian(2 * (theta + Math.PI / 2) - angle.value));
       }
-
-      angle = normalizeRadian(angle);
     }
 
     if (fixedPoints) {
       const obstacles: Obstacle[] = [];
       if (winnerWall) obstacles.push({ type: 'wall', value: winnerWall });
       if (winnerBallIndex !== -1) obstacles.push({ type: 'ball', value: staticBalls[winnerBallIndex] });
-      fixedPoints.push({ t: t1, x, y, angle, velocity, acceleration: ballAcceleration, obstacles });
+      fixedPoints.push({ t: t1, x, y, angle: { ...angle }, velocity, acceleration: ballAcceleration, obstacles });
     }
 
     // Stop if:
@@ -170,7 +166,7 @@ export function computeFixedPoints(
       ||
       (winnerWall !== undefined && winnerWall === GameWalls.bottom)
       ||
-      (winnerBallIndex !== -1 && y < ballRadius && Math.sin(angle) < 0)
+      (winnerBallIndex !== -1 && y < ballRadius && angle.sin < 0)
     ) {
       gameover = (winnerWall !== undefined || winnerBallIndex !== -1);
       out = (winnerWall === undefined && winnerBallIndex === -1) && y <= 0;

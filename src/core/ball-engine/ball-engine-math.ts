@@ -94,7 +94,7 @@ export class BallEngineMath extends BallEngine {
         for (const obstacle of obstacles) {
           console.debug(`Collision with ${ppObstacle(obstacle)}`);
         }
-        console.debug(`Δt:${t.toFixed(3)} ${directionalArrow(Math.cos(angle) * velocity, Math.sin(angle) * velocity)} x:${x.toFixed(3)} y:${y.toFixed(3)} v:${velocity.toFixed(3)} angle:${ppAngle(angle)}`);
+        console.debug(`Δt:${t.toFixed(3)} ${directionalArrow(angle.cos * velocity, angle.sin * velocity)} x:${x.toFixed(3)} y:${y.toFixed(3)} v:${velocity.toFixed(3)} angle:${ppAngle(angle.value)}`);
       }
       console.groupEnd();
     }
@@ -164,7 +164,7 @@ export class BallEngineMath extends BallEngine {
       const fp = pastFixedPoints.at(-1)!;
 
       if (this.verbose) {
-        console.log(`Last fixed point t:${fp.t.toFixed(3)} x:${fp.x.toFixed(3)} y:${fp.y.toFixed(3)} ${directionalArrow(Math.cos(fp.angle), Math.sin(fp.angle))}`);
+        console.log(`Last fixed point t:${fp.t.toFixed(3)} x:${fp.x.toFixed(3)} y:${fp.y.toFixed(3)} ${directionalArrow(fp.angle.cos, fp.angle.sin)}`);
       }
 
       let hasHitBottomWall = fp.obstacles.some(({type, value}) => {
@@ -183,8 +183,8 @@ export class BallEngineMath extends BallEngine {
 
       if (fp !== currentBall.fixedPoints.at(-1)) {
         const timeSinceFixedPoint = frameTime - (fp.t + firedAt);
-        currentBall.x += Math.cos(fp.angle) * fp.velocity * timeSinceFixedPoint + 1/2 * Math.cos(fp.angle) * fp.acceleration * timeSinceFixedPoint**2;
-        currentBall.y += Math.sin(fp.angle) * fp.velocity * timeSinceFixedPoint + 1/2 * Math.sin(fp.angle) * fp.acceleration * timeSinceFixedPoint**2;
+        currentBall.x += fp.angle.cos * fp.velocity * timeSinceFixedPoint + 1/2 * fp.angle.cos * fp.acceleration * timeSinceFixedPoint**2;
+        currentBall.y += fp.angle.sin * fp.velocity * timeSinceFixedPoint + 1/2 * fp.angle.sin * fp.acceleration * timeSinceFixedPoint**2;
       } else { // This was the last fixed point, the ball has stopped.
         if (!hasHitBottomWall && currentBall.y >= 0 && shouldGrow) {
           const expandedRadius = computeExpandedRadius(currentBall, this.staticBalls);
@@ -196,7 +196,7 @@ export class BallEngineMath extends BallEngine {
           });
         }
 
-        hasHitBottomWall = hasHitBottomWall || (currentBall.y < currentBall.radius && Math.sin(fp.angle) < 0);
+        hasHitBottomWall = hasHitBottomWall || (currentBall.y < currentBall.radius && fp.angle.sin < 0);
 
         this.internalReset();
       }

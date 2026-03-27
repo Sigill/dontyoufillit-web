@@ -1,7 +1,7 @@
 import { BallEngine } from "../ball-engine";
 import { BouncingBall } from "./bouncing-ball";
 import { computeExpandedRadius } from "../static-ball";
-import { normalizeRadian } from "../utils";
+import { normalizeRadian, updateAngle } from "../utils";
 
 /**
  * A BallEngine implementation that uses temporal discretization to update the physics.
@@ -49,14 +49,14 @@ export abstract class BallEngineTemporalDiscretization extends BallEngine {
           const limit = 1 - this.currentBall.radius;
           const penetration = this.currentBall.x - limit;
           this.currentBall.x = limit - penetration; // Reflect position
-          this.currentBall.angle = normalizeRadian(Math.PI - this.currentBall.angle);
+          updateAngle(this.currentBall.angle, normalizeRadian(Math.PI - this.currentBall.angle.value));
         }
         // Left wall
         else if (this.currentBall.x < this.currentBall.radius) {
           const limit = this.currentBall.radius;
           const penetration = limit - this.currentBall.x;
           this.currentBall.x = limit + penetration; // Reflect position
-          this.currentBall.angle = normalizeRadian(Math.PI - this.currentBall.angle);
+          updateAngle(this.currentBall.angle, normalizeRadian(Math.PI - this.currentBall.angle.value));
         }
 
         // Top Wall
@@ -64,7 +64,7 @@ export abstract class BallEngineTemporalDiscretization extends BallEngine {
           const limit = 1 - this.currentBall.radius;
           const penetration = this.currentBall.y - limit;
           this.currentBall.y = limit - penetration; // Reflect position
-          this.currentBall.angle = normalizeRadian(-this.currentBall.angle);
+          updateAngle(this.currentBall.angle, normalizeRadian(-this.currentBall.angle.value));
         }
 
         // 3. Check Static Balls
@@ -93,7 +93,7 @@ export abstract class BallEngineTemporalDiscretization extends BallEngine {
               // Reflect direction
               const alpha = Math.atan2(ny, nx);
               const tangentAngle = alpha + Math.PI / 2;
-              this.currentBall.angle = normalizeRadian(2 * tangentAngle - this.currentBall.angle);
+              updateAngle(this.currentBall.angle, normalizeRadian(2 * tangentAngle - this.currentBall.angle.value));
             }
 
             // Apply counter decrement from handler
@@ -115,7 +115,7 @@ export abstract class BallEngineTemporalDiscretization extends BallEngine {
           }
         }
 
-        if (this.currentBall.y < this.currentBall.radius && normalizeRadian(this.currentBall.angle) > Math.PI) {
+        if (this.currentBall.y < this.currentBall.radius && normalizeRadian(this.currentBall.angle.value) > Math.PI) {
           this.currentBall.stop();
           updateState.gameover = true;
           this.internalReset();

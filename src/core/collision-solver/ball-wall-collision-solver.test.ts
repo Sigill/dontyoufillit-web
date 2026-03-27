@@ -15,7 +15,7 @@ const Walls = {
   verticalX1: GameWalls.right,
 } satisfies { [ k: string ]: WallSide };
 
-const centerBall = {x: 0.5, y: 0.5, angle: 0, velocity: 1, acceleration: -0.4, radius: 0.1};
+const centerBall = {x: 0.5, y: 0.5, angle: precomputeAngle(0), velocity: 1, acceleration: -0.4, radius: 0.1};
 const tMax = 2.5;
 
 function reverseWall<W extends Wall>(wall: W): W {
@@ -124,7 +124,7 @@ describe('computeCollisionWithWalls', () => {
 
   it("should return the first wall it collides with", () => {
     // 45° NE, ball located slightly below the trajectory to (1, 1) in order to hide the x=1 wall first.
-    const b = { ...centerBall, angle: Math.PI / 4, y: 0.4 };
+    const b = { ...centerBall, angle: precomputeAngle(Math.PI / 4), y: 0.4 };
     const collision1 = computeCollisionWithWallSide(b, Walls.verticalX1, 0, tMax);
     const collision2 = computeCollisionWithWallSide(b, Walls.horizontalY1, 0, tMax);
     assert.exists(collision1);
@@ -142,7 +142,7 @@ describe('computeCollisionWithWalls', () => {
   });
 
   it("should return all the walls it collides with in case of multiple collisions", () => {
-    const b = { ...centerBall, angle: Math.PI / 4 }; // 45° NE.
+    const b = { ...centerBall, angle: precomputeAngle(Math.PI / 4) }; // 45° NE.
     const collisions = computeCollisionsWithWalls(b, [Walls.verticalX1, Walls.horizontalY1]);
     assert.sameDeepMembers(collisions, [
       {

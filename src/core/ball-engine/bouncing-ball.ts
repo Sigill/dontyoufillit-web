@@ -1,4 +1,5 @@
 import { BallGeometry, MovingBall } from "../ball";
+import { Angle } from "../utils";
 
 /**
  * Represents a ball that bounces against walls and other balls.
@@ -14,7 +15,7 @@ export abstract class BouncingBall implements BallGeometry {
   /** The y-coordinate of the ball's center. */
   y: number;
   /** The current direction of movement in radians. */
-  angle: number;
+  angle: Angle;
 
   constructor({ radius, x, y, angle }: Pick<MovingBall, 'radius' | 'x' | 'y' | 'angle'>) {
     this.radius = radius;

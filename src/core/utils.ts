@@ -165,3 +165,9 @@ export interface Angle {
 export function precomputeAngle(angle: number): Angle {
   return { value: angle, cos: Math.cos(angle), sin: Math.sin(angle) };
 }
+
+export function updateAngle(angle: Angle, value: number) {
+  angle.value = value;
+  angle.cos = Math.cos(value);
+  angle.sin = Math.sin(value);
+}

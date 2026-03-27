@@ -1,7 +1,7 @@
 import { BallEngineMath, ppObstacle } from '../core/ball-engine/ball-engine-math';
 import { makeBalls } from '../core/ball';
 import * as Constants from '../core/constants';
-import { directionalArrow, ppAngle } from '../core/utils';
+import { directionalArrow, ppAngle, precomputeAngle } from '../core/utils';
 import { computeFixedPoints } from '../core/collision-solver/fixed-points';
 
 const GameWalls = {
@@ -53,7 +53,7 @@ for (const w of Object.values(GameWalls)) {
 const { ball, staticBalls } = makeBalls({
   ball: {
     radius: 0.025,
-    angle: 0.9000000000000002,
+    angle: precomputeAngle(0.9000000000000002),
     x: 0.5414406645513776,
     y: -0.04777820602483442,
     velocity: 1,
@@ -114,7 +114,7 @@ for (const [a, b] of pairwise(fixedPoints!)) {
   for (const obstacle of obstacles) {
     console.debug(`Collision with ${ppObstacle(obstacle)}`);
   }
-  console.debug(`Δt:${t.toFixed(3)} ${directionalArrow(Math.cos(angle) * velocity, Math.sin(angle) * velocity)} x:${x.toFixed(3)} y:${y.toFixed(3)} v:${velocity.toFixed(3)} angle:${ppAngle(angle)}`);
+  console.debug(`Δt:${t.toFixed(3)} ${directionalArrow(angle.cos * velocity, angle.sin * velocity)} x:${x.toFixed(3)} y:${y.toFixed(3)} v:${velocity.toFixed(3)} angle:${ppAngle(angle.value)}`);
 }
 
 const engine = new BallEngineMath();

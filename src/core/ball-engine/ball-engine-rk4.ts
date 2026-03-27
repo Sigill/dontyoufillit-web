@@ -48,8 +48,8 @@ class BouncingBallRK4 extends BouncingBall {
     this.#integrator.integrate(lastFrameTime, frameTime - lastFrameTime);
 
     const deltaU = this.#integrator.u - previousStateU;
-    this.x += deltaU * Math.cos(this.angle);
-    this.y += deltaU * Math.sin(this.angle);
+    this.x += deltaU * this.angle.cos;
+    this.y += deltaU * this.angle.sin;
   }
 }
 

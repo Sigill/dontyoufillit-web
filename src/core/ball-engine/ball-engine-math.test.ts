@@ -3,6 +3,7 @@ import { computeFixedPoints } from "../collision-solver/fixed-points";
 import { makeBalls } from '../ball';
 import { DEFAULT_BALL_RADIUS, DEFAULT_BALL_VELOCITY, DEFAULT_BALL_ACCELERATION } from '../constants';
 import { makeWall } from './walls';
+import { precomputeAngle } from '../utils';
 
 describe('computeFixedPoints()', () => {
   // it('should stops when a collision with a ball occured but the bottom wall has not been cleared', () => {
@@ -30,7 +31,7 @@ describe('computeFixedPoints()', () => {
 
   it('should stop when a collision with a static ball occurs before clearing the bottom wall and the ball bounces down', () => {
     const { ball, staticBalls } = makeBalls({
-      ball: { angle: Math.PI / 2, x: 0.8, y: -0.1 },
+      ball: { angle: precomputeAngle(Math.PI / 2), x: 0.8, y: -0.1 },
       staticBalls: [
         // At x + cos(45) * radius * 2, the ball should bounce at 180°. Shift ball a bit to the left to make the ball bounce down.
         { x: 0.8 + Math.cos(Math.PI / 4) * 0.025 * 2 - 0.001, y: 0.025 },
@@ -43,7 +44,7 @@ describe('computeFixedPoints()', () => {
         t: 0.09030310788927243,
         x: 0.8,
         y: -0.011327822369619892,
-        angle: 3.1973901445240145,
+        angle: precomputeAngle(3.1973901445240145),
         velocity: 0.963878756844291,
         acceleration: -0.4,
         obstacles: [{
@@ -56,7 +57,7 @@ describe('computeFixedPoints()', () => {
 
   it('should not stop when a collision with a static ball occurs before clearing the bottom wall and the ball bounces up', () => {
     const { ball, staticBalls } = makeBalls({
-      ball: { angle: Math.PI / 2, x: 0.8, y: -0.1 },
+      ball: { angle: precomputeAngle(Math.PI / 2), x: 0.8, y: -0.1 },
       staticBalls: [
         // At x + cos(45) * radius * 2, the ball should bounce at 180°. Shift ball a bit to the right to make the ball bounce up.
         { x: 0.8 + Math.cos(Math.PI / 4) * 0.025 * 2 + 0.001, y: 0.025 },
@@ -69,7 +70,7 @@ describe('computeFixedPoints()', () => {
         t: 0.09238061650009927,
         x: 0.8,
         y: -0.009326219160888424,
-        angle: 3.084192596321998,
+        angle: precomputeAngle(3.084192596321998),
         velocity: 0.9630477533999603,
         acceleration: -0.4,
         obstacles: [{
@@ -81,7 +82,7 @@ describe('computeFixedPoints()', () => {
         t: 1.1160785028532507,
         x: 0.025000000000000022,
         y: 0.035207745640972954,
-        angle: 0.05740005726779529,
+        angle: precomputeAngle(0.05740005726779529),
         velocity: 0.5535685988586997,
         acceleration: -0.4,
         obstacles: [{
@@ -93,7 +94,7 @@ describe('computeFixedPoints()', () => {
         t: 2.5,
         x: 0.4074168888425764,
         y: 0.05718263630852469,
-        angle: 0.05740005726779529,
+        angle: precomputeAngle(0.05740005726779529),
         velocity: 0,
         acceleration: -0.4,
         obstacles: [],
@@ -103,7 +104,7 @@ describe('computeFixedPoints()', () => {
 
   it('should not stop when no collision with a static ball occurs and the ball does not clear the bottom wall', () => {
     const { ball, staticBalls } = makeBalls({
-      ball: { angle: Math.PI, x: 0.8, y: -0.1 },
+      ball: { angle: precomputeAngle(Math.PI), x: 0.8, y: -0.1 },
       staticBalls: [],
     });
     const { fixedPoints } = computeFixedPoints(ball, staticBalls, { epsilon: 1e-5, includeFixedPoints: true });
@@ -113,7 +114,7 @@ describe('computeFixedPoints()', () => {
         t: 0.9588964992577562,
         x: 0.02499999999999991,
         y: -0.09999999999999991,
-        angle: 0,
+        angle: precomputeAngle(0),
         velocity: 0.6164414002968974,
         acceleration: -0.4,
         obstacles: [{
@@ -125,7 +126,7 @@ describe('computeFixedPoints()', () => {
         t: 2.5,
         x: 0.49999999999999944,
         y: -0.09999999999999991,
-        angle: 0,
+        angle: precomputeAngle(0),
         velocity: 0,
         acceleration: -0.4,
         obstacles: [],
@@ -134,10 +135,10 @@ describe('computeFixedPoints()', () => {
   });
 
   it('should handle collisions against multiple items', () => {
-    const {ball, staticBalls } = {
+    const { ball, staticBalls } = {
       ball: {
         radius: 0.025,
-        angle: 0.9000000000000002,
+        angle: precomputeAngle(0.9000000000000002),
         x: 0.5414406645513776,
         y: -0.04777820602483442,
         velocity: 1,

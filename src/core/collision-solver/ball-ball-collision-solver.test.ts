@@ -3,8 +3,9 @@ import {
   computeCollisionsWithBalls,
   computeCollisionWithBall,
 } from './ball-ball-collision-solver';
+import { precomputeAngle } from '../utils';
 
-const centerBall = {x: 0.5, y: 0.5, angle: 0, velocity: 1, acceleration: -0.4, radius: 0.1};
+const centerBall = {x: 0.5, y: 0.5, angle: precomputeAngle(0), velocity: 1, acceleration: -0.4, radius: 0.1};
 const tMax = 2.5;
 
 describe('computeCollisionWithBall', () => {

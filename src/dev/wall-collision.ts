@@ -2,7 +2,7 @@ import { type Tab } from 'bootstrap';
 import * as Constants from "../core/constants";
 import { WallSide } from "../core/collision-solver/ball-wall-collision-solver";
 import { computeCollisionsWithWalls } from "../core/collision-solver/ball-wall-collision-solver";
-import { selectElement } from '../core/utils';
+import { precomputeAngle, selectElement } from '../core/utils';
 import { makeWall, GameWalls } from '../core/ball-engine/walls';
 
 declare function getTab(element: string | Element): Tab;
@@ -85,7 +85,7 @@ for (const [title, config] of cases) {
     const ballState = {
       t: 0,
       ...config.position,
-      angle,
+      angle: precomputeAngle(angle),
       velocity: Constants.DEFAULT_BALL_VELOCITY,
       acceleration: Constants.DEFAULT_BALL_ACCELERATION,
       radius: Constants.DEFAULT_BALL_RADIUS,

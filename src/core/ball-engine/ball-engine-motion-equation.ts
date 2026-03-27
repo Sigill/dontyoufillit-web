@@ -42,8 +42,8 @@ class BouncingBallMotionEquationDelta extends BouncingBall {
     const deltaU = this.#velocity * deltaT + 1/2 * this.#acceleration * deltaT**2;
     this.#velocity += this.#acceleration * deltaT;
 
-    this.x += deltaU * Math.cos(this.angle);
-    this.y += deltaU * Math.sin(this.angle);
+    this.x += deltaU * this.angle.cos;
+    this.y += deltaU * this.angle.sin;
   }
 }
 
@@ -100,8 +100,8 @@ class BouncingBallMotionEquationAbsolute extends BouncingBall {
 
     const deltaU = this.#u - prevU;
 
-    this.x += deltaU * Math.cos(this.angle);
-    this.y += deltaU * Math.sin(this.angle);
+    this.x += deltaU * this.angle.cos;
+    this.y += deltaU * this.angle.sin;
   }
 }
 
