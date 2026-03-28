@@ -7,8 +7,6 @@ import { BallObstacle, WallObstacle } from "./collision-utils";
 
 export type Obstacle = WallObstacle | BallObstacle<StaticBall>;
 
-const CANDIDATE_WALLS_DEFAULT = [GameWalls.top, GameWalls.right, GameWalls.left];
-const CANDIDATE_WALLS_WITH_BOTTOM = [GameWalls.top, GameWalls.right, GameWalls.left, GameWalls.bottom];
 
 export interface FixedPointsOptions {
   epsilon?: number;
@@ -90,14 +88,47 @@ export function computeFixedPoints(
     const computeParams = { epsilon };
 
     // Walls
-    const candidateWalls = y > ballRadius ? CANDIDATE_WALLS_WITH_BOTTOM : CANDIDATE_WALLS_DEFAULT;
-    for (let i = 0; i < candidateWalls.length; i++) {
-      const wall = candidateWalls[i];
-      const t = computeCollisionWithWallSide(ballState, wall, epsilon, minT + epsilon, computeParams);
+    if (angle.cos > 0) {
+      const t = computeCollisionWithWallSide(ballState, GameWalls.right, epsilon, minT + epsilon, computeParams);
       if (t !== undefined) {
         if (t < minT - epsilon) {
           minT = t;
-          winnerWall = wall;
+          winnerWall = GameWalls.right;
+          tie = false;
+        } else if (t <= minT + epsilon) {
+          tie = true;
+        }
+      }
+    } else if (angle.cos < 0) {
+      const t = computeCollisionWithWallSide(ballState, GameWalls.left, epsilon, minT + epsilon, computeParams);
+      if (t !== undefined) {
+        if (t < minT - epsilon) {
+          minT = t;
+          winnerWall = GameWalls.left;
+          tie = false;
+        } else if (t <= minT + epsilon) {
+          tie = true;
+        }
+      }
+    }
+
+    if (angle.sin > 0) {
+      const t = computeCollisionWithWallSide(ballState, GameWalls.top, epsilon, minT + epsilon, computeParams);
+      if (t !== undefined) {
+        if (t < minT - epsilon) {
+          minT = t;
+          winnerWall = GameWalls.top;
+          tie = false;
+        } else if (t <= minT + epsilon) {
+          tie = true;
+        }
+      }
+    } else if (angle.sin < 0 && y > ballRadius) {
+      const t = computeCollisionWithWallSide(ballState, GameWalls.bottom, epsilon, minT + epsilon, computeParams);
+      if (t !== undefined) {
+        if (t < minT - epsilon) {
+          minT = t;
+          winnerWall = GameWalls.bottom;
           tie = false;
         } else if (t <= minT + epsilon) {
           tie = true;

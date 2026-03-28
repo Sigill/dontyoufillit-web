@@ -8,15 +8,30 @@ const ROOTS2 = new Float64Array(2);
 
 export function computeCollisionWithBall(
   ball: MovingBall,
-  otherBall: BallGeometry,
+  staticBall: BallGeometry,
   t0: number, tMax: number,
   { epsilon = 1e-5 }: { epsilon?: number } = {}
 ): number | undefined {
-  const dx = ball.x - otherBall.x;
-  const dy = ball.y - otherBall.y;
+  const dx = ball.x - staticBall.x;
+  const dy = ball.y - staticBall.y;
   const k = dx * ball.angle.cos + dy * ball.angle.sin;
+  const sumRadii = ball.radius + staticBall.radius;
 
-  const count1 = solveQuadraticInPlace(1, 2 * k, (dx * dx + dy * dy) - (ball.radius + otherBall.radius) ** 2, ROOTS1, epsilon);
+  // (-dx, -dy) is the vector from the moving ball to the static ball.
+  // -k is the projection of this vector on the moving ball's trajectory vector.
+  // If -k is negative, the static ball is behind the moving ball, so it cannot be hit.
+  if (-k <= 0) {
+    return undefined;
+  }
+
+  // l is the projection on a vector perpendicular to the trajectory (only the amplitude matters, not the direction).
+  // If |l| is greater than the sum of the radii, the ball are too far apart to hit each other.
+  const l = Math.abs(dx * -ball.angle.sin + dy * ball.angle.cos);
+  if (l > sumRadii) {
+    return undefined;
+  }
+
+  const count1 = solveQuadraticInPlace(1, 2 * k, (dx * dx + dy * dy) - sumRadii ** 2, ROOTS1, epsilon);
 
   let minT = undefined;
   for (let i = 0; i < count1; i++) {

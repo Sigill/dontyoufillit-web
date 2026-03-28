@@ -9,6 +9,11 @@ const centerBall = {x: 0.5, y: 0.5, angle: precomputeAngle(0), velocity: 1, acce
 const tMax = 2.5;
 
 describe('computeCollisionWithBall', () => {
+  it('should return undefined if the static ball is behind the moving ball', () => {
+    const collision = computeCollisionWithBall(centerBall, { x: 0, y: 0, radius: 0.1 }, 0, tMax);
+    assert.notExists(collision);
+  });
+
   it('should return undefined if balls are not on a collision path', () => {
     const collision = computeCollisionWithBall(centerBall, { x: 1, y: 0, radius: 0.1 }, 0, tMax);
     assert.notExists(collision);
