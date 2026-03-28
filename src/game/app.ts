@@ -11,7 +11,8 @@ import { GameHandler } from "../core/game-handler";
 import { addTouchOrClickEvent, asBool, selectElement } from "../core/utils";
 import { HUD } from "../ui/hud";
 import { CssBoard } from "../ui/css-board";
-import { evaluateMove, evaluateMoves, evaluateMovesParallel } from "../core/evaluate-move";
+import { evaluateMoves } from "../core/evaluate-move";
+import { evaluateMovesParallel } from "../core/evaluate-moves-webworker";
 import { normalizeRewards, computeRewardPath } from "../core/reward";
 import { LAZER_BONUS_COST, ORACLE_BONUS_COST } from "../core/constants";
 

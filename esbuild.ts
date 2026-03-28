@@ -29,7 +29,7 @@ program.option('--watch', 'Rebuild upon change', false);
 program.option('--serve', 'Serve using esbuild webserver', false);
 program.option('--live-reload', 'Enable live-reload', false);
 program.action(async ({ watch, serve, liveReload }: { watch: boolean; serve: boolean; liveReload: boolean; }) => {
-  const ctx = await esbuild.context({
+  const browserCtx = await esbuild.context({
     platform: 'browser',
     target: 'esnext',
     format: 'esm',
@@ -45,6 +45,8 @@ program.action(async ({ watch, serve, liveReload }: { watch: boolean; serve: boo
       { in: 'src/dev/debug.ts', out: 'dev/debug' },
       { in: 'src/bot/bot.ts', out: 'bot/bot' },
       { in: 'src/core/evaluate-move.worker.ts', out: 'www/evaluate-move.worker' },
+      // { in: 'src/core/evaluate-move.thread.ts', out: 'www/evaluate-move.thread' },
+      // npx esbuild --platform=node src/core/evaluate-move.thread.ts --outdir=dist/www/ --allow-overwrite --bundle --format=esm
     ],
     loader: {
       '.html': 'text'
@@ -65,19 +67,38 @@ program.action(async ({ watch, serve, liveReload }: { watch: boolean; serve: boo
     }
   });
 
+  const nodeCtx = await esbuild.context({
+    platform: 'node',
+    target: 'esnext',
+    format: 'esm',
+    bundle: true,
+    minify: false,
+    outdir: distdir,
+    entryPoints: [
+      { in: 'src/core/evaluate-move.thread.ts', out: 'evaluate-move.thread' },
+    ],
+    plugins: [
+      logRebuildPlugin
+    ],
+    sourcemap: 'linked',
+  });
+
   if (watch) {
     console.log('Starting watch');
-    await ctx.watch();
+    await browserCtx.watch();
+    await nodeCtx.watch();
   } else {
-    await ctx.rebuild();
+    await browserCtx.rebuild();
+    await nodeCtx.rebuild();
   }
 
   if (serve) {
-    const { hosts, port } = await ctx.serve({ servedir: root });
+    const { hosts, port } = await browserCtx.serve({ servedir: root });
     console.log(`Serving on http://${hosts[0]}:${port}`);
   }
 
   if (!watch && !serve) {
-    await ctx.dispose();
+    await browserCtx.dispose();
+    await nodeCtx.dispose();
   }
 }).parse();

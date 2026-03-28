@@ -2,8 +2,6 @@ import { StaticBall, makeCannonBall } from "./ball";
 import { computeFixedPoints } from "./collision-solver/fixed-points";
 import { CANNON_BASE_HEIGHT, CANNON_LENGTH, CANNON_Y_POSITION, DEFAULT_BALL_ACCELERATION, DEFAULT_BALL_RADIUS, DEFAULT_BALL_VELOCITY } from "./constants";
 import { computeExpandedRadius } from "./static-ball";
-import { splitIntoChunks } from "./utils";
-import pLimit from 'p-limit';
 
 export interface EvaluatedMove {
   reward: number;
@@ -16,52 +14,12 @@ export interface EvaluatedMove {
   };
 }
 
-const OUT_PENALITY      = -1000000; // Heavy penalty for out
-const GAMEOVER_PENALITY = -100000;  // Less heavy penalty for gameover
-
-const NUM_WORKERS = (typeof navigator !== 'undefined' && navigator.hardwareConcurrency) || 4;
-const workerPool: Worker[] = [];
-
-function getWorkerPool() {
-  if (workerPool.length === 0 && typeof Worker !== 'undefined') {
-    for (let i = 0; i < NUM_WORKERS; i++) {
-      // Path relative to play.html in dist/www/
-      workerPool.push(new Worker('evaluate-move.worker.js', { type: 'module', name: `worker-${i}` }));
-    }
-  }
-  return workerPool;
-}
-
-const poolScheduler = pLimit(NUM_WORKERS);
+export const OUT_PENALITY = -1000000; // Heavy penalty for out
+export const GAMEOVER_PENALITY = -100000;  // Less heavy penalty for gameover
 
 /**
-* Evaluates a single range of moves in a worker.
-*/
-async function evaluateRangeInWorker(
-  staticBalls: Array<StaticBall>,
-  angles: number[],
-  params: { steps: number[], criteria: 'score' | 'hits' },
-): Promise<number[]> {
-  return poolScheduler(async () => {
-    const pool = getWorkerPool();
-    const worker = pool.pop()!;
-
-    return new Promise<Array<number>>((resolve) => {
-      const handler = (e: MessageEvent) => {
-        worker.removeEventListener('message', handler);
-        resolve(e.data as Array<number>);
-      };
-      worker.addEventListener('message', handler);
-      worker.postMessage({ staticBalls, angles, params });
-    }).finally(() => {
-      pool.push(worker);
-    });
-  });
-}
-
-/**
-* Evaluates a single move at a given angle.
-*/
+ * Evaluates a single move at a given angle.
+ */
 export function evaluateMove(
   staticBalls: Array<StaticBall>,
   angle: number,
@@ -143,66 +101,10 @@ const DISTANCE_TRAVELLED = 0.5 * DEFAULT_BALL_ACCELERATION * TIME_OF_FLIGHT ** 2
 // DISTANCE_TRAVELLED * sin(angle) + sin(angle) * CANNON_LENGTH = - CANNON_Y_POSITION - CANNON_BASE_HEIGHT - DEFAULT_BALL_RADIUS
 // sin(angle) * (DISTANCE_TRAVELLED + CANNON_LENGTH) = - (CANNON_Y_POSITION + CANNON_BASE_HEIGHT + DEFAULT_BALL_RADIUS)
 // sin(angle) = - (CANNON_Y_POSITION + CANNON_BASE_HEIGHT + DEFAULT_BALL_RADIUS) / (DISTANCE_TRAVELLED + CANNON_LENGTH)
-const MIN_SAFE_ANGLE = Math.asin(
+export const MIN_SAFE_ANGLE = Math.asin(
   -(CANNON_Y_POSITION + CANNON_BASE_HEIGHT + DEFAULT_BALL_RADIUS) /
   (CANNON_LENGTH + DISTANCE_TRAVELLED)
 );
-
-/**
- * Evaluates all possible moves for a given board state using a worker pool.
- */
-export async function evaluateMovesParallel(
-  staticBalls: Array<StaticBall>,
-  {
-    steps = [180],
-    criteria = 'hits',
-  }: {
-    steps?: Array<number>,
-    criteria?: 'score' | 'hits';
-  } = {}
-): Promise<Array<number>> {
-  const isNode = typeof process !== 'undefined' && process.versions && process.versions.node;
-  if (isNode || typeof Worker === 'undefined') {
-    return evaluateMoves(staticBalls, { steps, criteria });
-  }
-
-  const rewards: Array<number> = [];
-  const params = { steps: steps.slice(1), criteria };
-
-  // Scan angles from 0 to PI
-  const numSteps = steps[0];
-  const stepAngle = Math.PI / (numSteps - 1);
-
-  const minSafeStep = Math.ceil(MIN_SAFE_ANGLE / stepAngle);
-  const maxSafeStep = numSteps - 1 - minSafeStep;
-
-  let i = 0;
-  for (; i < minSafeStep; ++i) {
-    rewards.push(OUT_PENALITY);
-  }
-
-  const safeRangeSize = maxSafeStep - minSafeStep + 1;
-  // const numWorkersToUse = Math.min(NUM_WORKERS, safeRangeSize);
-  // const chunkSize = Math.ceil(safeRangeSize / numWorkersToUse);
-
-  const angles = new Array<number>(safeRangeSize);
-  for (let j = 0; j < safeRangeSize; j++) {
-    angles[j] = (minSafeStep + j) * stepAngle;
-  }
-
-  const results = await Promise.all(splitIntoChunks(angles, 10).map((chunk) => {
-    return evaluateRangeInWorker(staticBalls, chunk, params);
-  })).then((results) => results.flat());
-
-  rewards.push(...results);
-
-  i = rewards.length;
-  for (; i < numSteps; ++i) {
-    rewards.push(OUT_PENALITY);
-  }
-
-  return rewards;
-}
 
 /**
  * Evaluates all possible moves for a given board state.
