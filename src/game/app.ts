@@ -11,7 +11,7 @@ import { GameHandler } from "../core/game-handler";
 import { addTouchOrClickEvent, asBool, selectElement } from "../core/utils";
 import { HUD } from "../ui/hud";
 import { CssBoard } from "../ui/css-board";
-import { evaluateMoves } from "../core/evaluate-move";
+import { evaluateMove, evaluateMoves, evaluateMovesParallel } from "../core/evaluate-move";
 import { normalizeRewards, computeRewardPath } from "../core/reward";
 import { LAZER_BONUS_COST, ORACLE_BONUS_COST } from "../core/constants";
 
@@ -276,25 +276,26 @@ lazerBonusButton.addEventListener('click', function (evt) {
 });
 
 oracleBonusButton.addEventListener('click', function (evt) {
-  evt.preventDefault();
-  if (game.score >= 0) {
-    game.applyOracleBonus();
+  void (async () => {
+    evt.preventDefault();
+    if (game.score >= 0) {
+      game.applyOracleBonus();
 
-    console.time('evaluateMoves');
-    const stats = { value: 0 };
-    const moves = evaluateMoves(game.staticBalls, { steps: [181, 191, 90], criteria: 'hits', stats });
-    console.timeEnd('evaluateMoves');
-    console.log(`evaluateMoves ${stats.value} calls`);
-    const targets = normalizeRewards(moves);
-    const d = computeRewardPath(targets);
-    selectElement('#RewardPath').setAttribute('d', d);
+      console.time('evaluateMoves');
+      const moves = await evaluateMovesParallel(game.staticBalls, { steps: [181, 121, 61], criteria: 'hits' });
+      console.timeEnd('evaluateMoves');
 
-    updateLazerButtonState();
-    updateOracleButtonState();
+      const targets = normalizeRewards(moves);
+      const d = computeRewardPath(targets);
+      selectElement('#RewardPath').setAttribute('d', d);
 
-    game.resume();
-    popScreen();
-  }
+      updateLazerButtonState();
+      updateOracleButtonState();
+
+      game.resume();
+      popScreen();
+    }
+  })();
 });
 
 selectElement('#pause-screen #menu-button').addEventListener('click', function (evt) {

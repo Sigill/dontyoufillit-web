@@ -171,3 +171,11 @@ export function updateAngle(angle: Angle, value: number) {
   angle.cos = Math.cos(value);
   angle.sin = Math.sin(value);
 }
+
+export function splitIntoChunks<T>(array: Array<T>, size = 10) {
+  const chunks: Array<Array<T>> = [];
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size));
+  }
+  return chunks;
+}

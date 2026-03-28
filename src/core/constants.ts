@@ -7,4 +7,4 @@ export const CANNON_LENGTH = 1 / 15.0;
 export const CANON_ANGULAR_SPEED = Math.PI / 3;
 
 export const LAZER_BONUS_COST = 5;
-export const ORACLE_BONUS_COST = 3;
+export const ORACLE_BONUS_COST = 0;

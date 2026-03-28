@@ -39,6 +39,7 @@
     "commander": "^14.0.0",
     "esbuild": "^0.27.2",
     "eslint": "^9.30.0",
+    "p-limit": "^7.3.0",
     "sinon": "^21.0.1",
     "stats.js": "^0.17.0",
     "typescript-eslint": "^8.35.0"

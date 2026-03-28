@@ -77,7 +77,7 @@ export function computeRewardPath(targets: Float32Array | number[]): string {
   const centerX = 0.5;
   const centerY = 1 - (CANNON_Y_POSITION + CANNON_BASE_HEIGHT);
   const baseRadius = 0.05;
-  const maxRadius = 0.25;
+  const maxRadius = 0.2;
 
   const numActions = targets.length;
   let path = "";
